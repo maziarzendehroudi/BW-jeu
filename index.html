@@ -158,8 +158,15 @@
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
             border: none; color: white; padding: 8px 20px; font-size: 14px;
         }
-        .level-up-anim { animation: levelUpPop 0.8s ease-out; }
-        @keyframes levelUpPop { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.5); } }
+        /* Animation spectaculaire Level UP */
+        .level-up-anim { animation: levelUpSpectacular 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes levelUpSpectacular { 
+            0% { transform: scale(1); filter: brightness(1); } 
+            20% { transform: scale(2) rotate(10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
+            40% { transform: scale(1.8) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
+            60% { transform: scale(2) rotate(5deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
+            100% { transform: scale(1); filter: brightness(1); } 
+        }
 
         /* --- BARRES VERTICALES --- */
         .vertical-bar-container {
@@ -173,53 +180,43 @@
         #battery-left { left: 12px; } #biodiversity-right { right: 12px; }
         .modern-track { width: 14px; height: 170px; background: rgba(255, 255, 255, 0.1); border-radius: 7px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
         .modern-fill { width: 100%; border-radius: 7px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        
         .power-fill { background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-        .power-drain { background: linear-gradient(to top, #dc2626, #ef4444) !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.8) !important; }
         .bio-fill { background: linear-gradient(to top, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+
+        /* Effet clignotement batterie faible (< 20%) */
+        .battery-blink { animation: batteryCritical 0.6s infinite alternate; }
+        @keyframes batteryCritical {
+            0% { filter: brightness(1); background: #ef4444; box-shadow: 0 0 5px #ef4444; }
+            100% { filter: brightness(1.8); background: #dc2626; box-shadow: 0 0 20px #ef4444; }
+        }
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
         
         #turbine-1 { left: 28%; bottom: 95px; } 
-        /* Pylône légèrement élargi pour mieux voir le dégradé cylindrique */
         #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         
         #turbine-2 { left: 68%; bottom: 115px; } 
         #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         
         .tower { 
-            /* Dégradé revu pour un véritable effet 3D cylindrique */
             background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); 
             border-radius: 2px;
             position: relative;
         }
-        /* Base de fondation en béton */
         .tower::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: -25%;
-            width: 150%; height: 6px;
-            background: #1e293b;
-            border-radius: 3px 3px 0 0;
+            content: ''; position: absolute; bottom: 0; left: -25%;
+            width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0;
         }
 
         .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
-        
-        /* Balisage lumineux d'obstacle aérien (Flash rouge) */
         .nacelle::after {
-            content: '';
-            position: absolute;
-            top: -3px; right: 6px;
-            width: 4px; height: 4px;
-            background: #ef4444;
-            border-radius: 50%;
-            box-shadow: 0 0 6px #ef4444;
+            content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px;
+            background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444;
             animation: blinkAviation 2s infinite;
         }
-        @keyframes blinkAviation {
-            0%, 15% { opacity: 1; }
-            20%, 100% { opacity: 0; }
-        }
+        @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
 
         #turbine-1 .nacelle { width: 22px; height: 12px; } 
         #turbine-2 .nacelle { width: 26px; height: 14px; }
@@ -244,15 +241,29 @@
         }
         .turbine-station, .ultrasound-station { display: flex; flex-direction: column; align-items: center; width: 30%; max-width: 180px; }
         .station-title { font-size: 9px; color: #64748b; margin-bottom: 4px; font-weight: bold; }
-        .btn-control, .btn-ultrasound-global {
+        
+        .btn-control {
             width: 100%; border: none; padding: 12px 4px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1;
         }
-        .btn-control { background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1; }
         .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; }
         .btn-curtail.active { background: #ea580c; color: white; box-shadow: 0 4px 0 #c2410c; }
         .btn-curtail.active:active { box-shadow: 0 0 0 #c2410c; }
-        .btn-ultrasound-global { background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; }
-        .btn-ultrasound-global:active { transform: translateY(4px); box-shadow: 0 0 0 #0369a1; }
+        
+        /* Bouton Ultrasons avec jauge */
+        .btn-ultrasound-global {
+            width: 100%; border: none; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s;
+            background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; position: relative; overflow: hidden;
+            padding: 12px 4px;
+        }
+        .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0369a1; }
+        .btn-ultrasound-global:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: 0 4px 0 #64748b; }
+        
+        #us-progress {
+            position: absolute; top: 0; left: 0; height: 100%; width: 100%;
+            background: rgba(0, 0, 0, 0.4); transition: width 0.2s linear;
+        }
+        .btn-content { position: relative; z-index: 2; pointer-events: none; }
 
         /* --- ANIMAUX & FEEDBACKS --- */
         .creature { position: absolute; z-index: 30; font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); will-change: transform; }
@@ -269,7 +280,7 @@
         .feedback-bad { color: #ef4444; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
-        /* --- MODALES & MENUS (Glassmorphism) --- */
+        /* --- MODALES & MENUS --- */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
@@ -293,15 +304,12 @@
 <body>
 
     <div id="game-container" ontouchstart="handleContainerTouch(event)" onclick="handleContainerClick(event)">
-        <!-- Décor de fond -->
         <div id="stars-container"></div>
         <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
         <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.6;"></div>
 
-        <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
         
-        <!-- Nouvelle Lune épurée sans cratères -->
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
                 <circle cx="26" cy="26" r="26" fill="#0f172a" opacity="0.4" />
@@ -309,16 +317,12 @@
             </svg>
         </div>
 
-        <!-- Montagnes Rétro-Modernes -->
         <div class="mountain-back"></div>
         <div class="mountain-mid"></div>
         <div class="hill-mid"></div>
         <div class="hill-foreground"></div>
-        
-        <!-- Brume lumineuse d'ambiance -->
         <div class="mist-layer"></div>
 
-        <!-- HUD Amélioré -->
         <div class="top-hud">
             <div class="hud-item level-badge" id="level-badge">Niv. <span id="level-num">1</span></div>
             <div class="hud-item">⏱️ <span id="time-text">60</span>s</div>
@@ -338,7 +342,6 @@
             <span class="bar-value-v" id="bio-val">100%</span>
         </div>
 
-        <!-- Éoliennes avec socle et balisage -->
         <div class="wind-turbine" id="turbine-1">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
@@ -353,7 +356,6 @@
             </div></div></div>
         </div>
 
-        <!-- Pupitre -->
         <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
             <div class="turbine-station">
                 <span class="station-title">ÉOLIENNE 1 (Touche 1)</span>
@@ -361,7 +363,11 @@
             </div>
             <div class="ultrasound-station">
                 <span class="station-title">RÉPULSIF (Espace)</span>
-                <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">🔊 ULTRASONS</button>
+                <!-- Bouton modifié avec jauge de rechargement intégrée -->
+                <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
+                    <div id="us-progress" style="width: 0%;"></div>
+                    <span class="btn-content">🔊 ULTRASONS</span>
+                </button>
             </div>
             <div class="turbine-station">
                 <span class="station-title">ÉOLIENNE 2 (Touche 2)</span>
@@ -370,7 +376,7 @@
         </div>
     </div>
 
-    <!-- Écran d'accueil (Menu Principal) -->
+    <!-- Modales -->
     <div id="start-screen" class="screen">
         <div class="menu-box">
             <h1>🦇 Bat&Watt</h1>
@@ -384,7 +390,6 @@
         </div>
     </div>
 
-    <!-- Écran de pause -->
     <div id="pause-screen" class="screen hidden">
         <div class="menu-box">
             <h1>PAUSE</h1>
@@ -393,7 +398,6 @@
         </div>
     </div>
 
-    <!-- Écran de fin -->
     <div id="gameover-screen" class="screen hidden">
         <div class="menu-box">
             <h1 style="color: #ef4444;">⚠️ ARRÊT D'URGENCE</h1>
@@ -404,16 +408,19 @@
     </div>
 
     <script>
-        // Variables globales
         let production = 0, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
         let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
+        
         let curtailed = { 1: false, 2: false };
+        let tSpeed = { 1: 4, 2: 4.5 }; // Vitesse instantanée (inertie)
+        let targetSpeed = { 1: 4, 2: 4.5 }; // Vitesse cible demandée
+        
         let isNight = false;
         let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
+        let ultrasoundCharge = 100; // Charge max (en kWh générés)
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
-        // Gestion LocalStorage
         let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
         document.getElementById('menu-high-level').innerText = highScores.maxLevel;
         document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
@@ -426,7 +433,6 @@
             document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
         }
 
-        // Contrôles Clavier
         window.addEventListener('keydown', (e) => {
             if (!isPlaying || isPaused) return;
             if (e.key === '1') toggleCurtail(1);
@@ -453,12 +459,21 @@
             document.getElementById('gameover-screen').classList.add('hidden');
             document.querySelectorAll('.creature').forEach(c => c.remove());
             
-            production = 0; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
+            production = 20; // On commence avec un peu de batterie pour éviter la perte immédiate
+            biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
             savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
+            ultrasoundCharge = 100; 
+            document.getElementById('us-progress').style.width = '100%';
+            document.getElementById('btn-ultrasound').disabled = false;
+
             curtailed = { 1: false, 2: false };
+            tSpeed = { 1: 4, 2: 4.5 };
+            targetSpeed = { 1: 4, 2: 4.5 };
+
             document.getElementById('btn-c1').classList.remove('active'); document.getElementById('btn-c2').classList.remove('active');
             document.getElementById('btn-c1').innerText = "BRIDER"; document.getElementById('btn-c2').innerText = "BRIDER";
             document.getElementById('turbine-1').classList.remove('curtailed'); document.getElementById('turbine-2').classList.remove('curtailed');
+            document.getElementById('battery-fill').classList.remove('battery-blink');
 
             isPlaying = true; isPaused = false;
             updateUI();
@@ -474,30 +489,60 @@
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
+        function updateBiodiversity() {
+            let totalAnimals = savedFauna + injuredFauna;
+            if (totalAnimals > 0) {
+                biodiversityPercent = (savedFauna / totalAnimals) * 100;
+            } else {
+                biodiversityPercent = 100;
+            }
+        }
+
         function gameLoop() {
             if (!isPlaying || isPaused) return;
 
             let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
+            // La ville consomme de l'énergie en continu (-1.2), les éoliennes en rajoutent
             let addedPower = (activeTurbines === 2) ? 3.5 : (activeTurbines === 1.5) ? 1.8 : (activeTurbines === 1) ? 1.0 : -1.2;
 
             if (addedPower > 0) {
                 production += addedPower;
-                totalEnergyProduced += addedPower * 1.5;
+                let addedKwh = addedPower * 1.5;
+                totalEnergyProduced += addedKwh;
+                
+                // Rechargement progressif des ultrasons (100 kWh max)
+                if (ultrasoundCharge < 100) {
+                    ultrasoundCharge += addedKwh;
+                    if (ultrasoundCharge >= 100) {
+                        ultrasoundCharge = 100;
+                        document.getElementById('btn-ultrasound').disabled = false;
+                    }
+                    document.getElementById('us-progress').style.width = ultrasoundCharge + '%';
+                }
             } else {
+                // Perte sèche
                 production += addedPower;
             }
 
             production = Math.max(0, Math.min(100, production));
-            levelTime -= 0.4;
+            
+            // Gestion visuelle de la jauge (Clignotement à 20%)
+            if (production <= 20) {
+                document.getElementById('battery-fill').classList.add('battery-blink');
+            } else {
+                document.getElementById('battery-fill').classList.remove('battery-blink');
+            }
 
+            levelTime -= 0.4;
             if (levelTime <= 0) {
                 currentLevel++; levelTime = 60;
                 let badge = document.getElementById('level-badge');
                 badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
             }
 
-            if (gameTime > 5 && production <= 0) endGame("Batterie vide. Gérez mieux vos bridages.");
-            if (biodiversityPercent < 90) endGame("Biodiversité sous le seuil critique (90%).");
+            // Conditions de défaite
+            if (production <= 0) endGame("Batterie vide ! La ville subit un Blackout total.");
+            if (biodiversityPercent < 90) endGame("Impact écologique : la biodiversité préservée est passée sous les 90%.");
 
             updateUI();
         }
@@ -507,10 +552,26 @@
             if (!isPaused) {
                 let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
                 gameTime += dt;
-                rot1 += (curtailed[1] ? 0.8 : 4) * (dt * 60);
-                rot2 += (curtailed[2] ? 0.9 : 4.5) * (dt * 60);
+                
+                // LOGIQUE D'INERTIE MÉCANIQUE (1.5 secondes de temps de réaction pour le freinage/accélération)
+                // Écart max (4.5 - 0.8) divisé par 1.5 sec = ~2.46 points de vitesse modifiés par seconde
+                let accelRate = 2.46 * dt; 
+                
+                for (let i of [1, 2]) {
+                    if (tSpeed[i] < targetSpeed[i]) {
+                        tSpeed[i] = Math.min(targetSpeed[i], tSpeed[i] + accelRate);
+                    } else if (tSpeed[i] > targetSpeed[i]) {
+                        tSpeed[i] = Math.max(targetSpeed[i], tSpeed[i] - accelRate);
+                    }
+                }
+
+                // Application de la vitesse calculée par l'inertie
+                rot1 += tSpeed[1] * (dt * 60);
+                rot2 += tSpeed[2] * (dt * 60);
+                
                 document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`;
                 document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
+                
                 updateEphemerisPoetic();
             }
             lastTimestamp = timestamp;
@@ -568,6 +629,10 @@
         function toggleCurtail(id) {
             if (!isPlaying || isPaused) return;
             curtailed[id] = !curtailed[id];
+            
+            // Modification de la vitesse CIBLE, l'inertie fera le reste
+            targetSpeed[id] = curtailed[id] ? 0.8 : (id === 1 ? 4 : 4.5);
+            
             const btn = document.getElementById(`btn-c${id}`);
             const turbine = document.getElementById(`turbine-${id}`);
             btn.classList.toggle('active', curtailed[id]);
@@ -585,8 +650,14 @@
         }
 
         function triggerGlobalUltrasound() {
-            if (!isPlaying || isPaused || production < 30) return;
-            production -= 30;
+            if (!isPlaying || isPaused || production < 30 || ultrasoundCharge < 100) return;
+            
+            production -= 30; // Consomme la batterie
+            ultrasoundCharge = 0; // Vide la jauge de l'ultrason
+            
+            document.getElementById('us-progress').style.width = '0%';
+            document.getElementById('btn-ultrasound').disabled = true;
+
             let fillEl = document.getElementById('battery-fill');
             fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
 
@@ -599,11 +670,11 @@
             document.querySelectorAll('.creature').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
-                biodiversityPercent = Math.min(100, biodiversityPercent + 1); savedFauna++;
+                savedFauna++;
+                updateBiodiversity();
                 
                 let rect = creature.getBoundingClientRect();
-                showFeedback("💚 +1%", rect.left, rect.top, true);
-                
+                showFeedback("💚", rect.left, rect.top, true);
                 setTimeout(() => creature.remove(), 600);
             });
             updateUI();
@@ -653,20 +724,23 @@
 
                 if (hit1 || hit2) {
                     if ((hit1 && curtailed[1]) || (hit2 && curtailed[2])) {
-                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5); savedFauna++;
-                        showFeedback("💚 +0.5%", posX, posY, true);
+                        savedFauna++;
+                        updateBiodiversity();
+                        showFeedback("💚", posX, posY, true);
                         creature.remove(); clearInterval(fallInterval);
                     } else {
-                        biodiversityPercent = Math.max(0, biodiversityPercent - 6); injuredFauna++;
-                        showFeedback("💔 -6%", posX, posY, false);
+                        injuredFauna++;
+                        updateBiodiversity();
+                        showFeedback("💔", posX, posY, false);
                         updateUI();
                         creature.classList.add('crashing');
                         setTimeout(() => creature.remove(), 800);
                         clearInterval(fallInterval);
-                        if (biodiversityPercent < 90) endGame("Biodiversité détruite par des impacts répétés.");
+                        if (biodiversityPercent < 90) endGame("La biodiversité préservée est tombée sous les 90%.");
                     }
                 } else if (posY > window.innerHeight - 100) {
-                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5); savedFauna++;
+                    savedFauna++;
+                    updateBiodiversity();
                     creature.remove(); clearInterval(fallInterval);
                 }
             }, 30);
@@ -725,12 +799,11 @@
             document.getElementById('final-stats').innerHTML = 
                 `Niveau atteint : <b>${currentLevel}</b><br>` +
                 `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
-                `Énergie totale : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` +
+                `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` +
                 `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
         }
         
-        // --- Enregistrement du Service Worker pour l'installation PWA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then((reg) => {
