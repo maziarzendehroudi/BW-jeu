@@ -691,6 +691,15 @@
             return `M 26 2 A 24 24 0 0 1 26 50 A ${rx} 24 0 0 ${sweep2} 26 2`;
         }
 
+        function interpolateColor(c1, c2, factor) {
+            factor = Math.max(0, Math.min(1, factor));
+            return [
+                Math.round(c1[0] + factor * (c2[0] - c1[0])),
+                Math.round(c1[1] + factor * (c2[1] - c1[1])),
+                Math.round(c1[2] + factor * (c2[2] - c1[2]))
+            ];
+        }
+
         function updateEphemerisPoetic() {
             let cycleProgress = (gameTime % 60) / 60;
             let angle = cycleProgress * Math.PI * 2;
@@ -704,35 +713,27 @@
             let moonFactor = Math.sin(angle + Math.PI);
             isNight = sunFactor < 0; 
 
-            // Répartition des paliers : longs plateaux de jour et de nuit, transitions plus courtes
-            const frames = [
-                { pos: 0.00, top: [255, 130, 110], bot: [255, 180, 140] }, // Aube
-                { pos: 0.08, top: [56, 189, 248],  bot: [186, 230, 253] }, // Plein jour (début)
-                { pos: 0.42, top: [56, 189, 248],  bot: [186, 230, 253] }, // Plein jour (fin)
-                { pos: 0.50, top: [249, 115, 22],  bot: [254, 215, 170] }, // Crépuscule
-                { pos: 0.58, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit (début)
-                { pos: 0.92, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit (fin)
-                { pos: 1.00, top: [255, 130, 110], bot: [255, 180, 140] }  // Retour aube
-            ];
-
-            let i = 0;
-            while (i < frames.length - 1 && cycleProgress > frames[i+1].pos) {
-                i++;
+            // Dégradé du ciel synchronisé exactement sur le rythme naturel de la course des astres (plateaux longs et transitions rapides)
+            let topColor, botColor;
+            if (sunFactor >= 0.15) {
+                topColor = [56, 189, 248];
+                botColor = [186, 230, 253];
+            } else if (sunFactor <= -0.15) {
+                topColor = [2, 6, 23];
+                botColor = [15, 23, 42];
+            } else {
+                let t = (sunFactor + 0.15) / 0.3;
+                t = t * t * (3 - 2 * t);
+                if (sunFactor >= 0) {
+                    topColor = interpolateColor([255, 130, 110], [56, 189, 248], t);
+                    botColor = interpolateColor([255, 180, 140], [186, 230, 253], t);
+                } else {
+                    topColor = interpolateColor([2, 6, 23], [255, 130, 110], t);
+                    botColor = interpolateColor([15, 23, 42], [255, 180, 140], t);
+                }
             }
-            let f1 = frames[i];
-            let f2 = frames[i+1];
-            let localP = (cycleProgress - f1.pos) / (f2.pos - f1.pos);
-            localP = localP * localP * (3 - 2 * localP); 
 
-            let topR = Math.round(f1.top[0] + localP * (f2.top[0] - f1.top[0]));
-            let topG = Math.round(f1.top[1] + localP * (f2.top[1] - f1.top[1]));
-            let topB = Math.round(f1.top[2] + localP * (f2.top[2] - f1.top[2]));
-
-            let botR = Math.round(f1.bot[0] + localP * (f2.bot[0] - f1.bot[0]));
-            let botG = Math.round(f1.bot[1] + localP * (f2.bot[1] - f1.bot[1]));
-            let botB = Math.round(f1.bot[2] + localP * (f2.bot[2] - f1.bot[2]));
-
-            container.style.background = `linear-gradient(to bottom, rgb(${topR}, ${topG}, ${topB}), rgb(${botR}, ${botG}, ${botB}))`;
+            container.style.background = `linear-gradient(to bottom, rgb(${topColor[0]}, ${topColor[1]}, ${topColor[2]}), rgb(${botColor[0]}, ${botColor[1]}, ${botColor[2]}))`;
 
             let sunX = 50 + Math.cos(angle) * 46;
             let sunY = 55 - Math.sin(angle) * 55;
