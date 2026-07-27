@@ -62,6 +62,7 @@
             border-radius: 50%;
             z-index: 1;
             box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+            transition: background 0.5s ease, box-shadow 0.5s ease;
         }
 
         /* --- DÉCOR COLLINES --- */
@@ -647,7 +648,8 @@
         }
 
         function updateEphemerisPoetic() {
-            let cycleProgress = (gameTime % 30) / 30;
+            // Cycle de 60 secondes : 30 secondes de jour (0 à 30s) et 30 secondes de nuit (30 à 60s)
+            let cycleProgress = (gameTime % 60) / 60;
             let angle = cycleProgress * Math.PI * 2;
             
             let container = document.getElementById('game-container');
@@ -657,11 +659,13 @@
             isNight = sunFactor < 0; 
 
             const frames = [
-                { pos: 0.00, top: [255, 117, 140], bot: [255, 126, 179] }, 
-                { pos: 0.25, top: [56, 189, 248],  bot: [186, 230, 253] }, 
-                { pos: 0.50, top: [249, 115, 22],  bot: [254, 215, 170] }, 
-                { pos: 0.75, top: [2, 6, 23],      bot: [30, 27, 75] },     
-                { pos: 1.00, top: [255, 117, 140], bot: [255, 126, 179] }  
+                { pos: 0.00, top: [255, 130, 110], bot: [255, 180, 140] }, // Aube
+                { pos: 0.15, top: [56, 189, 248],  bot: [186, 230, 253] }, // Jour
+                { pos: 0.35, top: [249, 115, 22],  bot: [254, 215, 170] }, // Crépuscule
+                { pos: 0.50, top: [15, 23, 42],    bot: [30, 41, 59] },     // Début de nuit
+                { pos: 0.75, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit
+                { pos: 0.90, top: [40, 20, 60],    bot: [100, 60, 100] },   // Pré-aube
+                { pos: 1.00, top: [255, 130, 110], bot: [255, 180, 140] }  // Aube
             ];
 
             let i = 0;
@@ -683,16 +687,16 @@
 
             container.style.background = `linear-gradient(to bottom, rgb(${topR}, ${topG}, ${topB}), rgb(${botR}, ${botG}, ${botB}))`;
 
-            let posX = 15 + ((Math.cos(angle) + 1) / 2) * 70; 
-            let posY = 15 + (1 - sunFactor) * 35; 
+            let posX = 10 + ((Math.cos(angle) + 1) / 2) * 80; 
+            let posY = 10 + (1 - sunFactor) * 40; 
             celestial.style.transform = `translate(${posX}vw, ${posY}vh)`;
 
-            if (sunFactor > -0.1) {
+            if (sunFactor >= 0) {
                 celestial.style.background = "#fde047";
-                celestial.style.boxShadow = "0 0 45px #facc15";
+                celestial.style.boxShadow = "0 0 50px #facc15";
             } else {
-                celestial.style.background = "#fef08a"; 
-                celestial.style.boxShadow = "0 0 30px rgba(254, 240, 138, 0.4)";
+                celestial.style.background = "#f1f5f9"; 
+                celestial.style.boxShadow = "0 0 35px rgba(241, 245, 249, 0.7)";
             }
         }
 
