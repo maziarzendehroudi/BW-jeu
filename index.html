@@ -71,36 +71,36 @@
 
         .moon {
             background: transparent;
-            box-shadow: 0 0 35px rgba(226, 232, 240, 0.5);
+            box-shadow: 0 0 35px rgba(226, 232, 240, 0.3);
             overflow: visible;
         }
 
-        /* --- DÉCOR COLLINES --- */
+        /* --- DÉCOR COLLINES & MONTAGNES ARRONDIES --- */
         .mountain-bg-left {
             position: absolute;
-            bottom: 220px;
+            bottom: 150px;
             left: -10%;
             width: 60%;
             height: 220px;
             background: #dce7d1;
-            clip-path: polygon(0% 100%, 20% 40%, 60% 70%, 100% 30%, 100% 100%);
+            border-radius: 50% 50% 0 0 / 60% 60% 0 0;
             z-index: 2;
         }
 
         .mountain-bg-right {
             position: absolute;
-            bottom: 210px;
+            bottom: 140px;
             right: -10%;
             width: 65%;
             height: 250px;
             background: #cfdec1;
-            clip-path: polygon(0% 100%, 30% 50%, 70% 20%, 100% 60%, 100% 100%);
+            border-radius: 50% 50% 0 0 / 60% 60% 0 0;
             z-index: 2;
         }
 
         .hill-mid {
             position: absolute;
-            bottom: 175px;
+            bottom: 110px;
             left: 0;
             width: 100%;
             height: 160px;
@@ -111,7 +111,7 @@
 
         .hill-foreground {
             position: absolute;
-            bottom: 150px;
+            bottom: 80px;
             left: -10%;
             width: 120%;
             height: 120px;
@@ -169,7 +169,6 @@
             transition: transform 0.3s;
         }
 
-        /* Animation au changement de niveau */
         .level-up-anim {
             animation: levelUpPop 0.8s ease-out;
         }
@@ -180,19 +179,6 @@
             100% { transform: scale(1); filter: brightness(1); }
         }
 
-        .btn-pause {
-            background: #475569;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 11px;
-            transition: all 0.1s;
-        }
-        .btn-pause:active { transform: scale(0.95); }
-
         /* --- BARRES VERTICALES MODERNES --- */
         .vertical-bar-container {
             position: absolute;
@@ -202,6 +188,7 @@
             height: 260px;
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 18px;
             z-index: 35;
@@ -282,15 +269,11 @@
             pointer-events: auto;
         }
 
-        #turbine-1 { left: 28%; bottom: 165px; }
+        #turbine-1 { left: 28%; bottom: 95px; }
         #turbine-1 .tower { height: 135px; width: 10px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        #turbine-1 .blades-container { width: 85px; height: 85px; }
-        #turbine-1 .blade { height: 70px; width: 8px; top: 35px; left: 38px; }
 
-        #turbine-2 { left: 68%; bottom: 185px; }
+        #turbine-2 { left: 68%; bottom: 115px; }
         #turbine-2 .tower { height: 165px; width: 12px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        #turbine-2 .blades-container { width: 105px; height: 105px; }
-        #turbine-2 .blade { height: 85px; width: 9px; top: 43px; left: 48px; }
 
         .tower {
             background: linear-gradient(to right, #94a3b8, #f8fafc, #64748b);
@@ -323,18 +306,16 @@
             z-index: 13;
         }
 
+        /* Correction de l'axe de rotation rigoureusement centré sur le moyeu */
         .blades-container {
             position: absolute;
-            top: -42px;
+            top: 0px;
             left: 50%;
-            transform: translateX(-50%);
-            transform-origin: center;
+            width: 0;
+            height: 0;
+            transform-origin: 0 0;
             z-index: 12;
             will-change: transform;
-        }
-
-        #turbine-2 .blades-container {
-            top: -50px;
         }
 
         .curtailed .nacelle {
@@ -349,9 +330,16 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
             clip-path: polygon(30% 0%, 70% 0%, 90% 100%, 10% 100%);
         }
-        .blade:nth-child(1) { transform: rotate(0deg); }
-        .blade:nth-child(2) { transform: rotate(120deg); }
-        .blade:nth-child(3) { transform: rotate(240deg); }
+        
+        #turbine-1 .blade { height: 70px; width: 8px; top: 0px; left: -4px; }
+        #turbine-1 .blade:nth-child(1) { transform: rotate(0deg); }
+        #turbine-1 .blade:nth-child(2) { transform: rotate(120deg); }
+        #turbine-1 .blade:nth-child(3) { transform: rotate(240deg); }
+
+        #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
+        #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); }
+        #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); }
+        #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
         /* --- PUPITRE DE CONTRÔLE --- */
         .control-deck {
@@ -522,18 +510,18 @@
 </head>
 <body>
 
-    <div id="game-container">
+    <div id="game-container" ontouchstart="handleContainerTouch(event)" onclick="handleContainerClick(event)">
         <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
                 <circle cx="26" cy="26" r="24" fill="#f1f5f9" />
                 <!-- Cratères lunaires -->
-                <circle cx="18" cy="18" r="4" fill="#cbd5e1" opacity="0.5"/>
-                <circle cx="35" cy="30" r="5" fill="#cbd5e1" opacity="0.5"/>
-                <circle cx="22" cy="38" r="3" fill="#cbd5e1" opacity="0.5"/>
-                <!-- Ombre / Phases lunaires dynamiques -->
-                <path id="moon-shadow-path" d="M26,2 A24,24 0 0,1 26,50 A24,24 0 0,1 26,2 Z" fill="#0f172a" opacity="0.88" />
+                <circle cx="18" cy="18" r="4" fill="#cbd5e1" opacity="0.4"/>
+                <circle cx="35" cy="30" r="5" fill="#cbd5e1" opacity="0.4"/>
+                <circle cx="22" cy="38" r="3" fill="#cbd5e1" opacity="0.4"/>
+                <!-- Ombre / Phases lunaires dynamiques (sans cache noir net) -->
+                <path id="moon-shadow-path" d="M26,2 A24,24 0 0,1 26,50 A24,24 0 0,1 26,2 Z" fill="#0f172a" opacity="0.92" style="mix-blend-mode: multiply;" />
             </svg>
         </div>
 
@@ -559,7 +547,6 @@
             <div class="hud-item" title="Biodiversité globale">
                 🌿 <span id="hud-bio-val">100%</span>
             </div>
-            <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
         </div>
 
         <!-- BARRE VERTICALE PUISSANCE (MODERNISÉE) -->
@@ -581,65 +568,69 @@
         </div>
 
         <!-- Éoliennes -->
-        <div class="wind-turbine" id="turbine-1" ontouchstart="toggleCurtail(1); event.preventDefault();" onclick="toggleCurtail(1)">
-            <div class="nacelle"><div class="hub"></div></div>
+        <div class="wind-turbine" id="turbine-1" ontouchstart="toggleCurtail(1); event.stopPropagation();" onclick="toggleCurtail(1); event.stopPropagation();">
             <div class="tower"></div>
-            <div class="blades-container" id="blades-1">
-                <div class="blade"></div>
-                <div class="blade"></div>
-                <div class="blade"></div>
+            <div class="nacelle">
+                <div class="hub"></div>
+                <div class="blades-container" id="blades-1">
+                    <div class="blade"></div>
+                    <div class="blade"></div>
+                    <div class="blade"></div>
+                </div>
             </div>
         </div>
 
-        <div class="wind-turbine" id="turbine-2" ontouchstart="toggleCurtail(2); event.preventDefault();" onclick="toggleCurtail(2)">
-            <div class="nacelle"><div class="hub"></div></div>
+        <div class="wind-turbine" id="turbine-2" ontouchstart="toggleCurtail(2); event.stopPropagation();" onclick="toggleCurtail(2); event.stopPropagation();">
             <div class="tower"></div>
-            <div class="blades-container" id="blades-2">
-                <div class="blade"></div>
-                <div class="blade"></div>
-                <div class="blade"></div>
+            <div class="nacelle">
+                <div class="hub"></div>
+                <div class="blades-container" id="blades-2">
+                    <div class="blade"></div>
+                    <div class="blade"></div>
+                    <div class="blade"></div>
+                </div>
             </div>
         </div>
 
         <!-- Pupitre de contrôle -->
-        <div class="control-deck">
+        <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
             <div class="turbine-station">
                 <span class="station-title">ÉOLIENNE E-01</span>
-                <button class="btn-control btn-curtail" id="btn-c1" ontouchstart="toggleCurtail(1); event.preventDefault();" onclick="toggleCurtail(1)">BRIDER</button>
+                <button class="btn-control btn-curtail" id="btn-c1" ontouchstart="toggleCurtail(1); event.stopPropagation();" onclick="toggleCurtail(1); event.stopPropagation();">BRIDER</button>
             </div>
 
             <div class="ultrasound-station">
                 <span class="station-title">RÉPULSIF GLOBAL</span>
-                <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.preventDefault();" onclick="triggerGlobalUltrasound()">
+                <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.stopPropagation();" onclick="triggerGlobalUltrasound(); event.stopPropagation();">
                     🔊 ULTRASONS (-30%)
                 </button>
             </div>
 
             <div class="turbine-station">
                 <span class="station-title">ÉOLIENNE E-02</span>
-                <button class="btn-control btn-curtail" id="btn-c2" ontouchstart="toggleCurtail(2); event.preventDefault();" onclick="toggleCurtail(2)">BRIDER</button>
+                <button class="btn-control btn-curtail" id="btn-c2" ontouchstart="toggleCurtail(2); event.stopPropagation();" onclick="toggleCurtail(2); event.stopPropagation();">BRIDER</button>
             </div>
         </div>
 
         <!-- Écran d'accueil -->
         <div id="start-screen" class="screen">
             <h1>🦇 Bat&Watt v0.1 // Alignement Parfait</h1>
-            <p>La centrale commence à <b>0% de puissance</b> : libérez les éoliennes pour charger la batterie. Utilisez les <b>ultrasons</b> (coûtent 30% de puissance) pour écarter la faune. Gardez la <b>biodiversité au-dessus de 90%</b> !</p>
-            <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">LANCER LA CENTRALE</button>
+            <p>La centrale commence à <b>0% de puissance</b> : libérez les éoliennes pour charger la batterie. Utilisez les <b>ultrasons</b> (coûtent 30% de puissance) pour écarter la faune. Gardez la <b>biodiversité au-dessus de 90%</b> !<br><br><i>Touchez le centre de l'écran à tout moment pour mettre en pause.</i></p>
+            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">LANCER LA CENTRALE</button>
         </div>
 
         <!-- Écran de pause -->
         <div id="pause-screen" class="screen hidden">
             <h1>PAUSE</h1>
-            <p>Centrale en maintenance.</p>
-            <button class="btn-main" ontouchstart="togglePause(); event.preventDefault();" onclick="togglePause()">Reprendre</button>
+            <p>Centrale en maintenance.<br>Touchez le centre de l'écran pour reprendre.</p>
+            <button class="btn-main" ontouchstart="togglePause(); event.stopPropagation();" onclick="togglePause(); event.stopPropagation();">Reprendre</button>
         </div>
 
         <!-- Écran de fin -->
-        <div id="gameover-screen" class="screen hidden">
+        <div id="gameover-screen" class="screen hidden" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
             <h1 id="gameover-title" style="color: #dc2626;">⚠️ ARRÊT D'URGENCE</h1>
             <p id="final-stats"></p>
-            <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">NOUVELLE SESSION</button>
+            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">NOUVELLE SESSION</button>
         </div>
     </div>
 
@@ -662,6 +653,20 @@
         let rot1 = 0;
         let rot2 = 0;
         let lastTimestamp = 0;
+
+        // Gestionnaire de clic/tactile central pour la pause
+        function handleContainerClick(event) {
+            if (!isPlaying) return;
+            // Si on clique en dehors du pupitre de contrôle et des modales
+            togglePause();
+        }
+
+        function handleContainerTouch(event) {
+            if (!isPlaying) return;
+            // Évite le déclenchement double avec click sur mobile
+            event.preventDefault();
+            togglePause();
+        }
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
@@ -745,8 +750,8 @@
                 rot1 += (curtailed[1] ? 0.8 : 4) * (dt * 60);
                 rot2 += (curtailed[2] ? 0.9 : 4.5) * (dt * 60);
                 
-                document.getElementById('blades-1').style.transform = `translateX(-50%) rotate(${rot1}deg)`;
-                document.getElementById('blades-2').style.transform = `translateX(-50%) rotate(${rot2}deg)`;
+                document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`;
+                document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
                 updateEphemerisPoetic();
             }
             lastTimestamp = timestamp;
@@ -987,15 +992,15 @@
             let bladesEl = turbineEl.querySelector('.blades-container');
             if (bladesEl) {
                 let bRect = bladesEl.getBoundingClientRect();
-                let hubX = bRect.left + bRect.width / 2;
-                let hubY = bRect.top + (turbineEl.id === 'turbine-1' ? 42 : 50); 
-                let bladeLength = turbineEl.id === 'turbine-1' ? 68 : 82; 
+                let hubX = bRect.left; 
+                let hubY = bRect.top;  
+                let bladeLength = turbineEl.id === 'turbine-1' ? 70 : 85; 
                 let radBase = rotationDeg * (Math.PI / 180);
 
                 for (let b = 0; b < 3; b++) {
                     let angle = radBase + (b * 120 * Math.PI / 180);
-                    let tipX = hubX + bladeLength * Math.cos(angle);
-                    let tipY = hubY + bladeLength * Math.sin(angle);
+                    let tipX = hubX + bladeLength * Math.cos(angle - Math.PI / 2);
+                    let tipY = hubY + bladeLength * Math.sin(angle - Math.PI / 2);
 
                     let d = pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY);
                     if (d < 12) return true; 
