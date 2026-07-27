@@ -59,168 +59,69 @@
             z-index: 0;
         }
 
-        /* --- NUAGES (Style Vectoriel / Flat Design) --- */
+        /* --- NUAGES --- */
         .cloud {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 50px;
-            z-index: 2;
-            animation: floatCloud linear infinite;
+            position: absolute; background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px; z-index: 2; animation: floatCloud linear infinite;
             box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1);
         }
-        .cloud::before, .cloud::after {
-            content: ''; position: absolute; background: inherit; border-radius: inherit; box-shadow: inherit;
-        }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: inherit; border-radius: inherit; box-shadow: inherit; }
         .cloud::before { bottom: 40%; left: 15%; width: 50%; height: 100%; }
         .cloud::after { bottom: 20%; right: 10%; width: 40%; height: 80%; }
+        @keyframes floatCloud { from { transform: translateX(110vw); } to { transform: translateX(-30vw); } }
 
-        @keyframes floatCloud {
-            from { transform: translateX(110vw); }
-            to { transform: translateX(-30vw); }
-        }
-
-        /* --- ASTRES CÉLESTES --- */
-        .celestial {
-            position: absolute;
-            width: 52px; height: 52px;
-            z-index: 1;
-            will-change: transform, opacity;
-        }
+        /* --- ASTRES --- */
+        .celestial { position: absolute; width: 52px; height: 52px; z-index: 1; will-change: transform, opacity; }
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
         .moon { background: transparent; box-shadow: none; overflow: visible; }
 
-        /* --- DÉCOR RÉTRO-MODERNE (Vector / Low-Poly Style) --- */
-        .mountain-back {
-            position: absolute; bottom: 120px; left: -5%; width: 110%; height: 260px;
-            background: linear-gradient(to bottom, #475569, #1e293b);
-            clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%);
-            z-index: 3;
-        }
+        /* --- DÉCOR --- */
+        .mountain-back { position: absolute; bottom: 120px; left: -5%; width: 110%; height: 260px; background: linear-gradient(to bottom, #475569, #1e293b); clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%); z-index: 3; }
+        .mountain-mid { position: absolute; bottom: 100px; left: -5%; width: 110%; height: 200px; background: linear-gradient(to bottom, #334155, #0f172a); clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%); z-index: 4; }
+        .hill-mid { position: absolute; bottom: 80px; left: -5%; width: 110%; height: 140px; background: linear-gradient(to bottom, #0f766e, #042f2e); clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%); z-index: 5; }
+        .hill-foreground { position: absolute; bottom: 60px; left: -5%; width: 110%; height: 100px; background: linear-gradient(to bottom, #064e3b, #020617); clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%); z-index: 6; }
+        .mist-layer { position: absolute; bottom: 60px; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
+        @keyframes mistBreathe { 0% { transform: translateY(0) scaleY(1); opacity: 0.4; } 100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; } }
 
-        .mountain-mid {
-            position: absolute; bottom: 100px; left: -5%; width: 110%; height: 200px;
-            background: linear-gradient(to bottom, #334155, #0f172a);
-            clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%);
-            z-index: 4;
-        }
-
-        .hill-mid {
-            position: absolute; bottom: 80px; left: -5%; width: 110%; height: 140px;
-            background: linear-gradient(to bottom, #0f766e, #042f2e);
-            clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%);
-            z-index: 5;
-        }
-
-        .hill-foreground {
-            position: absolute; bottom: 60px; left: -5%; width: 110%; height: 100px;
-            background: linear-gradient(to bottom, #064e3b, #020617);
-            clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%);
-            z-index: 6;
-        }
-
-        /* --- BRUME LUMINEUSE --- */
-        .mist-layer {
-            position: absolute;
-            bottom: 60px;
-            left: -10%; width: 120%; height: 100px;
-            background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent);
-            filter: blur(12px);
-            z-index: 7;
-            pointer-events: none;
-            animation: mistBreathe 8s infinite alternate ease-in-out;
-        }
-        @keyframes mistBreathe {
-            0% { transform: translateY(0) scaleY(1); opacity: 0.4; }
-            100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; }
-        }
-
-        /* --- HUD AMÉLIORÉ --- */
+        /* --- HUD --- */
         .top-hud {
-            position: absolute; top: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 16px 20px; z-index: 40;
-            display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: absolute; top: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 16px 20px; z-index: 40; display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         .hud-item { 
-            background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 12px; 
-            display: flex; align-items: center; gap: 8px; 
-            font-size: 13px; font-weight: 600; color: #cbd5e1;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 12px; display: flex; align-items: center; gap: 8px; 
+            font-size: 13px; font-weight: 600; color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        .hud-item span {
-            font-size: 16px; font-weight: 900; color: #ffffff;
-        }
-        .level-badge { 
-            background: linear-gradient(135deg, #2563eb, #3b82f6); 
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
-            border: none; color: white; padding: 8px 20px; font-size: 14px;
-        }
-        /* Animation spectaculaire Level UP */
+        .hud-item span { font-size: 16px; font-weight: 900; color: #ffffff; }
+        .level-badge { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); border: none; color: white; padding: 8px 20px; font-size: 14px; }
         .level-up-anim { animation: levelUpSpectacular 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes levelUpSpectacular { 
-            0% { transform: scale(1); filter: brightness(1); } 
-            20% { transform: scale(2) rotate(10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
-            40% { transform: scale(1.8) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
-            60% { transform: scale(2) rotate(5deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); }
-            100% { transform: scale(1); filter: brightness(1); } 
-        }
+        @keyframes levelUpSpectacular { 0%, 100% { transform: scale(1); filter: brightness(1); } 20%, 60% { transform: scale(2) rotate(10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); } 40% { transform: scale(1.8) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); } }
 
         /* --- BARRES VERTICALES --- */
         .vertical-bar-container {
             position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 260px;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; z-index: 35;
-            display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; z-index: 35; display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
         .bar-title-v { font-size: 8px; font-weight: 800; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); }
         .bar-value-v { font-size: 9px; font-weight: bold; margin-top: 6px; }
         #battery-left { left: 12px; } #biodiversity-right { right: 12px; }
         .modern-track { width: 14px; height: 170px; background: rgba(255, 255, 255, 0.1); border-radius: 7px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
         .modern-fill { width: 100%; border-radius: 7px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
-        
         .power-fill { background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
         .bio-fill { background: linear-gradient(to top, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
-
-        /* Effet clignotement batterie faible (< 20%) */
         .battery-blink { animation: batteryCritical 0.6s infinite alternate; }
-        @keyframes batteryCritical {
-            0% { filter: brightness(1); background: #ef4444; box-shadow: 0 0 5px #ef4444; }
-            100% { filter: brightness(1.8); background: #dc2626; box-shadow: 0 0 20px #ef4444; }
-        }
+        @keyframes batteryCritical { 0% { filter: brightness(1); background: #ef4444; box-shadow: 0 0 5px #ef4444; } 100% { filter: brightness(1.8); background: #dc2626; box-shadow: 0 0 20px #ef4444; } }
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
-        
-        #turbine-1 { left: 28%; bottom: 95px; } 
-        #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        
-        #turbine-2 { left: 68%; bottom: 115px; } 
-        #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        
-        .tower { 
-            background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); 
-            border-radius: 2px;
-            position: relative;
-        }
-        .tower::after {
-            content: ''; position: absolute; bottom: 0; left: -25%;
-            width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0;
-        }
-
+        #turbine-1 { left: 28%; bottom: 95px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-2 { left: 68%; bottom: 115px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        .tower { background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); border-radius: 2px; position: relative; }
+        .tower::after { content: ''; position: absolute; bottom: 0; left: -25%; width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
         .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
-        .nacelle::after {
-            content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px;
-            background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444;
-            animation: blinkAviation 2s infinite;
-        }
+        .nacelle::after { content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: blinkAviation 2s infinite; }
         @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
-
-        #turbine-1 .nacelle { width: 22px; height: 12px; } 
-        #turbine-2 .nacelle { width: 26px; height: 14px; }
-        
+        #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
         .hub { position: absolute; width: 12px; height: 12px; background: #475569; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 13; }
         .blades-container { position: absolute; top: 50%; left: 50%; z-index: 12; will-change: transform; }
         .curtailed .nacelle { background: linear-gradient(to bottom, #fdba74, #ea580c); }
@@ -233,37 +134,35 @@
         /* --- PUPITRE DE CONTRÔLE --- */
         .control-deck {
             position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255,255,255,0.5);
-            display: flex; justify-content: space-around; align-items: center; z-index: 50; padding: 0 10px;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            padding-bottom: env(safe-area-inset-bottom, 0px); background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.5);
+            display: flex; justify-content: center; gap: 15px; align-items: center; z-index: 50; padding: 0 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
         }
-        .turbine-station, .ultrasound-station { display: flex; flex-direction: column; align-items: center; width: 30%; max-width: 180px; }
+        .turbine-station, .ultrasound-station { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 220px; }
         .station-title { font-size: 9px; color: #64748b; margin-bottom: 4px; font-weight: bold; }
-        
-        .btn-control {
-            width: 100%; border: none; padding: 12px 4px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s;
-            background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1;
-        }
+        .btn-control { width: 100%; border: none; padding: 12px 4px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1; }
         .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; }
         .btn-curtail.active { background: #ea580c; color: white; box-shadow: 0 4px 0 #c2410c; }
         .btn-curtail.active:active { box-shadow: 0 0 0 #c2410c; }
-        
-        /* Bouton Ultrasons avec jauge */
-        .btn-ultrasound-global {
-            width: 100%; border: none; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s;
-            background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; position: relative; overflow: hidden;
-            padding: 12px 4px;
-        }
+        .btn-ultrasound-global { width: 100%; border: none; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; position: relative; overflow: hidden; padding: 12px 4px; }
         .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0369a1; }
         .btn-ultrasound-global:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: 0 4px 0 #64748b; }
-        
-        #us-progress {
-            position: absolute; top: 0; left: 0; height: 100%; width: 100%;
-            background: rgba(0, 0, 0, 0.4); transition: width 0.2s linear;
-        }
+        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: rgba(0, 0, 0, 0.4); transition: width 0.2s linear; }
         .btn-content { position: relative; z-index: 2; pointer-events: none; }
+
+        /* --- OPTIMISATION MOBILE (Pixel 9a & Petits écrans) --- */
+        @media (max-width: 768px) {
+            .top-hud { padding: 10px 8px; gap: 6px; }
+            .hud-item { padding: 6px 10px; font-size: 11px; }
+            .hud-item span { font-size: 14px; }
+            .vertical-bar-container { height: 180px; width: 30px; }
+            .modern-track { height: 110px; width: 10px; }
+            .control-deck { height: 85px; gap: 5px; padding: 0 5px; justify-content: space-between; }
+            .station-title { font-size: 8px; white-space: nowrap; }
+            .btn-control, .btn-ultrasound-global { font-size: 10px; padding: 10px 2px; }
+            /* Rapprochement des éoliennes pour ne pas se superposer avec les jauges sur mobile */
+            #turbine-1 { left: 22%; bottom: 100px; }
+            #turbine-2 { left: 72%; bottom: 120px; }
+        }
 
         /* --- ANIMAUX & FEEDBACKS --- */
         .creature { position: absolute; z-index: 30; font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); will-change: transform; }
@@ -274,23 +173,14 @@
         .fleeing { transition: all 0.6s ease-out; transform: translateY(-120px) scale(0.8); opacity: 0.3; }
         .crashing { animation: crashFall 0.8s ease-in forwards; }
         @keyframes crashFall { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(540deg) scale(0.6); opacity: 0; } }
-        
         .feedback-text { position: absolute; font-weight: bold; font-size: 14px; z-index: 60; animation: floatUp 1s ease-out forwards; pointer-events: none; }
         .feedback-good { color: #10b981; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .feedback-bad { color: #ef4444; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
         /* --- MODALES & MENUS --- */
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 100; text-align: center; padding: 20px;
-        }
-        .menu-box {
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%;
-        }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; }
+        .menu-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .menu-box p { font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px; }
         .stats-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
@@ -363,7 +253,6 @@
             </div>
             <div class="ultrasound-station">
                 <span class="station-title">RÉPULSIF (Espace)</span>
-                <!-- Bouton modifié avec jauge de rechargement intégrée -->
                 <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
                     <div id="us-progress" style="width: 0%;"></div>
                     <span class="btn-content">🔊 ULTRASONS</span>
@@ -459,7 +348,7 @@
             document.getElementById('gameover-screen').classList.add('hidden');
             document.querySelectorAll('.creature').forEach(c => c.remove());
             
-            production = 20; // On commence avec un peu de batterie pour éviter la perte immédiate
+            production = 20; 
             biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
             savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
             ultrasoundCharge = 100; 
@@ -501,16 +390,22 @@
         function gameLoop() {
             if (!isPlaying || isPaused) return;
 
-            let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
-            // La ville consomme de l'énergie en continu (-1.2), les éoliennes en rajoutent
-            let addedPower = (activeTurbines === 2) ? 3.5 : (activeTurbines === 1.5) ? 1.8 : (activeTurbines === 1) ? 1.0 : -1.2;
+            // --- INERTIE DE L'ÉNERGIE (Basée sur la vitesse réelle des pales) ---
+            // tSpeed varie entre 0.8 (bridé) et 4 ou 4.5 (libre).
+            let speedFactor1 = Math.max(0, (tSpeed[1] - 0.8) / (4 - 0.8));
+            let speedFactor2 = Math.max(0, (tSpeed[2] - 0.8) / (4.5 - 0.8));
+            
+            // Chaque éolienne peut fournir jusqu'à 1.75 (Total max = 3.5)
+            let turbinePower = (speedFactor1 * 1.75) + (speedFactor2 * 1.75);
+            // La ville consomme de l'énergie en continu (-1.2)
+            let addedPower = turbinePower - 1.2;
 
             if (addedPower > 0) {
                 production += addedPower;
                 let addedKwh = addedPower * 1.5;
                 totalEnergyProduced += addedKwh;
                 
-                // Rechargement progressif des ultrasons (100 kWh max)
+                // Rechargement progressif des ultrasons
                 if (ultrasoundCharge < 100) {
                     ultrasoundCharge += addedKwh;
                     if (ultrasoundCharge >= 100) {
@@ -526,7 +421,7 @@
 
             production = Math.max(0, Math.min(100, production));
             
-            // Gestion visuelle de la jauge (Clignotement à 20%)
+            // Clignotement à 20%
             if (production <= 20) {
                 document.getElementById('battery-fill').classList.add('battery-blink');
             } else {
@@ -540,9 +435,14 @@
                 badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
             }
 
-            // Conditions de défaite
+            // Conditions de défaite (Avec Tolérance Biodiversité)
             if (production <= 0) endGame("Batterie vide ! La ville subit un Blackout total.");
-            if (biodiversityPercent < 90) endGame("Impact écologique : la biodiversité préservée est passée sous les 90%.");
+            
+            // Tolérance : On ne juge la biodiversité qu'après l'apparition d'au moins 10 animaux
+            let totalAnimalsSpawned = savedFauna + injuredFauna;
+            if (biodiversityPercent < 90 && totalAnimalsSpawned >= 10) {
+                endGame("Impact écologique inacceptable : la biodiversité préservée est passée sous les 90%.");
+            }
 
             updateUI();
         }
@@ -553,8 +453,7 @@
                 let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
                 gameTime += dt;
                 
-                // LOGIQUE D'INERTIE MÉCANIQUE (1.5 secondes de temps de réaction pour le freinage/accélération)
-                // Écart max (4.5 - 0.8) divisé par 1.5 sec = ~2.46 points de vitesse modifiés par seconde
+                // INERTIE MÉCANIQUE : 1.5 secondes pour atteindre la vitesse cible
                 let accelRate = 2.46 * dt; 
                 
                 for (let i of [1, 2]) {
@@ -565,7 +464,6 @@
                     }
                 }
 
-                // Application de la vitesse calculée par l'inertie
                 rot1 += tSpeed[1] * (dt * 60);
                 rot2 += tSpeed[2] * (dt * 60);
                 
@@ -630,7 +528,7 @@
             if (!isPlaying || isPaused) return;
             curtailed[id] = !curtailed[id];
             
-            // Modification de la vitesse CIBLE, l'inertie fera le reste
+            // Vitesse cible (l'inertie fait la transition)
             targetSpeed[id] = curtailed[id] ? 0.8 : (id === 1 ? 4 : 4.5);
             
             const btn = document.getElementById(`btn-c${id}`);
@@ -652,8 +550,8 @@
         function triggerGlobalUltrasound() {
             if (!isPlaying || isPaused || production < 30 || ultrasoundCharge < 100) return;
             
-            production -= 30; // Consomme la batterie
-            ultrasoundCharge = 0; // Vide la jauge de l'ultrason
+            production -= 30;
+            ultrasoundCharge = 0;
             
             document.getElementById('us-progress').style.width = '0%';
             document.getElementById('btn-ultrasound').disabled = true;
@@ -723,7 +621,10 @@
                 let hit2 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-2'), rot2);
 
                 if (hit1 || hit2) {
-                    if ((hit1 && curtailed[1]) || (hit2 && curtailed[2])) {
+                    // Vérification avec la vitesse réelle (si la pale a freiné sous 1.2, elle est considérée comme non mortelle)
+                    let activeCurtail = (hit1 && tSpeed[1] < 1.2) || (hit2 && tSpeed[2] < 1.2);
+
+                    if (activeCurtail) {
                         savedFauna++;
                         updateBiodiversity();
                         showFeedback("💚", posX, posY, true);
@@ -736,7 +637,9 @@
                         creature.classList.add('crashing');
                         setTimeout(() => creature.remove(), 800);
                         clearInterval(fallInterval);
-                        if (biodiversityPercent < 90) endGame("La biodiversité préservée est tombée sous les 90%.");
+                        
+                        let totalAnimalsSpawned = savedFauna + injuredFauna;
+                        if (biodiversityPercent < 90 && totalAnimalsSpawned >= 10) endGame("La biodiversité préservée est tombée sous les 90%.");
                     }
                 } else if (posY > window.innerHeight - 100) {
                     savedFauna++;
