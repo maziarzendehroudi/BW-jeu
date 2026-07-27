@@ -140,77 +140,83 @@
         }
         .btn-pause:active { transform: scale(0.95); }
 
-        /* --- BARRES VERTICALES MOBILE --- */
+        /* --- BARRES VERTICALES MODERNES --- */
         .vertical-bar-container {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            width: 30px;
-            height: 240px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 2px solid #cbd5e1;
-            border-radius: 15px;
+            width: 36px;
+            height: 260px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
             z-index: 35;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 5px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 8px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
         .bar-title-v {
-            font-size: 7px;
-            font-weight: bold;
-            color: #64748b;
-            margin-bottom: 4px;
+            font-size: 8px;
+            font-weight: 800;
+            color: #94a3b8;
+            margin-bottom: 6px;
             text-transform: uppercase;
             writing-mode: vertical-lr;
             transform: rotate(180deg);
+            letter-spacing: 1px;
+        }
+
+        .bar-value-v {
+            font-size: 9px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-top: 6px;
         }
 
         #battery-left {
-            left: 10px;
+            left: 12px;
         }
 
-        .battery-track {
+        .modern-track {
             width: 14px;
-            height: 180px;
-            background: #e2e8f0;
+            height: 170px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 7px;
             overflow: hidden;
             display: flex;
             flex-direction: column-reverse;
             position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
         }
 
-        .battery-fill {
+        .modern-fill {
             width: 100%;
-            background: linear-gradient(to top, #dc2626, #f59e0b, #16a34a);
-            transition: height 0.2s linear;
+            border-radius: 7px;
+            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
+        }
+
+        /* Effet visuel rouge d'impact/consommation sur la puissance */
+        .modern-fill.power-fill {
+            background: linear-gradient(to top, #ef4444, #f59e0b, #10b981);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
+        }
+
+        .modern-fill.power-drain {
+            background: linear-gradient(to top, #dc2626, #ef4444) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8) !important;
         }
 
         #biodiversity-right {
-            right: 10px;
+            right: 12px;
         }
 
-        .bio-track {
-            width: 14px;
-            height: 180px;
-            display: flex;
-            flex-direction: column-reverse;
-            gap: 2px;
-        }
-
-        .bio-segment {
-            width: 100%;
-            flex: 1;
-            background: #16a34a;
-            border-radius: 2px;
-            transition: background 0.3s;
-        }
-
-        .bio-segment.injured {
-            background: #dc2626;
+        .modern-fill.bio-fill {
+            background: linear-gradient(to top, #f59e0b, #10b981);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
         }
 
         /* --- ÉOLIENNES : FIXATION DE L'AXE AU SOMMET DU MÂT --- */
@@ -370,22 +376,7 @@
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
         }
-        .btn-ultrasound-global:disabled {
-            background: #cbd5e1;
-            border-color: #94a3b8;
-            color: #64748b;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        .cooldown-fill {
-            position: absolute;
-            bottom: 0; left: 0;
-            height: 5px;
-            background: #f59e0b;
-            width: 100%;
-            transition: width 0.1s linear;
-        }
+        .btn-ultrasound-global:active { transform: scale(0.96); }
 
         /* --- ANIMAUX --- */
         .creature {
@@ -491,18 +482,22 @@
             <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
         </div>
 
-        <!-- BARRE VERTICALE GAUCHE -->
+        <!-- BARRE VERTICALE PUISSANCE (MODERNISÉE) -->
         <div class="vertical-bar-container" id="battery-left">
             <span class="bar-title-v">Puissance</span>
-            <div class="battery-track">
-                <div class="battery-fill" id="battery-fill" style="height: 70%;"></div>
+            <div class="modern-track">
+                <div class="modern-fill power-fill" id="battery-fill" style="height: 0%;"></div>
             </div>
+            <span class="bar-value-v" id="power-val">0%</span>
         </div>
 
-        <!-- BARRE VERTICALE DROITE -->
+        <!-- BARRE VERTICALE BIODIVERSITÉ (MODERNISÉE) -->
         <div class="vertical-bar-container" id="biodiversity-right">
             <span class="bar-title-v">Biodiversité</span>
-            <div class="bio-track" id="bio-track"></div>
+            <div class="modern-track">
+                <div class="modern-fill bio-fill" id="bio-fill" style="height: 100%;"></div>
+            </div>
+            <span class="bar-value-v" id="bio-val">100%</span>
         </div>
 
         <!-- Éoliennes -->
@@ -536,8 +531,7 @@
             <div class="ultrasound-station">
                 <span class="station-title">RÉPULSIF GLOBAL</span>
                 <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.preventDefault();" onclick="triggerGlobalUltrasound()">
-                    🔊 ULTRASONS
-                    <div class="cooldown-fill" id="cd-global" style="width: 0%;"></div>
+                    🔊 ULTRASONS (-30%)
                 </button>
             </div>
 
@@ -550,7 +544,7 @@
         <!-- Écran d'accueil -->
         <div id="start-screen" class="screen">
             <h1>🦇 Bat&Watt v0.1 // Alignement Parfait</h1>
-            <p>Maintenez la <b>batterie de puissance</b> (gauche) dans le vert et protégez la <b>biodiversité</b> (droite, 10 barrettes). Utilisez les <b>ultrasons</b> pour éloigner la faune. Le bridage protège l'ensemble des animaux en cas de contact exact avec le mât, la nacelle ou les pales en rotation !</p>
+            <p>La centrale commence à <b>0% de puissance</b> : libérez les éoliennes pour charger la batterie. Utilisez les <b>ultrasons</b> (coûtent 30% de puissance) pour écarter la faune. Gardez la <b>biodiversité au-dessus de 90%</b> !</p>
             <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">LANCER LA CENTRALE</button>
         </div>
 
@@ -570,8 +564,8 @@
     </div>
 
     <script>
-        let production = 70; 
-        let biodiversitySegments = 10; 
+        let production = 0; 
+        let biodiversityPercent = 100; 
         let levelTime = 60; 
         let currentLevel = 1;
         let gameTime = 0; 
@@ -579,37 +573,22 @@
         let isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
         let curtailed = { 1: false, 2: false };
-        
-        let ultrasoundCharge = 100; 
         let isNight = false;
 
         let rot1 = 0;
         let rot2 = 0;
-
-        function initBioBar() {
-            const track = document.getElementById('bio-track');
-            track.innerHTML = '';
-            for (let i = 0; i < 10; i++) {
-                let seg = document.createElement('div');
-                seg.className = 'bio-segment';
-                seg.id = `bio-seg-${i}`;
-                track.appendChild(seg);
-            }
-        }
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('pause-screen').classList.add('hidden');
             document.getElementById('gameover-screen').classList.add('hidden');
             
-            production = 70;
-            biodiversitySegments = 10;
-            initBioBar();
+            production = 0;
+            biodiversityPercent = 100;
             levelTime = 60;
             currentLevel = 1;
             gameTime = 0;
             curtailed = { 1: false, 2: false };
-            ultrasoundCharge = 100;
             isPlaying = true;
             isPaused = false;
             updateUI();
@@ -618,10 +597,15 @@
             gameInterval = setInterval(() => {
                 if (!isPlaying || isPaused) return;
 
+                gameTime += 0.4;
+
                 let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
-                if (activeTurbines === 2) production += 1.5;
-                else if (activeTurbines === 1.5) production += 0.2;
-                else production -= 1.8; 
+                
+                // Recharge plus rapide selon la vitesse des éoliennes
+                if (activeTurbines === 2) production += 3.5;
+                else if (activeTurbines === 1.5) production += 1.8;
+                else if (activeTurbines === 1) production += 1.0;
+                else production -= 1.2; 
 
                 production = Math.max(0, Math.min(100, production));
 
@@ -631,15 +615,13 @@
                     levelTime = 60; 
                 }
 
-                if (ultrasoundCharge < 100) {
-                    let isAnyCurtailed = curtailed[1] || curtailed[2] || production < 50;
-                    let rechargeTime = isAnyCurtailed ? 15 : 10; 
-                    let increment = (0.4 / rechargeTime) * 100;
-                    ultrasoundCharge = Math.min(100, ultrasoundCharge + increment);
+                // Condition de défaite si la puissance tombe à 0 après le début ou si la biodiversité chute sous les 90%
+                if (gameTime > 5 && production <= 0) {
+                    endGame("Panne totale : la batterie de puissance est vide.");
                 }
 
-                if (production < 25 || biodiversitySegments <= 0) {
-                    endGame(production < 25 ? "Batterie de puissance dans le rouge." : "La biodiversité s'est effondrée.");
+                if (biodiversityPercent < 90) {
+                    endGame("La biodiversité est passée sous le seuil critique des 90%.");
                 }
 
                 updateUI();
@@ -655,13 +637,11 @@
         function runVisualLoop() {
             if (!isPlaying) return;
             if (!isPaused) {
-                gameTime += 0.02; 
-                updateEphemerisPoetic();
-
                 rot1 += curtailed[1] ? 0.8 : 4;
                 rot2 += curtailed[2] ? 0.9 : 4.5;
                 document.getElementById('blades-1').style.transform = `translateX(-50%) rotate(${rot1}deg)`;
                 document.getElementById('blades-2').style.transform = `translateX(-50%) rotate(${rot2}deg)`;
+                updateEphemerisPoetic();
             }
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
@@ -747,9 +727,13 @@
 
         function triggerGlobalUltrasound() {
             if (!isPlaying || isPaused) return;
-            if (ultrasoundCharge < 100) return; 
+            if (production < 30) return; // Coûte 30% de puissance
 
-            ultrasoundCharge = 0; 
+            // Consommation de puissance avec animation rouge (effet visuel de drain)
+            production -= 30;
+            let fillEl = document.getElementById('battery-fill');
+            fillEl.classList.add('power-drain');
+            setTimeout(() => fillEl.classList.remove('power-drain'), 400);
 
             [1, 2].forEach(id => {
                 let turbine = document.getElementById(`turbine-${id}`);
@@ -760,8 +744,11 @@
             document.querySelectorAll('.creature').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
+                // Gagner un peu de biodiversité (+1%) lorsqu'on sauve des animaux avec succès
+                biodiversityPercent = Math.min(100, biodiversityPercent + 1);
                 setTimeout(() => creature.remove(), 600);
             });
+            updateUI();
         }
 
         function manageCreatureSpawns() {
@@ -821,21 +808,26 @@
                     let activeCurtail = (hit1 && curtailed[1]) || (hit2 && curtailed[2]);
 
                     if (activeCurtail) {
+                        // Animal sauvé grâce au bridage
+                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
                         creature.remove();
                         clearInterval(fallInterval);
                     } else {
-                        biodiversitySegments--;
+                        // Animal blessé -> perte de 6% de biodiversité
+                        biodiversityPercent = Math.max(0, biodiversityPercent - 6);
                         updateUI();
                         
                         creature.classList.add('crashing');
                         setTimeout(() => creature.remove(), 800);
                         clearInterval(fallInterval);
 
-                        if (biodiversitySegments <= 0) {
-                            endGame("La biodiversité s'est effondrée suite aux impacts.");
+                        if (biodiversityPercent < 90) {
+                            endGame("La biodiversité a chuté sous les 90% suite aux impacts.");
                         }
                     }
                 } else if (posY > window.innerHeight - 110) {
+                    // Animal passé en toute sécurité
+                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
                     creature.remove();
                     clearInterval(fallInterval);
                 }
@@ -899,27 +891,18 @@
         }
 
         function updateUI() {
-            let batteryFill = document.getElementById('battery-fill');
             let prodVal = Math.round(production);
-            batteryFill.style.height = prodVal + '%';
+            let bioVal = Math.round(biodiversityPercent);
 
-            for (let i = 0; i < 10; i++) {
-                let seg = document.getElementById(`bio-seg-${i}`);
-                if (i < biodiversitySegments) {
-                    seg.classList.remove('injured');
-                } else {
-                    seg.classList.add('injured');
-                }
-            }
+            document.getElementById('battery-fill').style.height = prodVal + '%';
+            document.getElementById('power-val').innerText = prodVal + '%';
+
+            document.getElementById('bio-fill').style.height = bioVal + '%';
+            document.getElementById('bio-val').innerText = bioVal + '%';
 
             let timeVal = Math.max(0, Math.round(levelTime));
             document.getElementById('time-text').innerText = timeVal;
             document.getElementById('level-num').innerText = currentLevel;
-
-            let fill = document.getElementById('cd-global');
-            let btn = document.getElementById('btn-ultrasound');
-            fill.style.width = (100 - ultrasoundCharge) + '%';
-            btn.disabled = ultrasoundCharge < 100;
         }
 
         function endGame(reason) {
