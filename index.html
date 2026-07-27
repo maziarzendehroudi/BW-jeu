@@ -66,16 +66,10 @@
             border-radius: 50px;
             z-index: 2;
             animation: floatCloud linear infinite;
-            /* Ombre interne pour l'effet volume */
             box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1);
         }
-        /* Ajout de formes géométriques pour sculpter le nuage */
         .cloud::before, .cloud::after {
-            content: '';
-            position: absolute;
-            background: inherit;
-            border-radius: inherit;
-            box-shadow: inherit;
+            content: ''; position: absolute; background: inherit; border-radius: inherit; box-shadow: inherit;
         }
         .cloud::before { bottom: 40%; left: 15%; width: 50%; height: 100%; }
         .cloud::after { bottom: 20%; right: 10%; width: 40%; height: 80%; }
@@ -89,51 +83,49 @@
         .celestial {
             position: absolute;
             width: 52px; height: 52px;
-            border-radius: 50%;
-            z-index: 1; /* Derrière les nuages et montagnes */
+            z-index: 1; /* Derrière nuages et montagnes */
             will-change: transform, opacity;
         }
-        .sun { background: #fde047; box-shadow: 0 0 50px #facc15; }
-        .moon { background: #f1f5f9; box-shadow: 0 0 35px rgba(226, 232, 240, 0.5); overflow: hidden; }
+        .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
+        .moon { background: transparent; box-shadow: none; overflow: visible; }
 
         /* --- DÉCOR RÉTRO-MODERNE (Vector / Low-Poly Style) --- */
-        .mountain-bg-left {
-            position: absolute; bottom: 130px; left: -5%; width: 65%; height: 240px;
-            background: linear-gradient(135deg, rgba(71, 85, 105, 0.85), rgba(15, 23, 42, 0.95));
-            clip-path: polygon(0% 100%, 0% 70%, 20% 35%, 45% 65%, 75% 15%, 95% 60%, 100% 100%);
-            z-index: 4;
-            backdrop-filter: blur(2px);
-        }
-
-        .mountain-bg-right {
-            position: absolute; bottom: 120px; right: -5%; width: 75%; height: 280px;
-            background: linear-gradient(135deg, rgba(100, 116, 139, 0.7), rgba(2, 6, 23, 0.9));
-            clip-path: polygon(0% 100%, 10% 80%, 30% 25%, 55% 55%, 80% 20%, 100% 60%, 100% 100%);
+        .mountain-back {
+            position: absolute; bottom: 120px; left: -5%; width: 110%; height: 260px;
+            background: linear-gradient(to bottom, #475569, #1e293b);
+            clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%);
             z-index: 3;
         }
 
+        .mountain-mid {
+            position: absolute; bottom: 100px; left: -5%; width: 110%; height: 200px;
+            background: linear-gradient(to bottom, #334155, #0f172a);
+            clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%);
+            z-index: 4;
+        }
+
         .hill-mid {
-            position: absolute; bottom: 90px; left: -5%; width: 110%; height: 160px;
+            position: absolute; bottom: 80px; left: -5%; width: 110%; height: 140px;
             background: linear-gradient(to bottom, #0f766e, #042f2e);
-            clip-path: polygon(0% 100%, 0% 30%, 25% 15%, 50% 40%, 80% 15%, 100% 35%, 100% 100%);
+            clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%);
             z-index: 5;
         }
 
         .hill-foreground {
-            position: absolute; bottom: 70px; left: -5%; width: 110%; height: 120px;
+            position: absolute; bottom: 60px; left: -5%; width: 110%; height: 100px;
             background: linear-gradient(to bottom, #064e3b, #020617);
-            clip-path: polygon(0% 100%, 0% 25%, 35% 40%, 65% 10%, 100% 35%, 100% 100%);
+            clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%);
             z-index: 6;
         }
 
         /* --- BRUME LUMINEUSE --- */
         .mist-layer {
             position: absolute;
-            bottom: 70px; /* S'appuie sur le premier plan */
+            bottom: 60px;
             left: -10%; width: 120%; height: 100px;
-            background: linear-gradient(to top, rgba(45, 212, 191, 0.3), transparent);
-            filter: blur(10px);
-            z-index: 7; /* Entre le décor et les éoliennes */
+            background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent);
+            filter: blur(12px);
+            z-index: 7;
             pointer-events: none;
             animation: mistBreathe 8s infinite alternate ease-in-out;
         }
@@ -142,18 +134,32 @@
             100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; }
         }
 
-        /* --- HUD --- */
+        /* --- HUD AMÉLIORÉ (Plus grand, lisible, dynamique) --- */
         .top-hud {
             position: absolute; top: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 12px; z-index: 40;
-            font-size: 11px; font-weight: bold; display: flex; gap: 8px; justify-content: space-around; flex-wrap: wrap;
+            background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 16px 20px; z-index: 40;
+            display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-        .hud-item { background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px; }
-        .level-badge { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4); transition: transform 0.3s; }
+        .hud-item { 
+            background: rgba(255, 255, 255, 0.1); padding: 8px 16px; border-radius: 12px; 
+            display: flex; align-items: center; gap: 8px; 
+            font-size: 13px; font-weight: 600; color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .hud-item span {
+            font-size: 16px; font-weight: 900; color: #ffffff;
+        }
+        .level-badge { 
+            background: linear-gradient(135deg, #2563eb, #3b82f6); 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); 
+            border: none; color: white; padding: 8px 20px; font-size: 14px;
+        }
         .level-up-anim { animation: levelUpPop 0.8s ease-out; }
-        @keyframes levelUpPop { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.35); filter: brightness(1.8); } }
+        @keyframes levelUpPop { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.2); filter: brightness(1.5); } }
 
         /* --- BARRES VERTICALES --- */
         .vertical-bar-container {
@@ -254,30 +260,35 @@
 
         <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
+        
+        <!-- Nouvelle Lune sans cache gris (SVG Dynamique) -->
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
-                <circle cx="26" cy="26" r="26" fill="#f1f5f9" />
-                <circle cx="18" cy="18" r="4" fill="#cbd5e1" opacity="0.4"/>
-                <circle cx="35" cy="30" r="5" fill="#cbd5e1" opacity="0.4"/>
-                <circle cx="22" cy="38" r="3" fill="#cbd5e1" opacity="0.4"/>
-                <path id="moon-shadow-path" d="M26,0 A26,26 0 0,1 26,52 A26,26 0 0,1 26,0 Z" fill="#0f172a" opacity="0.85" />
+                <!-- Face sombre de la lune (profondeur) -->
+                <circle cx="26" cy="26" r="26" fill="#0f172a" opacity="0.4" />
+                <!-- Croissant pur qui pointera toujours vers le soleil -->
+                <path d="M26,0 A26,26 0 0,1 26,52 A14,26 0 0,0 26,0 Z" fill="#f1f5f9" />
+                <!-- Cratères sur le croissant pour le détail -->
+                <circle cx="36" cy="26" r="4" fill="#cbd5e1" opacity="0.8"/>
+                <circle cx="28" cy="14" r="2.5" fill="#cbd5e1" opacity="0.8"/>
+                <circle cx="31" cy="40" r="3" fill="#cbd5e1" opacity="0.8"/>
             </svg>
         </div>
 
-        <!-- Montagnes Rétro-Modernes -->
-        <div class="mountain-bg-left"></div>
-        <div class="mountain-bg-right"></div>
+        <!-- Montagnes Rétro-Modernes Affinées -->
+        <div class="mountain-back"></div>
+        <div class="mountain-mid"></div>
         <div class="hill-mid"></div>
         <div class="hill-foreground"></div>
         
         <!-- Brume lumineuse d'ambiance -->
         <div class="mist-layer"></div>
 
-        <!-- HUD -->
+        <!-- HUD Amélioré -->
         <div class="top-hud">
             <div class="hud-item level-badge" id="level-badge">Niv. <span id="level-num">1</span></div>
             <div class="hud-item">⏱️ <span id="time-text">60</span>s</div>
-            <div class="hud-item">💚 <span id="saved-count">0</span> | 💔 <span id="injured-count">0</span></div>
+            <div class="hud-item">💚 <span id="saved-count">0</span> &nbsp;|&nbsp; 💔 <span id="injured-count">0</span></div>
             <div class="hud-item">⚡ <span id="energy-count">0</span> kWh</div>
         </div>
 
@@ -472,19 +483,6 @@
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
-        function getMoonPhasePath(progress) {
-            let angle = progress * Math.PI * 2;
-            let cosVal = Math.cos(angle);
-            
-            if (progress < 0.02 || progress > 0.98) return "M26,0 A26,26 0 1,1 25.99,0 Z"; 
-            if (Math.abs(progress - 0.5) < 0.02) return "M26,0 A26,26 0 0,1 26,0 Z"; 
-            
-            let rx = Math.max(0.1, Math.abs(26 * cosVal));
-            let sweep1 = progress < 0.5 ? 1 : 0;
-            let sweep2 = progress < 0.5 ? 0 : 1;
-            return `M 26 0 A 26 26 0 0 1 26 52 A ${rx} 26 0 0 ${sweep2} 26 0`;
-        }
-
         function interpolateColor(c1, c2, factor) {
             factor = Math.max(0, Math.min(1, factor));
             return [Math.round(c1[0] + factor * (c2[0] - c1[0])), Math.round(c1[1] + factor * (c2[1] - c1[1])), Math.round(c1[2] + factor * (c2[2] - c1[2]))];
@@ -499,30 +497,36 @@
 
             document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
 
+            // Transition ultra douce et allongée pour le ciel (Sunrise / Sunset)
             let topColor, botColor;
-            if (sunFactor >= 0.15) { topColor = [56,189,248]; botColor = [186,230,253]; }
-            else if (sunFactor <= -0.15) { topColor = [2,6,23]; botColor = [15,23,42]; }
-            else {
-                let t = (sunFactor + 0.15) / 0.3; t = t * t * (3 - 2 * t);
-                if (sunFactor >= 0) { topColor = interpolateColor([255,130,110], [56,189,248], t); botColor = interpolateColor([255,180,140], [186,230,253], t); }
-                else { topColor = interpolateColor([2,6,23], [255,130,110], t); botColor = interpolateColor([15,23,42], [255,180,140], t); }
+            let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); 
+            let t = (sf + 0.4) / 0.8; 
+            t = t * t * (3 - 2 * t); // Adoucissement courbe (Smoothstep)
+
+            if (t > 0.5) { // Jour <-> Crépuscule
+                let tr = (t - 0.5) * 2; 
+                topColor = interpolateColor([255,130,110], [56,189,248], tr);
+                botColor = interpolateColor([255,180,140], [186,230,253], tr);
+            } else { // Crépuscule <-> Nuit Noire
+                let tr = t * 2; 
+                topColor = interpolateColor([2,6,23], [255,130,110], tr);
+                botColor = interpolateColor([15,23,42], [255,180,140], tr);
             }
 
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
             
+            // Position et opacité du soleil (fondu doux à l'horizon)
             let sunEl = document.getElementById('sun-body');
             sunEl.style.transform = `translate(${50 + Math.cos(angle)*46}vw, ${55 - Math.sin(angle)*55}vh)`;
-            sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.15) * 4));
+            sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
 
+            // Position de la lune
             let moonEl = document.getElementById('moon-body');
-            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh)`;
-            moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.15) * 4));
-
-            let lunarCycleProgress = (gameTime / 240) % 1;
-            let moonShadowPath = document.getElementById('moon-shadow-path');
-            if (moonShadowPath) {
-                moonShadowPath.setAttribute('d', getMoonPhasePath(lunarCycleProgress));
-            }
+            
+            // Calculer la rotation de la lune pour que son croissant pointe toujours le soleil
+            let moonRotation = -(angle * 180 / Math.PI);
+            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh) rotate(${moonRotation}deg)`;
+            moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
         }
 
         function togglePause() {
