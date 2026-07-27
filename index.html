@@ -120,34 +120,74 @@
             z-index: 4;
         }
 
-        /* --- TOP HUD --- */
+        /* --- TOP HUD MODERNISÉ --- */
         .top-hud {
             position: absolute;
-            top: 15px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 6px 16px;
-            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 18px;
             z-index: 40;
-            font-size: 13px;
+            font-size: 11px;
             font-weight: bold;
-            color: #1e293b;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            color: #ffffff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
             display: flex;
-            gap: 20px;
+            gap: 8px;
             align-items: center;
+            justify-content: center;
+            max-width: 96vw;
+            flex-wrap: wrap;
+        }
+
+        .hud-item {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+            transition: transform 0.3s;
+        }
+
+        /* Animation au changement de niveau */
+        .level-up-anim {
+            animation: levelUpPop 0.8s ease-out;
+        }
+
+        @keyframes levelUpPop {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.35); filter: brightness(1.8); box-shadow: 0 0 20px #60a5fa; }
+            100% { transform: scale(1); filter: brightness(1); }
         }
 
         .btn-pause {
-            background: #64748b;
+            background: #475569;
             color: white;
-            border: none;
-            padding: 4px 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
             font-weight: bold;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 11px;
+            transition: all 0.1s;
         }
         .btn-pause:active { transform: scale(0.95); }
 
@@ -320,7 +360,7 @@
             background: #ffffff;
             border-top: 2px solid #e2e8f0;
             display: flex;
-            justify-content: space-around;
+            justify-style: space-around;
             align-items: center;
             z-index: 50;
             padding-left: 10px;
@@ -500,9 +540,23 @@
         <div class="hill-mid"></div>
         <div class="hill-foreground"></div>
 
-        <!-- TOP HUD -->
+        <!-- TOP HUD NOUVELLE GÉNÉRATION -->
         <div class="top-hud">
-            <span>Niveau <span id="level-num">1</span> (<span id="time-text">60</span>s)</span>
+            <div class="hud-item level-badge" id="level-badge">
+                Niveau <span id="level-num">1</span>
+            </div>
+            <div class="hud-item" title="Temps restant">
+                ⏱️ <span id="time-text">60</span>s
+            </div>
+            <div class="hud-item" title="Faune Sauvée / Blessée">
+                💚 <span id="saved-count">0</span> | 💔 <span id="injured-count">0</span>
+            </div>
+            <div class="hud-item" title="Énergie produite">
+                ⚡ <span id="energy-count">0</span> kWh
+            </div>
+            <div class="hud-item" title="Biodiversité globale">
+                🌿 <span id="hud-bio-val">100%</span>
+            </div>
             <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
         </div>
 
@@ -599,6 +653,11 @@
         let curtailed = { 1: false, 2: false };
         let isNight = false;
 
+        // Compteurs statistiques supplémentaires
+        let savedFauna = 0;
+        let injuredFauna = 0;
+        let totalEnergyProduced = 0;
+
         let rot1 = 0;
         let rot2 = 0;
         let lastTimestamp = 0;
@@ -613,6 +672,9 @@
             levelTime = 60;
             currentLevel = 1;
             gameTime = 0;
+            savedFauna = 0;
+            injuredFauna = 0;
+            totalEnergyProduced = 0;
             curtailed = { 1: false, 2: false };
             isPlaying = true;
             isPaused = false;
@@ -623,11 +685,17 @@
                 if (!isPlaying || isPaused) return;
 
                 let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
+                let addedPower = 0;
                 
-                if (activeTurbines === 2) production += 3.5;
-                else if (activeTurbines === 1.5) production += 1.8;
-                else if (activeTurbines === 1) production += 1.0;
+                if (activeTurbines === 2) addedPower = 3.5;
+                else if (activeTurbines === 1.5) addedPower = 1.8;
+                else if (activeTurbines === 1) addedPower = 1.0;
                 else production -= 1.2; 
+
+                if (addedPower > 0) {
+                    production += addedPower;
+                    totalEnergyProduced += addedPower * 1.5; // Cumul de la production d'énergie
+                }
 
                 production = Math.max(0, Math.min(100, production));
 
@@ -635,6 +703,7 @@
                 if (levelTime <= 0) {
                     currentLevel++;
                     levelTime = 60; 
+                    triggerLevelUpAnimation();
                 }
 
                 if (gameTime > 5 && production <= 0) {
@@ -654,6 +723,15 @@
             if (animFrameId) cancelAnimationFrame(animFrameId);
             lastTimestamp = performance.now();
             animFrameId = requestAnimationFrame(runVisualLoop);
+        }
+
+        function triggerLevelUpAnimation() {
+            let badge = document.getElementById('level-badge');
+            if (badge) {
+                badge.classList.remove('level-up-anim');
+                void badge.offsetWidth; // Déclenche un reflow pour rejouer l'animation
+                badge.classList.add('level-up-anim');
+            }
         }
 
         function runVisualLoop(timestamp) {
@@ -713,7 +791,7 @@
             let moonFactor = Math.sin(angle + Math.PI);
             isNight = sunFactor < 0; 
 
-            // Dégradé du ciel synchronisé exactement sur le rythme naturel de la course des astres (plateaux longs et transitions rapides)
+            // Dégradé du ciel synchronisé exactement sur le rythme naturel de la course des astres
             let topColor, botColor;
             if (sunFactor >= 0.15) {
                 topColor = [56, 189, 248];
@@ -800,6 +878,7 @@
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
                 biodiversityPercent = Math.min(100, biodiversityPercent + 1);
+                savedFauna++; // Incrément de la faune sauvée par ultrasons
                 setTimeout(() => creature.remove(), 600);
             });
             updateUI();
@@ -863,10 +942,12 @@
 
                     if (activeCurtail) {
                         biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
+                        savedFauna++; // Animaux épargnés grâce au bridage
                         creature.remove();
                         clearInterval(fallInterval);
                     } else {
                         biodiversityPercent = Math.max(0, biodiversityPercent - 6);
+                        injuredFauna++; // Animaux touchés
                         updateUI();
                         
                         creature.classList.add('crashing');
@@ -879,6 +960,7 @@
                     }
                 } else if (posY > window.innerHeight - 110) {
                     biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
+                    savedFauna++; // Traversée du parc réussie sans accident
                     creature.remove();
                     clearInterval(fallInterval);
                 }
@@ -954,6 +1036,12 @@
             let timeVal = Math.max(0, Math.round(levelTime));
             document.getElementById('time-text').innerText = timeVal;
             document.getElementById('level-num').innerText = currentLevel;
+
+            // Mises à jour des nouveaux compteurs du HUD
+            document.getElementById('saved-count').innerText = savedFauna;
+            document.getElementById('injured-count').innerText = injuredFauna;
+            document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
+            document.getElementById('hud-bio-val').innerText = bioVal + '%';
         }
 
         function endGame(reason) {
@@ -966,7 +1054,9 @@
 
             document.getElementById('final-stats').innerHTML = 
                 `Niveau atteint : <b>Niveau ${currentLevel}</b><br>` +
-                `Raison : <b>${reason}</b><br><br>` +
+                `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
+                `Énergie produite : <b>${Math.round(totalEnergyProduced)} kWh</b><br>` +
+                `Raison de l'arrêt : <b>${reason}</b><br><br>` +
                 `<i>Ajustez la régulation de votre parc pour maintenir l'équilibre écologique et énergétique.</i>`;
             
             document.getElementById('gameover-screen').classList.remove('hidden');
