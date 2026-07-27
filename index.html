@@ -698,6 +698,15 @@
                 `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
         }
+        
+        // --- Enregistrement du Service Worker pour l'installation PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then((reg) => {
+                    console.log('Service worker enregistré.', reg);
+                });
+            });
+        }
     </script>
 </body>
 </html>
