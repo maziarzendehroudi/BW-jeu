@@ -83,7 +83,7 @@
         .celestial {
             position: absolute;
             width: 52px; height: 52px;
-            z-index: 1; /* Derrière nuages et montagnes */
+            z-index: 1;
             will-change: transform, opacity;
         }
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
@@ -134,7 +134,7 @@
             100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; }
         }
 
-        /* --- HUD AMÉLIORÉ (Plus grand, lisible, dynamique) --- */
+        /* --- HUD AMÉLIORÉ --- */
         .top-hud {
             position: absolute; top: 0; left: 0; width: 100%;
             background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px);
@@ -179,11 +179,51 @@
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
-        #turbine-1 { left: 28%; bottom: 95px; } #turbine-1 .tower { height: 135px; width: 10px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        #turbine-2 { left: 68%; bottom: 115px; } #turbine-2 .tower { height: 165px; width: 12px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        .tower { background: linear-gradient(to right, #94a3b8, #f8fafc, #64748b); border-radius: 2px; }
+        
+        #turbine-1 { left: 28%; bottom: 95px; } 
+        /* Pylône légèrement élargi pour mieux voir le dégradé cylindrique */
+        #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        
+        #turbine-2 { left: 68%; bottom: 115px; } 
+        #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        
+        .tower { 
+            /* Dégradé revu pour un véritable effet 3D cylindrique */
+            background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); 
+            border-radius: 2px;
+            position: relative;
+        }
+        /* Base de fondation en béton */
+        .tower::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: -25%;
+            width: 150%; height: 6px;
+            background: #1e293b;
+            border-radius: 3px 3px 0 0;
+        }
+
         .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
-        #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
+        
+        /* Balisage lumineux d'obstacle aérien (Flash rouge) */
+        .nacelle::after {
+            content: '';
+            position: absolute;
+            top: -3px; right: 6px;
+            width: 4px; height: 4px;
+            background: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #ef4444;
+            animation: blinkAviation 2s infinite;
+        }
+        @keyframes blinkAviation {
+            0%, 15% { opacity: 1; }
+            20%, 100% { opacity: 0; }
+        }
+
+        #turbine-1 .nacelle { width: 22px; height: 12px; } 
+        #turbine-2 .nacelle { width: 26px; height: 14px; }
+        
         .hub { position: absolute; width: 12px; height: 12px; background: #475569; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 13; }
         .blades-container { position: absolute; top: 50%; left: 50%; z-index: 12; will-change: transform; }
         .curtailed .nacelle { background: linear-gradient(to bottom, #fdba74, #ea580c); }
@@ -261,21 +301,15 @@
         <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
         
-        <!-- Nouvelle Lune sans cache gris (SVG Dynamique) -->
+        <!-- Nouvelle Lune épurée sans cratères -->
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
-                <!-- Face sombre de la lune (profondeur) -->
                 <circle cx="26" cy="26" r="26" fill="#0f172a" opacity="0.4" />
-                <!-- Croissant pur qui pointera toujours vers le soleil -->
                 <path d="M26,0 A26,26 0 0,1 26,52 A14,26 0 0,0 26,0 Z" fill="#f1f5f9" />
-                <!-- Cratères sur le croissant pour le détail -->
-                <circle cx="36" cy="26" r="4" fill="#cbd5e1" opacity="0.8"/>
-                <circle cx="28" cy="14" r="2.5" fill="#cbd5e1" opacity="0.8"/>
-                <circle cx="31" cy="40" r="3" fill="#cbd5e1" opacity="0.8"/>
             </svg>
         </div>
 
-        <!-- Montagnes Rétro-Modernes Affinées -->
+        <!-- Montagnes Rétro-Modernes -->
         <div class="mountain-back"></div>
         <div class="mountain-mid"></div>
         <div class="hill-mid"></div>
@@ -304,7 +338,7 @@
             <span class="bar-value-v" id="bio-val">100%</span>
         </div>
 
-        <!-- Éoliennes -->
+        <!-- Éoliennes avec socle et balisage -->
         <div class="wind-turbine" id="turbine-1">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
@@ -497,17 +531,16 @@
 
             document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
 
-            // Transition ultra douce et allongée pour le ciel (Sunrise / Sunset)
             let topColor, botColor;
             let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); 
             let t = (sf + 0.4) / 0.8; 
-            t = t * t * (3 - 2 * t); // Adoucissement courbe (Smoothstep)
+            t = t * t * (3 - 2 * t); 
 
-            if (t > 0.5) { // Jour <-> Crépuscule
+            if (t > 0.5) { 
                 let tr = (t - 0.5) * 2; 
                 topColor = interpolateColor([255,130,110], [56,189,248], tr);
                 botColor = interpolateColor([255,180,140], [186,230,253], tr);
-            } else { // Crépuscule <-> Nuit Noire
+            } else {
                 let tr = t * 2; 
                 topColor = interpolateColor([2,6,23], [255,130,110], tr);
                 botColor = interpolateColor([15,23,42], [255,180,140], tr);
@@ -515,15 +548,11 @@
 
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
             
-            // Position et opacité du soleil (fondu doux à l'horizon)
             let sunEl = document.getElementById('sun-body');
             sunEl.style.transform = `translate(${50 + Math.cos(angle)*46}vw, ${55 - Math.sin(angle)*55}vh)`;
             sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
 
-            // Position de la lune
             let moonEl = document.getElementById('moon-body');
-            
-            // Calculer la rotation de la lune pour que son croissant pointe toujours le soleil
             let moonRotation = -(angle * 180 / Math.PI);
             moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh) rotate(${moonRotation}deg)`;
             moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
@@ -606,7 +635,6 @@
             creature.style.left = startX + 'px'; creature.style.top = posY + 'px';
             container.appendChild(creature);
 
-            // Difficulté croissante
             let baseSpeed = (type === 'bat') ? 3.0 : 2.2;
             let fallSpeed = baseSpeed + (currentLevel * 0.3);
 
@@ -615,7 +643,6 @@
                 if (isPaused || creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
 
                 posY += fallSpeed;
-                // Mouvement sinusoïdal organique
                 let posX = startX + Math.sin(posY/40 + timeOffset) * 30;
                 
                 creature.style.left = posX + 'px';
