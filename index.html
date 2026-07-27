@@ -120,28 +120,30 @@
             z-index: 4;
         }
 
-        /* --- TOP HUD MODERNISÉ --- */
+        /* --- TOP HUD PLEINE LARGEUR --- */
         .top-hud {
             position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
+            top: 0;
+            left: 0;
+            width: 100%;
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 12px;
-            border-radius: 18px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+            padding: 8px 12px;
             z-index: 40;
             font-size: 11px;
             font-weight: bold;
             color: #ffffff;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
             display: flex;
             gap: 8px;
             align-items: center;
-            justify-content: center;
-            max-width: 96vw;
+            justify-content: space-around;
             flex-wrap: wrap;
         }
 
@@ -360,7 +362,7 @@
             background: #ffffff;
             border-top: 2px solid #e2e8f0;
             display: flex;
-            justify-style: space-around;
+            justify-content: space-around;
             align-items: center;
             z-index: 50;
             padding-left: 10px;
@@ -540,7 +542,7 @@
         <div class="hill-mid"></div>
         <div class="hill-foreground"></div>
 
-        <!-- TOP HUD NOUVELLE GÉNÉRATION -->
+        <!-- TOP HUD PLEINE LARGEUR -->
         <div class="top-hud">
             <div class="hud-item level-badge" id="level-badge">
                 Niveau <span id="level-num">1</span>
@@ -653,7 +655,6 @@
         let curtailed = { 1: false, 2: false };
         let isNight = false;
 
-        // Compteurs statistiques supplémentaires
         let savedFauna = 0;
         let injuredFauna = 0;
         let totalEnergyProduced = 0;
@@ -694,7 +695,7 @@
 
                 if (addedPower > 0) {
                     production += addedPower;
-                    totalEnergyProduced += addedPower * 1.5; // Cumul de la production d'énergie
+                    totalEnergyProduced += addedPower * 1.5;
                 }
 
                 production = Math.max(0, Math.min(100, production));
@@ -729,7 +730,7 @@
             let badge = document.getElementById('level-badge');
             if (badge) {
                 badge.classList.remove('level-up-anim');
-                void badge.offsetWidth; // Déclenche un reflow pour rejouer l'animation
+                void badge.offsetWidth; 
                 badge.classList.add('level-up-anim');
             }
         }
@@ -791,7 +792,6 @@
             let moonFactor = Math.sin(angle + Math.PI);
             isNight = sunFactor < 0; 
 
-            // Dégradé du ciel synchronisé exactement sur le rythme naturel de la course des astres
             let topColor, botColor;
             if (sunFactor >= 0.15) {
                 topColor = [56, 189, 248];
@@ -878,7 +878,7 @@
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
                 biodiversityPercent = Math.min(100, biodiversityPercent + 1);
-                savedFauna++; // Incrément de la faune sauvée par ultrasons
+                savedFauna++;
                 setTimeout(() => creature.remove(), 600);
             });
             updateUI();
@@ -942,12 +942,12 @@
 
                     if (activeCurtail) {
                         biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                        savedFauna++; // Animaux épargnés grâce au bridage
+                        savedFauna++;
                         creature.remove();
                         clearInterval(fallInterval);
                     } else {
                         biodiversityPercent = Math.max(0, biodiversityPercent - 6);
-                        injuredFauna++; // Animaux touchés
+                        injuredFauna++;
                         updateUI();
                         
                         creature.classList.add('crashing');
@@ -960,7 +960,7 @@
                     }
                 } else if (posY > window.innerHeight - 110) {
                     biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                    savedFauna++; // Traversée du parc réussie sans accident
+                    savedFauna++;
                     creature.remove();
                     clearInterval(fallInterval);
                 }
@@ -1037,7 +1037,6 @@
             document.getElementById('time-text').innerText = timeVal;
             document.getElementById('level-num').innerText = currentLevel;
 
-            // Mises à jour des nouveaux compteurs du HUD
             document.getElementById('saved-count').innerText = savedFauna;
             document.getElementById('injured-count').innerText = injuredFauna;
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
