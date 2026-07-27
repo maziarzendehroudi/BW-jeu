@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Watt & Bats - Alignement Axe & Rotor Parfait</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Watt & Bats">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦇</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%230f172a%22/><text x=%2250%25%22 y=%2255%25%22 font-size=%2260%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>🦇</text></svg>">
+    
+    <link rel="manifest" href="data:application/manifest+json,{
+        %22name%22: %22Watt & Bats - Centrale & Biodiversité%22,
+        %22short_name%22: %22Watt&Bats%22,
+        %22start_url%22: %22.%22,
+        %22display%22: %22standalone%22,
+        %22background_color%22: %22%230f172a%22,
+        %22theme_color%22: %22%230f172a%22,
+        %22icons%22: [
+            {
+                %22src%22: %22data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><rect width=%22512%22 height=%22512%22 fill=%22%230f172a%22/><text x=%2250%25%22 y=%2255%25%22 font-size=%22320%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>🦇</text></svg>%22,
+                %22sizes%22: %22512x512%22,
+                %22type%22: %22image/svg+xml%22,
+                %22purpose%22: %22any maskable%22
+            }
+        ]
+    }">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0f172a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100vw;
+            height: 100dvh;
+            overflow: hidden;
+            color: #ffffff;
+            touch-action: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff758c, #ff7eb3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- ASTRE CÉLESTE --- */
+        #celestial-body {
+            position: absolute;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.6);
+        }
+
+        /* --- DÉCOR COLLINES --- */
+        .mountain-bg-left {
+            position: absolute;
+            bottom: 160px;
+            left: -10%;
+            width: 60%;
+            height: 220px;
+            background: #dce7d1;
+            clip-path: polygon(0% 100%, 20% 40%, 60% 70%, 100% 30%, 100% 100%);
+            z-index: 2;
+        }
+
+        .mountain-bg-right {
+            position: absolute;
+            bottom: 150px;
+            right: -10%;
+            width: 65%;
+            height: 250px;
+            background: #cfdec1;
+            clip-path: polygon(0% 100%, 30% 50%, 70% 20%, 100% 60%, 100% 100%);
+            z-index: 2;
+        }
+
+        .hill-mid {
+            position: absolute;
+            bottom: 120px;
+            left: 0;
+            width: 100%;
+            height: 160px;
+            background: #b5cca2;
+            clip-path: ellipse(70% 100% at 50% 100%);
+            z-index: 3;
+        }
+
+        .hill-foreground {
+            position: absolute;
+            bottom: 100px;
+            left: -10%;
+            width: 120%;
+            height: 120px;
+            background: #8fb375;
+            border-radius: 50% 50% 0 0 / 70% 70% 0 0;
+            z-index: 4;
+        }
+
+        /* --- TOP HUD --- */
+        .top-hud {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 6px 16px;
+            border-radius: 20px;
+            z-index: 40;
+            font-size: 13px;
+            font-weight: bold;
+            color: #1e293b;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-pause {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .btn-pause:active { transform: scale(0.95); }
+
+        /* --- BARRES VERTICALES MOBILE --- */
+        .vertical-bar-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 240px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #cbd5e1;
+            border-radius: 15px;
+            z-index: 35;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .bar-title-v {
+            font-size: 7px;
+            font-weight: bold;
+            color: #64748b;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+        }
+
+        #battery-left {
+            left: 10px;
+        }
+
+        .battery-track {
+            width: 14px;
+            height: 180px;
+            background: #e2e8f0;
+            border-radius: 7px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            position: relative;
+        }
+
+        .battery-fill {
+            width: 100%;
+            background: linear-gradient(to top, #dc2626, #f59e0b, #16a34a);
+            transition: height 0.2s linear;
+        }
+
+        #biodiversity-right {
+            right: 10px;
+        }
+
+        .bio-track {
+            width: 14px;
+            height: 180px;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 2px;
+        }
+
+        .bio-segment {
+            width: 100%;
+            flex: 1;
+            background: #16a34a;
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+
+        .bio-segment.injured {
+            background: #dc2626;
+        }
+
+        /* --- ÉOLIENNES : FIXATION DE L'AXE AU SOMMET DU MÂT --- */
+        .wind-turbine {
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+
+        #turbine-1 { left: 28%; bottom: 165px; }
+        #turbine-1 .tower { height: 135px; width: 10px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-1 .blades-container { width: 85px; height: 85px; }
+        #turbine-1 .blade { height: 70px; width: 8px; top: 35px; left: 38px; }
+
+        #turbine-2 { left: 68%; bottom: 185px; }
+        #turbine-2 .tower { height: 165px; width: 12px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-2 .blades-container { width: 105px; height: 105px; }
+        #turbine-2 .blade { height: 85px; width: 9px; top: 43px; left: 48px; }
+
+        .tower {
+            background: linear-gradient(to right, #94a3b8, #f8fafc, #64748b);
+            border-radius: 2px;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.25);
+        }
+
+        .nacelle {
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1);
+            border-radius: 8px 12px 6px 6px;
+            z-index: 11;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        }
+        #turbine-1 .nacelle { width: 22px; height: 12px; }
+        #turbine-2 .nacelle { width: 26px; height: 14px; }
+
+        .hub {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #475569;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 13;
+        }
+
+        .blades-container {
+            position: absolute;
+            top: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            transform-origin: center;
+            z-index: 12;
+        }
+
+        #turbine-2 .blades-container {
+            top: -50px;
+        }
+
+        .curtailed .nacelle {
+            background: linear-gradient(to bottom, #fdba74, #ea580c);
+        }
+
+        .blade {
+            position: absolute;
+            background: linear-gradient(to bottom, #ffffff, #e2e8f0);
+            border-radius: 50% 50% 4px 4px;
+            transform-origin: top center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            clip-path: polygon(30% 0%, 70% 0%, 90% 100%, 10% 100%);
+        }
+        .blade:nth-child(1) { transform: rotate(0deg); }
+        .blade:nth-child(2) { transform: rotate(120deg); }
+        .blade:nth-child(3) { transform: rotate(240deg); }
+
+        /* --- PUPITRE DE CONTRÔLE --- */
+        .control-deck {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 110px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            background: #ffffff;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 50;
+            padding-left: 10px;
+            padding-right: 10px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        }
+
+        .turbine-station {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            border-radius: 8px;
+            width: 30%;
+            max-width: 180px;
+        }
+
+        .station-title {
+            font-size: 9px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .btn-control {
+            width: 100%;
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            padding: 10px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.1s;
+        }
+
+        .btn-control:active { transform: scale(0.95); }
+
+        .btn-curtail { background: #ea580c; border-color: #c2410c; color: white; }
+        .btn-curtail.active { background: #ea580c; box-shadow: 0 0 8px rgba(234, 88, 12, 0.4); }
+
+        .ultrasound-station {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 34%;
+            max-width: 200px;
+        }
+
+        .btn-ultrasound-global {
+            position: relative;
+            width: 100%;
+            background: #0284c7;
+            border: 1px solid #0369a1;
+            color: white;
+            padding: 12px 4px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+        }
+        .btn-ultrasound-global:disabled {
+            background: #cbd5e1;
+            border-color: #94a3b8;
+            color: #64748b;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .cooldown-fill {
+            position: absolute;
+            bottom: 0; left: 0;
+            height: 5px;
+            background: #f59e0b;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        /* --- ANIMAUX --- */
+        .creature {
+            position: absolute;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .creature-icon {
+            font-size: 28px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .bat-icon { animation: flapWings 0.35s ease-in-out infinite alternate; }
+        .bird-icon { animation: flapBird 0.4s ease-in-out infinite alternate; }
+
+        @keyframes flapWings {
+            0% { transform: scaleY(1) scaleX(1); }
+            100% { transform: scaleY(0.7) scaleX(0.9) translateY(2px); }
+        }
+
+        @keyframes flapBird {
+            0% { transform: translateY(0px) scaleX(1); }
+            100% { transform: translateY(-4px) scaleX(1); }
+        }
+
+        .creature.fleeing {
+            transition: transform 0.6s ease-out, top 0.6s ease-out;
+            transform: translateX(-50%) translateY(-120px) scale(0.8);
+            opacity: 0.3;
+        }
+
+        .creature.crashing {
+            animation: crashFall 0.8s ease-in forwards;
+        }
+
+        @keyframes crashFall {
+            0% { transform: translateX(-50%) rotate(0deg) scale(1); }
+            50% { transform: translateX(-30%) rotate(180deg) scale(1.2); }
+            100% { transform: translateX(20%) rotate(540deg) scale(0.6); opacity: 0; }
+        }
+
+        /* --- MODALES --- */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .screen h1 {
+            color: #0f172a;
+            font-size: 26px;
+            margin-bottom: 12px;
+        }
+
+        .screen p {
+            color: #475569;
+            max-width: 450px;
+            line-height: 1.5;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .btn-main {
+            background: #16a34a;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+        }
+        .btn-main:active { transform: scale(0.96); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="celestial-body"></div>
+        <div class="mountain-bg-left"></div>
+        <div class="mountain-bg-right"></div>
+        <div class="hill-mid"></div>
+        <div class="hill-foreground"></div>
+
+        <div class="top-hud">
+            <span>Niveau <span id="level-num">1</span> (<span id="time-text">60</span>s)</span>
+            <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
+        </div>
+
+        <div class="vertical-bar-container" id="battery-left">
+            <span class="bar-title-v">Puissance</span>
+            <div class="battery-track">
+                <div class="battery-fill" id="battery-fill" style="height: 70%;"></div>
+            </div>
+        </div>
+
+        <div class="vertical-bar-container" id="biodiversity-right">
+            <span class="bar-title-v">Biodiversité</span>
+            <div class="bio-track" id="bio-track"></div>
+        </div>
+
+        <div class="wind-turbine" id="turbine-1" ontouchstart="toggleCurtail(1); event.preventDefault();" onclick="toggleCurtail(1)">
+            <div class="nacelle"><div class="hub"></div></div>
+            <div class="tower"></div>
+            <div class="blades-container" id="blades-1">
+                <div class="blade"></div>
+                <div class="blade"></div>
+                <div class="blade"></div>
+            </div>
+        </div>
+
+        <div class="wind-turbine" id="turbine-2" ontouchstart="toggleCurtail(2); event.preventDefault();" onclick="toggleCurtail(2)">
+            <div class="nacelle"><div class="hub"></div></div>
+            <div class="tower"></div>
+            <div class="blades-container" id="blades-2">
+                <div class="blade"></div>
+                <div class="blade"></div>
+                <div class="blade"></div>
+            </div>
+        </div>
+
+        <div class="control-deck">
+            <div class="turbine-station">
+                <span class="station-title">ÉOLIENNE E-01</span>
+                <button class="btn-control btn-curtail" id="btn-c1" ontouchstart="toggleCurtail(1); event.preventDefault();" onclick="toggleCurtail(1)">BRIDER</button>
+            </div>
+
+            <div class="ultrasound-station">
+                <span class="station-title">RÉPULSIF GLOBAL</span>
+                <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.preventDefault();" onclick="triggerGlobalUltrasound()">
+                    🔊 ULTRASONS
+                    <div class="cooldown-fill" id="cd-global" style="width: 0%;"></div>
+                </button>
+            </div>
+
+            <div class="turbine-station">
+                <span class="station-title">ÉOLIENNE E-02</span>
+                <button class="btn-control btn-curtail" id="btn-c2" ontouchstart="toggleCurtail(2); event.preventDefault();" onclick="toggleCurtail(2)">BRIDER</button>
+            </div>
+        </div>
+
+        <div id="start-screen" class="screen">
+            <h1>🦇 Watt & Bats // Alignement Parfait</h1>
+            <p>Maintenez la <b>batterie de puissance</b> (gauche) dans le vert et protégez la <b>biodiversité</b> (droite, 10 barrettes). Utilisez les <b>ultrasons</b> pour éloigner la faune. Le bridage protège l'ensemble des animaux en cas de contact exact avec le mât, la nacelle ou les pales en rotation !</p>
+            <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">LANCER LA CENTRALE</button>
+        </div>
+
+        <div id="pause-screen" class="screen hidden">
+            <h1>PAUSE</h1>
+            <p>Centrale en maintenance.</p>
+            <button class="btn-main" ontouchstart="togglePause(); event.preventDefault();" onclick="togglePause()">Reprendre</button>
+        </div>
+
+        <div id="gameover-screen" class="screen hidden">
+            <h1 id="gameover-title" style="color: #dc2626;">⚠️ ARRÊT D'URGENCE</h1>
+            <p id="final-stats"></p>
+            <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">NOUVELLE SESSION</button>
+        </div>
+    </div>
+
+    <script>
+        let production = 70; 
+        let biodiversitySegments = 10; 
+        let levelTime = 60; 
+        let currentLevel = 1;
+        let gameTime = 0; 
+        let isPlaying = false;
+        let isPaused = false;
+        let gameInterval, creatureInterval, animFrameId;
+        let curtailed = { 1: false, 2: false };
+        
+        let ultrasoundCharge = 100; 
+        let isNight = false;
+
+        let rot1 = 0;
+        let rot2 = 0;
+
+        function initBioBar() {
+            const track = document.getElementById('bio-track');
+            track.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                let seg = document.createElement('div');
+                seg.className = 'bio-segment';
+                seg.id = `bio-seg-${i}`;
+                track.appendChild(seg);
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            
+            production = 70;
+            biodiversitySegments = 10;
+            initBioBar();
+            levelTime = 60;
+            currentLevel = 1;
+            gameTime = 0;
+            curtailed = { 1: false, 2: false };
+            ultrasoundCharge = 100;
+            isPlaying = true;
+            isPaused = false;
+            updateUI();
+
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                if (!isPlaying || isPaused) return;
+
+                let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
+                if (activeTurbines === 2) production += 1.5;
+                else if (activeTurbines === 1.5) production += 0.2;
+                else production -= 1.8; 
+
+                production = Math.max(0, Math.min(100, production));
+
+                levelTime -= 0.4;
+                if (levelTime <= 0) {
+                    currentLevel++;
+                    levelTime = 60; 
+                }
+
+                if (ultrasoundCharge < 100) {
+                    let isAnyCurtailed = curtailed[1] || curtailed[2] || production < 50;
+                    let rechargeTime = isAnyCurtailed ? 15 : 10; 
+                    let increment = (0.4 / rechargeTime) * 100;
+                    ultrasoundCharge = Math.min(100, ultrasoundCharge + increment);
+                }
+
+                if (production < 25 || biodiversitySegments <= 0) {
+                    endGame(production < 25 ? "Batterie de puissance dans le rouge." : "La biodiversité s'est effondrée.");
+                }
+
+                updateUI();
+            }, 400);
+
+            if (creatureInterval) clearInterval(creatureInterval);
+            creatureInterval = setInterval(manageCreatureSpawns, 1500);
+
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            runVisualLoop();
+        }
+
+        function runVisualLoop() {
+            if (!isPlaying) return;
+            if (!isPaused) {
+                gameTime += 0.02; 
+                updateEphemerisPoetic();
+
+                rot1 += curtailed[1] ? 0.8 : 4;
+                rot2 += curtailed[2] ? 0.9 : 4.5;
+                document.getElementById('blades-1').style.transform = `translateX(-50%) rotate(${rot1}deg)`;
+                document.getElementById('blades-2').style.transform = `translateX(-50%) rotate(${rot2}deg)`;
+            }
+            animFrameId = requestAnimationFrame(runVisualLoop);
+        }
+
+        function updateEphemerisPoetic() {
+            let cycleProgress = (gameTime % 30) / 30;
+            let angle = cycleProgress * Math.PI * 2;
+            
+            let container = document.getElementById('game-container');
+            let celestial = document.getElementById('celestial-body');
+
+            let sunFactor = Math.sin(angle); 
+            isNight = sunFactor < 0; 
+
+            const frames = [
+                { pos: 0.00, top: [255, 117, 140], bot: [255, 126, 179] }, 
+                { pos: 0.25, top: [56, 189, 248],  bot: [186, 230, 253] }, 
+                { pos: 0.50, top: [249, 115, 22],  bot: [254, 215, 170] }, 
+                { pos: 0.75, top: [2, 6, 23],      bot: [30, 27, 75] },     
+                { pos: 1.00, top: [255, 117, 140], bot: [255, 126, 179] }  
+            ];
+
+            let i = 0;
+            while (i < frames.length - 1 && cycleProgress > frames[i+1].pos) {
+                i++;
+            }
+            let f1 = frames[i];
+            let f2 = frames[i+1];
+            let localP = (cycleProgress - f1.pos) / (f2.pos - f1.pos);
+            localP = localP * localP * (3 - 2 * localP); 
+
+            let topR = Math.round(f1.top[0] + localP * (f2.top[0] - f1.top[0]));
+            let topG = Math.round(f1.top[1] + localP * (f2.top[1] - f1.top[1]));
+            let topB = Math.round(f1.top[2] + localP * (f2.top[2] - f1.top[2]));
+
+            let botR = Math.round(f1.bot[0] + localP * (f2.bot[0] - f1.bot[0]));
+            let botG = Math.round(f1.bot[1] + localP * (f2.bot[1] - f1.bot[1]));
+            let botB = Math.round(f1.bot[2] + localP * (f2.bot[2] - f1.bot[2]));
+
+            container.style.background = `linear-gradient(to bottom, rgb(${topR}, ${topG}, ${topB}), rgb(${botR}, ${botG}, ${botB}))`;
+
+            let posX = 15 + ((Math.cos(angle) + 1) / 2) * 70; 
+            let posY = 15 + (1 - sunFactor) * 35; 
+            celestial.style.transform = `translate(${posX}vw, ${posY}vh)`;
+
+            if (sunFactor > -0.1) {
+                celestial.style.background = "#fde047";
+                celestial.style.boxShadow = "0 0 45px #facc15";
+            } else {
+                celestial.style.background = "#fef08a"; 
+                celestial.style.boxShadow = "0 0 30px rgba(254, 240, 138, 0.4)";
+            }
+        }
+
+        function togglePause() {
+            if (!isPlaying) return;
+            isPaused = !isPaused;
+            const pauseScreen = document.getElementById('pause-screen');
+            if (isPaused) {
+                pauseScreen.classList.remove('hidden');
+            } else {
+                pauseScreen.classList.add('hidden');
+            }
+        }
+
+        function toggleCurtail(id) {
+            if (!isPlaying || isPaused) return;
+            curtailed[id] = !curtailed[id];
+            
+            const btn = document.getElementById(`btn-c${id}`);
+            const turbine = document.getElementById(`turbine-${id}`);
+            
+            if (curtailed[id]) {
+                btn.classList.add('active');
+                btn.innerText = "LIBÉRER";
+                turbine.classList.add('curtailed');
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "BRIDER";
+                turbine.classList.remove('curtailed');
+            }
+        }
+
+        function triggerGlobalUltrasound() {
+            if (!isPlaying || isPaused) return;
+            if (ultrasoundCharge < 100) return; 
+
+            ultrasoundCharge = 0; 
+
+            [1, 2].forEach(id => {
+                let turbine = document.getElementById(`turbine-${id}`);
+                turbine.style.filter = "drop-shadow(0 0 20px #0284c7)";
+                setTimeout(() => turbine.style.filter = "none", 400);
+            });
+
+            document.querySelectorAll('.creature').forEach(creature => {
+                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                creature.classList.add('fleeing');
+                setTimeout(() => creature.remove(), 600);
+            });
+        }
+
+        function manageCreatureSpawns() {
+            if (!isPlaying || isPaused) return;
+            
+            if (isNight) {
+                let waveSize = Math.floor(Math.random() * 3) + 2;
+                for (let i = 0; i < waveSize; i++) {
+                    setTimeout(() => {
+                        if (isNight && isPlaying && !isPaused) spawnCreature('bat');
+                    }, i * 300);
+                }
+            } else {
+                if (Math.random() < 0.7) {
+                    spawnCreature('bird');
+                }
+            }
+        }
+
+        function spawnCreature(type) {
+            const container = document.getElementById('game-container');
+            let creature = document.createElement('div');
+            creature.className = `creature ${type}`;
+            let iconClass = type === 'bat' ? 'bat-icon' : 'bird-icon';
+            let emoji = type === 'bat' ? '🦇' : '🦅';
+
+            creature.innerHTML = `<div class="creature-icon ${iconClass}">${emoji}</div>`;
+            
+            let posX = Math.random() * (window.innerWidth - 120) + 60;
+            let posY = -40;
+            creature.style.left = posX + 'px';
+            creature.style.top = posY + 'px';
+            
+            container.appendChild(creature);
+
+            let fallSpeed = (type === 'bat') ? (3.2 + (currentLevel - 1) * 0.3) : 2.5;
+
+            let fallInterval = setInterval(() => {
+                if (!isPlaying) {
+                    creature.remove();
+                    clearInterval(fallInterval);
+                    return;
+                }
+                if (isPaused) return;
+                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+
+                posY += fallSpeed;
+                creature.style.top = posY + 'px';
+
+                let t1 = document.getElementById('turbine-1');
+                let t2 = document.getElementById('turbine-2');
+
+                let hit1 = checkTurbinePixelCollision(posX, posY, t1, rot1);
+                let hit2 = checkTurbinePixelCollision(posX, posY, t2, rot2);
+
+                if (hit1 || hit2) {
+                    let activeCurtail = (hit1 && curtailed[1]) || (hit2 && curtailed[2]);
+
+                    if (activeCurtail) {
+                        creature.remove();
+                        clearInterval(fallInterval);
+                    } else {
+                        biodiversitySegments--;
+                        updateUI();
+                        
+                        creature.classList.add('crashing');
+                        setTimeout(() => creature.remove(), 800);
+                        clearInterval(fallInterval);
+
+                        if (biodiversitySegments <= 0) {
+                            endGame("La biodiversité s'est effondrée suite aux impacts.");
+                        }
+                    }
+                } else if (posY > window.innerHeight - 110) {
+                    creature.remove();
+                    clearInterval(fallInterval);
+                }
+            }, 30);
+        }
+
+        function checkTurbinePixelCollision(px, py, turbineEl, rotationDeg) {
+            let towerEl = turbineEl.querySelector('.tower');
+            if (towerEl) {
+                let tRect = towerEl.getBoundingClientRect();
+                if (px >= tRect.left - 4 && px <= tRect.right + 4 && py >= tRect.top && py <= tRect.bottom) {
+                    return true;
+                }
+            }
+
+            let nacelleEl = turbineEl.querySelector('.nacelle');
+            if (nacelleEl) {
+                let nRect = nacelleEl.getBoundingClientRect();
+                if (px >= nRect.left - 4 && px <= nRect.right + 4 && py >= nRect.top - 4 && py <= nRect.bottom + 4) {
+                    return true;
+                }
+            }
+
+            let bladesEl = turbineEl.querySelector('.blades-container');
+            if (bladesEl) {
+                let bRect = bladesEl.getBoundingClientRect();
+                let hubX = bRect.left + bRect.width / 2;
+                let hubY = bRect.top + (turbineEl.id === 'turbine-1' ? 42 : 50); 
+                let bladeLength = turbineEl.id === 'turbine-1' ? 68 : 82; 
+                let radBase = rotationDeg * (Math.PI / 180);
+
+                for (let b = 0; b < 3; b++) {
+                    let angle = radBase + (b * 120 * Math.PI / 180);
+                    let tipX = hubX + bladeLength * Math.cos(angle);
+                    let tipY = hubY + bladeLength * Math.sin(angle);
+
+                    let d = pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY);
+                    if (d < 12) return true; 
+                }
+            }
+
+            return false;
+        }
+
+        function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+            let A = px - x1;
+            let B = py - y1;
+            let C = x2 - x1;
+            let D = y2 - y1;
+            let dot = A * C + B * D;
+            let len_sq = C * C + D * D;
+            let param = -1;
+            if (len_sq != 0) param = dot / len_sq;
+            let xx, yy;
+            if (param < 0) { xx = x1; yy = y1; }
+            else if (param > 1) { xx = x2; yy = y2; }
+            else { xx = x1 + param * C; yy = y1 + param * D; }
+            let dx = px - xx;
+            let dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function updateUI() {
+            let batteryFill = document.getElementById('battery-fill');
+            let prodVal = Math.round(production);
+            batteryFill.style.height = prodVal + '%';
+
+            for (let i = 0; i < 10; i++) {
+                let seg = document.getElementById(`bio-seg-${i}`);
+                if (i < biodiversitySegments) {
+                    seg.classList.remove('injured');
+                } else {
+                    seg.classList.add('injured');
+                }
+            }
+
+            let timeVal = Math.max(0, Math.round(levelTime));
+            document.getElementById('time-text').innerText = timeVal;
+            document.getElementById('level-num').innerText = currentLevel;
+
+            let fill = document.getElementById('cd-global');
+            let btn = document.getElementById('btn-ultrasound');
+            fill.style.width = (100 - ultrasoundCharge) + '%';
+            btn.disabled = ultrasoundCharge < 100;
+        }
+
+        function endGame(reason) {
+            isPlaying = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            clearInterval(gameInterval);
+            clearInterval(creatureInterval);
+
+            document.querySelectorAll('.creature').forEach(b => b.remove());
+
+            document.getElementById('final-stats').innerHTML = 
+                `Niveau atteint : <b>Niveau ${currentLevel}</b><br>` +
+                `Raison : <b>${reason}</b><br><br>` +
+                `<i>Ajustez la régulation de votre parc pour maintenir l'équilibre écologique et énergétique.</i>`;
+            
+            document.getElementById('gameover-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
