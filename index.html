@@ -3,21 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bat&Watt-v0.1 - Alignement Axe & Rotor Parfait</title>
+    <title>Bat&Watt - Alignement Parfait</title>
     
-    <!-- Paramètres PWA et Mobile -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Bat&Watt v0.1">
     <meta name="theme-color" content="#0f172a">
-
-    <!-- Icônes & Favicons multi-navigateurs / PWA -->
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
-    
-    <!-- Manifest PWA externe -->
-    <link rel="manifest" href="manifest.json">
 
     <style>
         * {
@@ -26,19 +16,13 @@
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
+            margin: 0; padding: 0;
         }
 
         body {
-            margin: 0;
-            padding: 0;
             background: #0f172a;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100vw;
-            height: 100dvh;
+            width: 100vw; height: 100dvh;
             overflow: hidden;
             color: #ffffff;
             touch-action: none;
@@ -46,681 +30,327 @@
 
         #game-container {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             background: linear-gradient(to bottom, #ff758c, #ff7eb3);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* --- ASTRES CÉLESTES (SOLEIL & LUNE) --- */
+        /* --- ÉTOILES ET NUAGES --- */
+        #stars-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                              radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                              radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                              radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            z-index: 0;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50px;
+            filter: blur(4px);
+            z-index: 1;
+            animation: floatCloud linear infinite;
+        }
+        @keyframes floatCloud {
+            from { transform: translateX(110vw); }
+            to { transform: translateX(-30vw); }
+        }
+
+        /* --- ASTRES CÉLESTES --- */
         .celestial {
             position: absolute;
-            width: 52px;
-            height: 52px;
+            width: 52px; height: 52px;
             border-radius: 50%;
-            z-index: 1;
+            z-index: 2;
             will-change: transform, opacity;
         }
+        .sun { background: #fde047; box-shadow: 0 0 50px #facc15; }
+        .moon { background: #f1f5f9; box-shadow: 0 0 35px rgba(226, 232, 240, 0.5); overflow: hidden; }
 
-        .sun {
-            background: #fde047;
-            box-shadow: 0 0 50px #facc15;
-        }
+        /* --- DÉCOR --- */
+        .mountain-bg-left { position: absolute; bottom: 150px; left: -10%; width: 60%; height: 130px; background: #dce7d1; border-radius: 50% 50% 0 0 / 20% 20% 0 0; z-index: 3; }
+        .mountain-bg-right { position: absolute; bottom: 140px; right: -10%; width: 65%; height: 140px; background: #cfdec1; border-radius: 50% 50% 0 0 / 20% 20% 0 0; z-index: 3; }
+        .hill-mid { position: absolute; bottom: 110px; left: 0; width: 100%; height: 160px; background: #b5cca2; clip-path: ellipse(70% 100% at 50% 100%); z-index: 4; }
+        .hill-foreground { position: absolute; bottom: 80px; left: -10%; width: 120%; height: 120px; background: #8fb375; border-radius: 50% 50% 0 0 / 70% 70% 0 0; z-index: 5; }
 
-        .moon {
-            background: #f1f5f9;
-            box-shadow: 0 0 35px rgba(226, 232, 240, 0.5);
-            overflow: hidden;
-        }
-
-        /* --- DÉCOR COLLINES & MONTAGNES (PLUS PLATES) --- */
-        .mountain-bg-left {
-            position: absolute;
-            bottom: 150px;
-            left: -10%;
-            width: 60%;
-            height: 130px;
-            background: #dce7d1;
-            border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-            z-index: 2;
-        }
-
-        .mountain-bg-right {
-            position: absolute;
-            bottom: 140px;
-            right: -10%;
-            width: 65%;
-            height: 140px;
-            background: #cfdec1;
-            border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-            z-index: 2;
-        }
-
-        .hill-mid {
-            position: absolute;
-            bottom: 110px;
-            left: 0;
-            width: 100%;
-            height: 160px;
-            background: #b5cca2;
-            clip-path: ellipse(70% 100% at 50% 100%);
-            z-index: 3;
-        }
-
-        .hill-foreground {
-            position: absolute;
-            bottom: 80px;
-            left: -10%;
-            width: 120%;
-            height: 120px;
-            background: #8fb375;
-            border-radius: 50% 50% 0 0 / 70% 70% 0 0;
-            z-index: 4;
-        }
-
-        /* --- TOP HUD PLEINE LARGEUR --- */
+        /* --- HUD --- */
         .top-hud {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            border-top: none;
-            border-left: none;
-            border-right: none;
-            border-radius: 0;
-            padding: 8px 12px;
-            z-index: 40;
-            font-size: 11px;
-            font-weight: bold;
-            color: #ffffff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            justify-content: space-around;
-            flex-wrap: wrap;
+            position: absolute; top: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 12px; z-index: 40;
+            font-size: 11px; font-weight: bold; display: flex; gap: 8px; justify-content: space-around; flex-wrap: wrap;
         }
+        .hud-item { background: rgba(255, 255, 255, 0.1); padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px; }
+        .level-badge { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4); transition: transform 0.3s; }
+        .level-up-anim { animation: levelUpPop 0.8s ease-out; }
+        @keyframes levelUpPop { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.35); filter: brightness(1.8); } }
 
-        .hud-item {
-            background: rgba(255, 255, 255, 0.08);
-            padding: 4px 8px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .level-badge {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            font-weight: 800;
-            padding: 4px 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
-            transition: transform 0.3s;
-        }
-
-        .level-up-anim {
-            animation: levelUpPop 0.8s ease-out;
-        }
-
-        @keyframes levelUpPop {
-            0% { transform: scale(1); filter: brightness(1); }
-            50% { transform: scale(1.35); filter: brightness(1.8); box-shadow: 0 0 20px #60a5fa; }
-            100% { transform: scale(1); filter: brightness(1); }
-        }
-
-        /* --- BARRES VERTICALES MODERNES --- */
+        /* --- BARRES VERTICALES --- */
         .vertical-bar-container {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 36px;
-            height: 260px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 18px;
-            z-index: 35;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 0;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 260px;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; z-index: 35;
+            display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
-
-        .bar-title-v {
-            font-size: 8px;
-            font-weight: 800;
-            color: #94a3b8;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            letter-spacing: 1px;
-        }
-
-        .bar-value-v {
-            font-size: 9px;
-            font-weight: bold;
-            color: #ffffff;
-            margin-top: 6px;
-        }
-
-        #battery-left {
-            left: 12px;
-        }
-
-        .modern-track {
-            width: 14px;
-            height: 170px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 7px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column-reverse;
-            position: relative;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-        .modern-fill {
-            width: 100%;
-            border-radius: 7px;
-            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
-        }
-
-        .modern-fill.power-fill {
-            background: linear-gradient(to top, #ef4444, #f59e0b, #10b981);
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
-        }
-
-        .modern-fill.power-drain {
-            background: linear-gradient(to top, #dc2626, #ef4444) !important;
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.8) !important;
-        }
-
-        #biodiversity-right {
-            right: 12px;
-        }
-
-        .modern-fill.bio-fill {
-            background: linear-gradient(to top, #f59e0b, #10b981);
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
-        }
+        .bar-title-v { font-size: 8px; font-weight: 800; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); }
+        .bar-value-v { font-size: 9px; font-weight: bold; margin-top: 6px; }
+        #battery-left { left: 12px; } #biodiversity-right { right: 12px; }
+        .modern-track { width: 14px; height: 170px; background: rgba(255, 255, 255, 0.1); border-radius: 7px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+        .modern-fill { width: 100%; border-radius: 7px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        .power-fill { background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+        .power-drain { background: linear-gradient(to top, #dc2626, #ef4444) !important; box-shadow: 0 0 15px rgba(239, 68, 68, 0.8) !important; }
+        .bio-fill { background: linear-gradient(to top, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
 
         /* --- ÉOLIENNES --- */
-        .wind-turbine {
-            position: absolute;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            pointer-events: auto;
-        }
-
-        #turbine-1 { left: 28%; bottom: 95px; }
-        #turbine-1 .tower { height: 135px; width: 10px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-
-        #turbine-2 { left: 68%; bottom: 115px; }
-        #turbine-2 .tower { height: 165px; width: 12px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-
-        .tower {
-            background: linear-gradient(to right, #94a3b8, #f8fafc, #64748b);
-            border-radius: 2px;
-            box-shadow: -2px 0 8px rgba(0,0,0,0.25);
-        }
-
-        .nacelle {
-            position: absolute;
-            top: -6px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1);
-            border-radius: 8px 12px 6px 6px;
-            z-index: 11;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-        }
-        #turbine-1 .nacelle { width: 22px; height: 12px; }
-        #turbine-2 .nacelle { width: 26px; height: 14px; }
-
-        .hub {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #475569;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 13;
-        }
-
-        /* Axe de rotation positionné exactement au centre géométrique du moyeu gris foncé */
-        .blades-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            transform-origin: 0 0;
-            z-index: 12;
-            will-change: transform;
-        }
-
-        .curtailed .nacelle {
-            background: linear-gradient(to bottom, #fdba74, #ea580c);
-        }
-
-        .blade {
-            position: absolute;
-            background: linear-gradient(to bottom, #ffffff, #e2e8f0);
-            border-radius: 50% 50% 4px 4px;
-            transform-origin: top center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            clip-path: polygon(30% 0%, 70% 0%, 90% 100%, 10% 100%);
-        }
-        
+        .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
+        #turbine-1 { left: 28%; bottom: 95px; } #turbine-1 .tower { height: 135px; width: 10px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-2 { left: 68%; bottom: 115px; } #turbine-2 .tower { height: 165px; width: 12px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        .tower { background: linear-gradient(to right, #94a3b8, #f8fafc, #64748b); border-radius: 2px; }
+        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
+        #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
+        .hub { position: absolute; width: 12px; height: 12px; background: #475569; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 13; }
+        .blades-container { position: absolute; top: 50%; left: 50%; z-index: 12; will-change: transform; }
+        .curtailed .nacelle { background: linear-gradient(to bottom, #fdba74, #ea580c); }
+        .blade { position: absolute; background: linear-gradient(to bottom, #ffffff, #e2e8f0); border-radius: 50% 50% 4px 4px; transform-origin: top center; clip-path: polygon(30% 0%, 70% 0%, 90% 100%, 10% 100%); }
         #turbine-1 .blade { height: 70px; width: 8px; top: 0px; left: -4px; }
-        #turbine-1 .blade:nth-child(1) { transform: rotate(0deg); }
-        #turbine-1 .blade:nth-child(2) { transform: rotate(120deg); }
-        #turbine-1 .blade:nth-child(3) { transform: rotate(240deg); }
-
+        #turbine-1 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-1 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-1 .blade:nth-child(3) { transform: rotate(240deg); }
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
-        #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); }
-        #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); }
-        #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
+        #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
         /* --- PUPITRE DE CONTRÔLE --- */
         .control-deck {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 110px;
+            position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
             padding-bottom: env(safe-area-inset-bottom, 0px);
-            background: #ffffff;
-            border-top: 2px solid #e2e8f0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 50;
-            padding-left: 10px;
-            padding-right: 10px;
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.5);
+            display: flex; justify-content: space-around; align-items: center; z-index: 50; padding: 0 10px;
             box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
         }
-
-        .turbine-station {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            padding: 6px 8px;
-            border-radius: 8px;
-            width: 30%;
-            max-width: 180px;
+        .turbine-station, .ultrasound-station { display: flex; flex-direction: column; align-items: center; width: 30%; max-width: 180px; }
+        .station-title { font-size: 9px; color: #64748b; margin-bottom: 4px; font-weight: bold; }
+        .btn-control, .btn-ultrasound-global {
+            width: 100%; border: none; padding: 12px 4px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s;
         }
+        .btn-control { background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1; }
+        .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; }
+        .btn-curtail.active { background: #ea580c; color: white; box-shadow: 0 4px 0 #c2410c; }
+        .btn-curtail.active:active { box-shadow: 0 0 0 #c2410c; }
+        .btn-ultrasound-global { background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; }
+        .btn-ultrasound-global:active { transform: translateY(4px); box-shadow: 0 0 0 #0369a1; }
 
-        .station-title {
-            font-size: 9px;
-            color: #64748b;
-            margin-bottom: 4px;
-            font-weight: bold;
-        }
-
-        .btn-control {
-            width: 100%;
-            background: #e2e8f0;
-            color: #1e293b;
-            border: 1px solid #cbd5e1;
-            padding: 10px 4px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.1s;
-        }
-
-        .btn-control:active { transform: scale(0.95); }
-
-        .btn-curtail { background: #ea580c; border-color: #c2410c; color: white; }
-        .btn-curtail.active { background: #ea580c; box-shadow: 0 0 8px rgba(234, 88, 12, 0.4); }
-
-        .ultrasound-station {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 34%;
-            max-width: 200px;
-        }
-
-        .btn-ultrasound-global {
-            position: relative;
-            width: 100%;
-            background: #0284c7;
-            border: 1px solid #0369a1;
-            color: white;
-            padding: 12px 4px;
-            font-size: 11px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
-        }
-        .btn-ultrasound-global:active { transform: scale(0.96); }
-
-        /* --- ANIMAUX --- */
-        .creature {
-            position: absolute;
-            z-index: 30;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transform: translateX(-50%);
-            pointer-events: none;
-        }
-
-        .creature-icon {
-            font-size: 28px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-        }
-
+        /* --- ANIMAUX & FEEDBACKS --- */
+        .creature { position: absolute; z-index: 30; font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); will-change: transform; }
         .bat-icon { animation: flapWings 0.35s ease-in-out infinite alternate; }
         .bird-icon { animation: flapBird 0.4s ease-in-out infinite alternate; }
+        @keyframes flapWings { 0% { transform: scaleY(1) scaleX(1); } 100% { transform: scaleY(0.7) scaleX(0.9) translateY(2px); } }
+        @keyframes flapBird { 0% { transform: translateY(0px) scaleX(1); } 100% { transform: translateY(-4px) scaleX(1); } }
+        .fleeing { transition: all 0.6s ease-out; transform: translateY(-120px) scale(0.8); opacity: 0.3; }
+        .crashing { animation: crashFall 0.8s ease-in forwards; }
+        @keyframes crashFall { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.2); } 100% { transform: rotate(540deg) scale(0.6); opacity: 0; } }
+        
+        .feedback-text { position: absolute; font-weight: bold; font-size: 14px; z-index: 60; animation: floatUp 1s ease-out forwards; pointer-events: none; }
+        .feedback-good { color: #10b981; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .feedback-bad { color: #ef4444; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
-        @keyframes flapWings {
-            0% { transform: scaleY(1) scaleX(1); }
-            100% { transform: scaleY(0.7) scaleX(0.9) translateY(2px); }
-        }
-
-        @keyframes flapBird {
-            0% { transform: translateY(0px) scaleX(1); }
-            100% { transform: translateY(-4px) scaleX(1); }
-        }
-
-        .creature.fleeing {
-            transition: transform 0.6s ease-out, top 0.6s ease-out;
-            transform: translateX(-50%) translateY(-120px) scale(0.8);
-            opacity: 0.3;
-        }
-
-        .creature.crashing {
-            animation: crashFall 0.8s ease-in forwards;
-        }
-
-        @keyframes crashFall {
-            0% { transform: translateX(-50%) rotate(0deg) scale(1); }
-            50% { transform: translateX(-30%) rotate(180deg) scale(1.2); }
-            100% { transform: translateX(20%) rotate(540deg) scale(0.6); opacity: 0; }
-        }
-
-        /* --- MODALES --- */
+        /* --- MODALES & MENUS (Glassmorphism) --- */
         .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            text-align: center;
-            padding: 30px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; text-align: center; padding: 20px;
         }
-
-        .screen h1 {
-            color: #0f172a;
-            font-size: 26px;
-            margin-bottom: 12px;
+        .menu-box {
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%;
         }
-
-        .screen p {
-            color: #475569;
-            max-width: 450px;
-            line-height: 1.5;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        .btn-main {
-            background: #16a34a;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
-        }
-        .btn-main:active { transform: scale(0.96); }
-
+        .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .menu-box p { font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px; }
+        .stats-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .btn-main { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 6px 0 #047857; transition: all 0.1s; width: 100%; margin-bottom: 10px; }
+        .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #047857; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
     <div id="game-container" ontouchstart="handleContainerTouch(event)" onclick="handleContainerClick(event)">
+        <!-- Décor de fond -->
+        <div id="stars-container"></div>
+        <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
+        <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.4;"></div>
+
         <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
                 <circle cx="26" cy="26" r="26" fill="#f1f5f9" />
-                <!-- Cratères lunaires -->
                 <circle cx="18" cy="18" r="4" fill="#cbd5e1" opacity="0.4"/>
                 <circle cx="35" cy="30" r="5" fill="#cbd5e1" opacity="0.4"/>
                 <circle cx="22" cy="38" r="3" fill="#cbd5e1" opacity="0.4"/>
-                <!-- Phase lunaire (croissant dessiné proprement sans cache noir externe) -->
                 <path id="moon-shadow-path" d="M26,0 A26,26 0 0,1 26,52 A26,26 0 0,1 26,0 Z" fill="#0f172a" opacity="0.85" />
             </svg>
         </div>
 
-        <div class="mountain-bg-left"></div>
-        <div class="mountain-bg-right"></div>
-        <div class="hill-mid"></div>
-        <div class="hill-foreground"></div>
+        <div class="mountain-bg-left"></div><div class="mountain-bg-right"></div>
+        <div class="hill-mid"></div><div class="hill-foreground"></div>
 
-        <!-- TOP HUD PLEINE LARGEUR -->
+        <!-- HUD -->
         <div class="top-hud">
-            <div class="hud-item level-badge" id="level-badge">
-                Niveau <span id="level-num">1</span>
-            </div>
-            <div class="hud-item" title="Temps restant">
-                ⏱️ <span id="time-text">60</span>s
-            </div>
-            <div class="hud-item" title="Faune Sauvée / Blessée">
-                💚 <span id="saved-count">0</span> | 💔 <span id="injured-count">0</span>
-            </div>
-            <div class="hud-item" title="Énergie produite">
-                ⚡ <span id="energy-count">0</span> kWh
-            </div>
-            <div class="hud-item" title="Biodiversité globale">
-                🌿 <span id="hud-bio-val">100%</span>
-            </div>
+            <div class="hud-item level-badge" id="level-badge">Niv. <span id="level-num">1</span></div>
+            <div class="hud-item">⏱️ <span id="time-text">60</span>s</div>
+            <div class="hud-item">💚 <span id="saved-count">0</span> | 💔 <span id="injured-count">0</span></div>
+            <div class="hud-item">⚡ <span id="energy-count">0</span> kWh</div>
         </div>
 
-        <!-- BARRE VERTICALE PUISSANCE (MODERNISÉE) -->
         <div class="vertical-bar-container" id="battery-left">
             <span class="bar-title-v">Puissance</span>
-            <div class="modern-track">
-                <div class="modern-fill power-fill" id="battery-fill" style="height: 0%;"></div>
-            </div>
+            <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="height: 0%;"></div></div>
             <span class="bar-value-v" id="power-val">0%</span>
         </div>
 
-        <!-- BARRE VERTICALE BIODIVERSITÉ (MODERNISÉE) -->
         <div class="vertical-bar-container" id="biodiversity-right">
             <span class="bar-title-v">Biodiversité</span>
-            <div class="modern-track">
-                <div class="modern-fill bio-fill" id="bio-fill" style="height: 100%;"></div>
-            </div>
+            <div class="modern-track"><div class="modern-fill bio-fill" id="bio-fill" style="height: 100%;"></div></div>
             <span class="bar-value-v" id="bio-val">100%</span>
         </div>
 
         <!-- Éoliennes -->
-        <div class="wind-turbine" id="turbine-1" ontouchstart="toggleCurtail(1); event.stopPropagation();" onclick="toggleCurtail(1); event.stopPropagation();">
+        <div class="wind-turbine" id="turbine-1">
             <div class="tower"></div>
-            <div class="nacelle">
-                <div class="hub">
-                    <div class="blades-container" id="blades-1">
-                        <div class="blade"></div>
-                        <div class="blade"></div>
-                        <div class="blade"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
+                <div class="blade"></div><div class="blade"></div><div class="blade"></div>
+            </div></div></div>
         </div>
 
-        <div class="wind-turbine" id="turbine-2" ontouchstart="toggleCurtail(2); event.stopPropagation();" onclick="toggleCurtail(2); event.stopPropagation();">
+        <div class="wind-turbine" id="turbine-2">
             <div class="tower"></div>
-            <div class="nacelle">
-                <div class="hub">
-                    <div class="blades-container" id="blades-2">
-                        <div class="blade"></div>
-                        <div class="blade"></div>
-                        <div class="blade"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-2">
+                <div class="blade"></div><div class="blade"></div><div class="blade"></div>
+            </div></div></div>
         </div>
 
-        <!-- Pupitre de contrôle -->
+        <!-- Pupitre -->
         <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
             <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE E-01</span>
-                <button class="btn-control btn-curtail" id="btn-c1" ontouchstart="toggleCurtail(1); event.stopPropagation();" onclick="toggleCurtail(1); event.stopPropagation();">BRIDER</button>
+                <span class="station-title">ÉOLIENNE 1 (Touche 1)</span>
+                <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
             </div>
-
             <div class="ultrasound-station">
-                <span class="station-title">RÉPULSIF GLOBAL</span>
-                <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.stopPropagation();" onclick="triggerGlobalUltrasound(); event.stopPropagation();">
-                    🔊 ULTRASONS (-30%)
-                </button>
+                <span class="station-title">RÉPULSIF (Espace)</span>
+                <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">🔊 ULTRASONS</button>
             </div>
-
             <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE E-02</span>
-                <button class="btn-control btn-curtail" id="btn-c2" ontouchstart="toggleCurtail(2); event.stopPropagation();" onclick="toggleCurtail(2); event.stopPropagation();">BRIDER</button>
+                <span class="station-title">ÉOLIENNE 2 (Touche 2)</span>
+                <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
             </div>
         </div>
+    </div>
 
-        <!-- Écran d'accueil -->
-        <div id="start-screen" class="screen">
-            <h1>🦇 Bat&Watt v0.1 // Alignement Parfait</h1>
-            <p>La centrale commence à <b>0% de puissance</b> : libérez les éoliennes pour charger la batterie. Utilisez les <b>ultrasons</b> (coûtent 30% de puissance) pour écarter la faune. Gardez la <b>biodiversité au-dessus de 90%</b> !<br><br><i>Touchez le centre de l'écran à tout moment pour mettre en pause.</i></p>
-            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">LANCER LA CENTRALE</button>
+    <!-- Écran d'accueil (Menu Principal) -->
+    <div id="start-screen" class="screen">
+        <div class="menu-box">
+            <h1>🦇 Bat&Watt</h1>
+            <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale (Oiseaux de jour, Chauves-souris la nuit).</p>
+            <div class="stats-box">
+                <b>🏆 Meilleurs Scores :</b><br>
+                Niveau max : <span id="menu-high-level">1</span><br>
+                Énergie max : <span id="menu-high-energy">0</span> kWh
+            </div>
+            <button class="btn-main" onclick="startGame()">LANCER LA CENTRALE</button>
         </div>
+    </div>
 
-        <!-- Écran de pause -->
-        <div id="pause-screen" class="screen hidden">
+    <!-- Écran de pause -->
+    <div id="pause-screen" class="screen hidden">
+        <div class="menu-box">
             <h1>PAUSE</h1>
-            <p>Centrale en maintenance.<br>Touchez le centre de l'écran pour reprendre.</p>
-            <button class="btn-main" ontouchstart="togglePause(); event.stopPropagation();" onclick="togglePause(); event.stopPropagation();">Reprendre</button>
+            <button class="btn-main" onclick="togglePause()">Reprendre</button>
+            <button class="btn-secondary" onclick="quitToMenu()">Quitter vers le Menu</button>
         </div>
+    </div>
 
-        <!-- Écran de fin -->
-        <div id="gameover-screen" class="screen hidden" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
-            <h1 id="gameover-title" style="color: #dc2626;">⚠️ ARRÊT D'URGENCE</h1>
+    <!-- Écran de fin -->
+    <div id="gameover-screen" class="screen hidden">
+        <div class="menu-box">
+            <h1 style="color: #ef4444;">⚠️ ARRÊT D'URGENCE</h1>
             <p id="final-stats"></p>
-            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">NOUVELLE SESSION</button>
+            <button class="btn-main" onclick="startGame()">NOUVELLE SESSION</button>
+            <button class="btn-secondary" onclick="quitToMenu()">Menu Principal</button>
         </div>
     </div>
 
     <script>
-        let production = 0; 
-        let biodiversityPercent = 100; 
-        let levelTime = 60; 
-        let currentLevel = 1;
-        let gameTime = 0; 
-        let isPlaying = false;
-        let isPaused = false;
+        // Variables globales
+        let production = 0, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
+        let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
         let curtailed = { 1: false, 2: false };
         let isNight = false;
+        let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
+        let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
-        let savedFauna = 0;
-        let injuredFauna = 0;
-        let totalEnergyProduced = 0;
+        // Gestion LocalStorage
+        let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
+        document.getElementById('menu-high-level').innerText = highScores.maxLevel;
+        document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
 
-        let rot1 = 0;
-        let rot2 = 0;
-        let lastTimestamp = 0;
-
-        function handleContainerClick(event) {
-            if (!isPlaying) return;
-            togglePause();
+        function saveScores() {
+            if (currentLevel > highScores.maxLevel) highScores.maxLevel = currentLevel;
+            if (totalEnergyProduced > highScores.maxEnergy) highScores.maxEnergy = totalEnergyProduced;
+            localStorage.setItem('batWattScores', JSON.stringify(highScores));
+            document.getElementById('menu-high-level').innerText = highScores.maxLevel;
+            document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
         }
 
-        function handleContainerTouch(event) {
-            if (!isPlaying) return;
-            event.preventDefault();
-            togglePause();
+        // Contrôles Clavier
+        window.addEventListener('keydown', (e) => {
+            if (!isPlaying || isPaused) return;
+            if (e.key === '1') toggleCurtail(1);
+            if (e.key === '2') toggleCurtail(2);
+            if (e.key === ' ') { e.preventDefault(); triggerGlobalUltrasound(); }
+            if (e.key === 'Escape') togglePause();
+        });
+
+        function handleContainerClick(e) { if (isPlaying) togglePause(); }
+        function handleContainerTouch(e) { if (isPlaying) { e.preventDefault(); togglePause(); } }
+
+        function quitToMenu() {
+            isPlaying = false; isPaused = false;
+            cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
+            document.querySelectorAll('.creature').forEach(c => c.remove());
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
         }
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('pause-screen').classList.add('hidden');
             document.getElementById('gameover-screen').classList.add('hidden');
+            document.querySelectorAll('.creature').forEach(c => c.remove());
             
-            production = 0;
-            biodiversityPercent = 100;
-            levelTime = 60;
-            currentLevel = 1;
-            gameTime = 0;
-            savedFauna = 0;
-            injuredFauna = 0;
-            totalEnergyProduced = 0;
+            production = 0; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
+            savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
             curtailed = { 1: false, 2: false };
-            isPlaying = true;
-            isPaused = false;
+            document.getElementById('btn-c1').classList.remove('active'); document.getElementById('btn-c2').classList.remove('active');
+            document.getElementById('btn-c1').innerText = "BRIDER"; document.getElementById('btn-c2').innerText = "BRIDER";
+            document.getElementById('turbine-1').classList.remove('curtailed'); document.getElementById('turbine-2').classList.remove('curtailed');
+
+            isPlaying = true; isPaused = false;
             updateUI();
 
             if (gameInterval) clearInterval(gameInterval);
-            gameInterval = setInterval(() => {
-                if (!isPlaying || isPaused) return;
-
-                let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
-                let addedPower = 0;
-                
-                if (activeTurbines === 2) addedPower = 3.5;
-                else if (activeTurbines === 1.5) addedPower = 1.8;
-                else if (activeTurbines === 1) addedPower = 1.0;
-                else production -= 1.2; 
-
-                if (addedPower > 0) {
-                    production += addedPower;
-                    totalEnergyProduced += addedPower * 1.5;
-                }
-
-                production = Math.max(0, Math.min(100, production));
-
-                levelTime -= 0.4;
-                if (levelTime <= 0) {
-                    currentLevel++;
-                    levelTime = 60; 
-                    triggerLevelUpAnimation();
-                }
-
-                if (gameTime > 5 && production <= 0) {
-                    endGame("Panne totale : la batterie de puissance est vide.");
-                }
-
-                if (biodiversityPercent < 90) {
-                    endGame("La biodiversité est passée sous le seuil critique des 90%.");
-                }
-
-                updateUI();
-            }, 400);
+            gameInterval = setInterval(gameLoop, 400);
 
             if (creatureInterval) clearInterval(creatureInterval);
             creatureInterval = setInterval(manageCreatureSpawns, 1500);
@@ -730,25 +360,41 @@
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
-        function triggerLevelUpAnimation() {
-            let badge = document.getElementById('level-badge');
-            if (badge) {
-                badge.classList.remove('level-up-anim');
-                void badge.offsetWidth; 
-                badge.classList.add('level-up-anim');
+        function gameLoop() {
+            if (!isPlaying || isPaused) return;
+
+            let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
+            let addedPower = (activeTurbines === 2) ? 3.5 : (activeTurbines === 1.5) ? 1.8 : (activeTurbines === 1) ? 1.0 : -1.2;
+
+            if (addedPower > 0) {
+                production += addedPower;
+                totalEnergyProduced += addedPower * 1.5;
+            } else {
+                production += addedPower;
             }
+
+            production = Math.max(0, Math.min(100, production));
+            levelTime -= 0.4;
+
+            if (levelTime <= 0) {
+                currentLevel++; levelTime = 60;
+                let badge = document.getElementById('level-badge');
+                badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
+            }
+
+            if (gameTime > 5 && production <= 0) endGame("Batterie vide. Gérez mieux vos bridages.");
+            if (biodiversityPercent < 90) endGame("Biodiversité sous le seuil critique (90%).");
+
+            updateUI();
         }
 
         function runVisualLoop(timestamp) {
             if (!isPlaying) return;
             if (!isPaused) {
-                let dt = (timestamp - lastTimestamp) / 1000;
-                if (dt > 0.1) dt = 0.1;
+                let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
                 gameTime += dt;
-
                 rot1 += (curtailed[1] ? 0.8 : 4) * (dt * 60);
                 rot2 += (curtailed[2] ? 0.9 : 4.5) * (dt * 60);
-                
                 document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`;
                 document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
                 updateEphemerisPoetic();
@@ -757,120 +403,71 @@
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
-        function getMoonPhasePath(progress) {
-            let angle = progress * Math.PI * 2;
-            let cosVal = Math.cos(angle);
-            
-            if (progress < 0.02 || progress > 0.98) {
-                return "M26,0 A26,26 0 1,1 25.99,0 Z"; 
-            }
-            if (Math.abs(progress - 0.5) < 0.02) {
-                return "M26,0 A26,26 0 0,1 26,0 Z"; 
-            }
-            
-            let rx = Math.max(0.1, Math.abs(26 * cosVal));
-            let sweep1 = progress < 0.5 ? 1 : 0;
-            let sweep2 = progress < 0.5 ? 0 : 1;
-            return `M 26 0 A 26 26 0 0 1 26 52 A ${rx} 26 0 0 ${sweep2} 26 0`;
-        }
-
         function interpolateColor(c1, c2, factor) {
             factor = Math.max(0, Math.min(1, factor));
-            return [
-                Math.round(c1[0] + factor * (c2[0] - c1[0])),
-                Math.round(c1[1] + factor * (c2[1] - c1[1])),
-                Math.round(c1[2] + factor * (c2[2] - c1[2]))
-            ];
+            return [Math.round(c1[0] + factor * (c2[0] - c1[0])), Math.round(c1[1] + factor * (c2[1] - c1[1])), Math.round(c1[2] + factor * (c2[2] - c1[2]))];
         }
 
         function updateEphemerisPoetic() {
             let cycleProgress = (gameTime % 60) / 60;
             let angle = cycleProgress * Math.PI * 2;
-            
-            let container = document.getElementById('game-container');
-            let sunEl = document.getElementById('sun-body');
-            let moonEl = document.getElementById('moon-body');
-            let moonShadowPath = document.getElementById('moon-shadow-path');
-
-            let sunFactor = Math.sin(angle); 
+            let sunFactor = Math.sin(angle);
             let moonFactor = Math.sin(angle + Math.PI);
-            isNight = sunFactor < 0; 
+            isNight = sunFactor < 0;
+
+            document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
 
             let topColor, botColor;
-            if (sunFactor >= 0.15) {
-                topColor = [56, 189, 248];
-                botColor = [186, 230, 253];
-            } else if (sunFactor <= -0.15) {
-                topColor = [2, 6, 23];
-                botColor = [15, 23, 42];
-            } else {
-                let t = (sunFactor + 0.15) / 0.3;
-                t = t * t * (3 - 2 * t);
-                if (sunFactor >= 0) {
-                    topColor = interpolateColor([255, 130, 110], [56, 189, 248], t);
-                    botColor = interpolateColor([255, 180, 140], [186, 230, 253], t);
-                } else {
-                    topColor = interpolateColor([2, 6, 23], [255, 130, 110], t);
-                    botColor = interpolateColor([15, 23, 42], [255, 180, 140], t);
-                }
+            if (sunFactor >= 0.15) { topColor = [56,189,248]; botColor = [186,230,253]; }
+            else if (sunFactor <= -0.15) { topColor = [2,6,23]; botColor = [15,23,42]; }
+            else {
+                let t = (sunFactor + 0.15) / 0.3; t = t * t * (3 - 2 * t);
+                if (sunFactor >= 0) { topColor = interpolateColor([255,130,110], [56,189,248], t); botColor = interpolateColor([255,180,140], [186,230,253], t); }
+                else { topColor = interpolateColor([2,6,23], [255,130,110], t); botColor = interpolateColor([15,23,42], [255,180,140], t); }
             }
 
-            container.style.background = `linear-gradient(to bottom, rgb(${topColor[0]}, ${topColor[1]}, ${topColor[2]}), rgb(${botColor[0]}, ${botColor[1]}, ${botColor[2]}))`;
-
-            let sunX = 50 + Math.cos(angle) * 46;
-            let sunY = 55 - Math.sin(angle) * 55;
-            sunEl.style.transform = `translate(${sunX}vw, ${sunY}vh)`;
+            document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
+            
+            let sunEl = document.getElementById('sun-body');
+            sunEl.style.transform = `translate(${50 + Math.cos(angle)*46}vw, ${55 - Math.sin(angle)*55}vh)`;
             sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.15) * 4));
 
-            let moonX = 50 + Math.cos(angle + Math.PI) * 46;
-            let moonY = 55 - Math.sin(angle + Math.PI) * 55;
-            moonEl.style.transform = `translate(${moonX}vw, ${moonY}vh)`;
+            let moonEl = document.getElementById('moon-body');
+            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh)`;
             moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.15) * 4));
-
-            let lunarCycleProgress = (gameTime / 240) % 1;
-            if (moonShadowPath) {
-                moonShadowPath.setAttribute('d', getMoonPhasePath(lunarCycleProgress));
-            }
         }
 
         function togglePause() {
             if (!isPlaying) return;
             isPaused = !isPaused;
-            const pauseScreen = document.getElementById('pause-screen');
-            if (isPaused) {
-                pauseScreen.classList.remove('hidden');
-            } else {
-                pauseScreen.classList.add('hidden');
-                lastTimestamp = performance.now();
-            }
+            document.getElementById('pause-screen').classList.toggle('hidden', !isPaused);
+            if (!isPaused) lastTimestamp = performance.now();
         }
 
         function toggleCurtail(id) {
             if (!isPlaying || isPaused) return;
             curtailed[id] = !curtailed[id];
-            
             const btn = document.getElementById(`btn-c${id}`);
             const turbine = document.getElementById(`turbine-${id}`);
-            
-            if (curtailed[id]) {
-                btn.classList.add('active');
-                btn.innerText = "LIBÉRER";
-                turbine.classList.add('curtailed');
-            } else {
-                btn.classList.remove('active');
-                btn.innerText = "BRIDER";
-                turbine.classList.remove('curtailed');
-            }
+            btn.classList.toggle('active', curtailed[id]);
+            btn.innerText = curtailed[id] ? "LIBÉRER" : "BRIDER";
+            turbine.classList.toggle('curtailed', curtailed[id]);
+        }
+
+        function showFeedback(text, x, y, isGood) {
+            let el = document.createElement('div');
+            el.className = `feedback-text ${isGood ? 'feedback-good' : 'feedback-bad'}`;
+            el.innerText = text;
+            el.style.left = `${x}px`; el.style.top = `${y}px`;
+            document.getElementById('game-container').appendChild(el);
+            setTimeout(() => el.remove(), 1000);
         }
 
         function triggerGlobalUltrasound() {
-            if (!isPlaying || isPaused) return;
-            if (production < 30) return;
-
+            if (!isPlaying || isPaused || production < 30) return;
             production -= 30;
             let fillEl = document.getElementById('battery-fill');
-            fillEl.classList.add('power-drain');
-            setTimeout(() => fillEl.classList.remove('power-drain'), 400);
+            fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
 
             [1, 2].forEach(id => {
                 let turbine = document.getElementById(`turbine-${id}`);
@@ -881,8 +478,11 @@
             document.querySelectorAll('.creature').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
-                biodiversityPercent = Math.min(100, biodiversityPercent + 1);
-                savedFauna++;
+                biodiversityPercent = Math.min(100, biodiversityPercent + 1); savedFauna++;
+                
+                let rect = creature.getBoundingClientRect();
+                showFeedback("💚 +1%", rect.left, rect.top, true);
+                
                 setTimeout(() => creature.remove(), 600);
             });
             updateUI();
@@ -890,83 +490,65 @@
 
         function manageCreatureSpawns() {
             if (!isPlaying || isPaused) return;
+            let freqModifier = Math.min(1.5, 1 + (currentLevel * 0.1));
             
             if (isNight) {
-                let waveSize = Math.floor(Math.random() * 3) + 2;
+                let waveSize = Math.floor(Math.random() * (2 + currentLevel/2)) + 1;
                 for (let i = 0; i < waveSize; i++) {
-                    setTimeout(() => {
-                        if (isNight && isPlaying && !isPaused) spawnCreature('bat');
-                    }, i * 300);
+                    setTimeout(() => { if (isNight && isPlaying && !isPaused) spawnCreature('bat'); }, i * 400 / freqModifier);
                 }
-            } else {
-                if (Math.random() < 0.7) {
-                    spawnCreature('bird');
-                }
+            } else if (Math.random() < 0.7 * freqModifier) {
+                spawnCreature('bird');
             }
         }
 
         function spawnCreature(type) {
             const container = document.getElementById('game-container');
             let creature = document.createElement('div');
-            creature.className = `creature ${type}`;
-            let iconClass = type === 'bat' ? 'bat-icon' : 'bird-icon';
-            let emoji = type === 'bat' ? '🦇' : '🦅';
-
-            creature.innerHTML = `<div class="creature-icon ${iconClass}">${emoji}</div>`;
+            creature.className = `creature ${type}-icon`;
+            creature.innerText = type === 'bat' ? '🦇' : '🦅';
             
-            let posX = Math.random() * (window.innerWidth - 120) + 60;
-            let posY = -40;
-            creature.style.left = posX + 'px';
-            creature.style.top = posY + 'px';
+            let startX = Math.random() * (window.innerWidth - 120) + 60;
+            let posY = -40; let timeOffset = Math.random() * 100;
             
+            creature.style.left = startX + 'px'; creature.style.top = posY + 'px';
             container.appendChild(creature);
 
-            let fallSpeed = (type === 'bat') ? (3.2 + (currentLevel - 1) * 0.3) : 2.5;
+            // Difficulté croissante
+            let baseSpeed = (type === 'bat') ? 3.0 : 2.2;
+            let fallSpeed = baseSpeed + (currentLevel * 0.3);
 
             let fallInterval = setInterval(() => {
-                if (!isPlaying) {
-                    creature.remove();
-                    clearInterval(fallInterval);
-                    return;
-                }
-                if (isPaused) return;
-                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                if (!isPlaying) { creature.remove(); clearInterval(fallInterval); return; }
+                if (isPaused || creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
 
                 posY += fallSpeed;
+                // Mouvement sinusoïdal organique
+                let posX = startX + Math.sin(posY/40 + timeOffset) * 30;
+                
+                creature.style.left = posX + 'px';
                 creature.style.top = posY + 'px';
 
-                let t1 = document.getElementById('turbine-1');
-                let t2 = document.getElementById('turbine-2');
-
-                let hit1 = checkTurbinePixelCollision(posX, posY, t1, rot1);
-                let hit2 = checkTurbinePixelCollision(posX, posY, t2, rot2);
+                let hit1 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-1'), rot1);
+                let hit2 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-2'), rot2);
 
                 if (hit1 || hit2) {
-                    let activeCurtail = (hit1 && curtailed[1]) || (hit2 && curtailed[2]);
-
-                    if (activeCurtail) {
-                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                        savedFauna++;
-                        creature.remove();
-                        clearInterval(fallInterval);
+                    if ((hit1 && curtailed[1]) || (hit2 && curtailed[2])) {
+                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5); savedFauna++;
+                        showFeedback("💚 +0.5%", posX, posY, true);
+                        creature.remove(); clearInterval(fallInterval);
                     } else {
-                        biodiversityPercent = Math.max(0, biodiversityPercent - 6);
-                        injuredFauna++;
+                        biodiversityPercent = Math.max(0, biodiversityPercent - 6); injuredFauna++;
+                        showFeedback("💔 -6%", posX, posY, false);
                         updateUI();
-                        
                         creature.classList.add('crashing');
                         setTimeout(() => creature.remove(), 800);
                         clearInterval(fallInterval);
-
-                        if (biodiversityPercent < 90) {
-                            endGame("La biodiversité a chuté sous les 90% suite aux impacts.");
-                        }
+                        if (biodiversityPercent < 90) endGame("Biodiversité détruite par des impacts répétés.");
                     }
-                } else if (posY > window.innerHeight - 110) {
-                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                    savedFauna++;
-                    creature.remove();
-                    clearInterval(fallInterval);
+                } else if (posY > window.innerHeight - 100) {
+                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5); savedFauna++;
+                    creature.remove(); clearInterval(fallInterval);
                 }
             }, 30);
         }
@@ -975,93 +557,57 @@
             let towerEl = turbineEl.querySelector('.tower');
             if (towerEl) {
                 let tRect = towerEl.getBoundingClientRect();
-                if (px >= tRect.left - 4 && px <= tRect.right + 4 && py >= tRect.top && py <= tRect.bottom) {
-                    return true;
-                }
+                if (px >= tRect.left - 4 && px <= tRect.right + 4 && py >= tRect.top && py <= tRect.bottom) return true;
             }
-
-            let nacelleEl = turbineEl.querySelector('.nacelle');
-            if (nacelleEl) {
-                let nRect = nacelleEl.getBoundingClientRect();
-                if (px >= nRect.left - 4 && px <= nRect.right + 4 && py >= nRect.top - 4 && py <= nRect.bottom + 4) {
-                    return true;
-                }
-            }
-
             let bladesEl = turbineEl.querySelector('.blades-container');
             if (bladesEl) {
                 let bRect = bladesEl.getBoundingClientRect();
-                let hubX = bRect.left; 
-                let hubY = bRect.top;  
-                let bladeLength = turbineEl.id === 'turbine-1' ? 70 : 85; 
+                let hubX = bRect.left, hubY = bRect.top;
+                let bladeLength = turbineEl.id === 'turbine-1' ? 70 : 85;
                 let radBase = rotationDeg * (Math.PI / 180);
-
                 for (let b = 0; b < 3; b++) {
                     let angle = radBase + (b * 120 * Math.PI / 180);
                     let tipX = hubX + bladeLength * Math.cos(angle - Math.PI / 2);
                     let tipY = hubY + bladeLength * Math.sin(angle - Math.PI / 2);
-
-                    let d = pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY);
-                    if (d < 12) return true; 
+                    if (pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY) < 15) return true;
                 }
             }
-
             return false;
         }
 
         function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
-            let A = px - x1;
-            let B = py - y1;
-            let C = x2 - x1;
-            let D = y2 - y1;
-            let dot = A * C + B * D;
-            let len_sq = C * C + D * D;
-            let param = -1;
+            let A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1;
+            let dot = A * C + B * D, len_sq = C * C + D * D, param = -1;
             if (len_sq != 0) param = dot / len_sq;
-            let xx, yy;
-            if (param < 0) { xx = x1; yy = y1; }
-            else if (param > 1) { xx = x2; yy = y2; }
-            else { xx = x1 + param * C; yy = y1 + param * D; }
-            let dx = px - xx;
-            let dy = py - yy;
+            let xx = (param < 0) ? x1 : (param > 1) ? x2 : x1 + param * C;
+            let yy = (param < 0) ? y1 : (param > 1) ? y2 : y1 + param * D;
+            let dx = px - xx, dy = py - yy;
             return Math.sqrt(dx * dx + dy * dy);
         }
 
         function updateUI() {
-            let prodVal = Math.round(production);
-            let bioVal = Math.round(biodiversityPercent);
-
-            document.getElementById('battery-fill').style.height = prodVal + '%';
-            document.getElementById('power-val').innerText = prodVal + '%';
-
-            document.getElementById('bio-fill').style.height = bioVal + '%';
-            document.getElementById('bio-val').innerText = bioVal + '%';
-
-            let timeVal = Math.max(0, Math.round(levelTime));
-            document.getElementById('time-text').innerText = timeVal;
+            document.getElementById('battery-fill').style.height = Math.round(production) + '%';
+            document.getElementById('power-val').innerText = Math.round(production) + '%';
+            document.getElementById('bio-fill').style.height = Math.round(biodiversityPercent) + '%';
+            document.getElementById('bio-val').innerText = Math.round(biodiversityPercent) + '%';
+            document.getElementById('time-text').innerText = Math.max(0, Math.round(levelTime));
             document.getElementById('level-num').innerText = currentLevel;
-
             document.getElementById('saved-count').innerText = savedFauna;
             document.getElementById('injured-count').innerText = injuredFauna;
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
-            document.getElementById('hud-bio-val').innerText = bioVal + '%';
         }
 
         function endGame(reason) {
             isPlaying = false;
-            if (animFrameId) cancelAnimationFrame(animFrameId);
-            clearInterval(gameInterval);
-            clearInterval(creatureInterval);
-
-            document.querySelectorAll('.creature').forEach(b => b.remove());
-
-            document.getElementById('final-stats').innerHTML = 
-                `Niveau atteint : <b>Niveau ${currentLevel}</b><br>` +
-                `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
-                `Énergie produite : <b>${Math.round(totalEnergyProduced)} kWh</b><br>` +
-                `Raison de l'arrêt : <b>${reason}</b><br><br>` +
-                `<i>Ajustez la régulation de votre parc pour maintenir l'équilibre écologique et énergétique.</i>`;
+            cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
+            saveScores(); // Enregistrement du score
             
+            document.querySelectorAll('.creature').forEach(b => b.remove());
+            document.getElementById('final-stats').innerHTML = 
+                `Niveau atteint : <b>${currentLevel}</b><br>` +
+                `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
+                `Énergie totale : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` +
+                `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
         }
     </script>
