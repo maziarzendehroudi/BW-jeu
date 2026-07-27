@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -602,4 +601,469 @@
                 <button class="btn-control btn-curtail" id="btn-c1" ontouchstart="toggleCurtail(1); event.stopPropagation();" onclick="toggleCurtail(1); event.stopPropagation();">BRIDER</button>
             </div>
 
-   
+            <div class="ultrasound-station">
+                <span class="station-title">RÉPULSIF GLOBAL</span>
+                <button class="btn-ultrasound-global" id="btn-ultrasound" ontouchstart="triggerGlobalUltrasound(); event.stopPropagation();" onclick="triggerGlobalUltrasound(); event.stopPropagation();">
+                    🔊 ULTRASONS (-30%)
+                </button>
+            </div>
+
+            <div class="turbine-station">
+                <span class="station-title">ÉOLIENNE E-02</span>
+                <button class="btn-control btn-curtail" id="btn-c2" ontouchstart="toggleCurtail(2); event.stopPropagation();" onclick="toggleCurtail(2); event.stopPropagation();">BRIDER</button>
+            </div>
+        </div>
+
+        <!-- Écran d'accueil -->
+        <div id="start-screen" class="screen">
+            <h1>🦇 Bat&Watt v0.1 // Alignement Parfait</h1>
+            <p>La centrale commence à <b>0% de puissance</b> : libérez les éoliennes pour charger la batterie. Utilisez les <b>ultrasons</b> (coûtent 30% de puissance) pour écarter la faune. Gardez la <b>biodiversité au-dessus de 90%</b> !<br><br><i>Touchez le centre de l'écran à tout moment pour mettre en pause.</i></p>
+            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">LANCER LA CENTRALE</button>
+        </div>
+
+        <!-- Écran de pause -->
+        <div id="pause-screen" class="screen hidden">
+            <h1>PAUSE</h1>
+            <p>Centrale en maintenance.<br>Touchez le centre de l'écran pour reprendre.</p>
+            <button class="btn-main" ontouchstart="togglePause(); event.stopPropagation();" onclick="togglePause(); event.stopPropagation();">Reprendre</button>
+        </div>
+
+        <!-- Écran de fin -->
+        <div id="gameover-screen" class="screen hidden" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
+            <h1 id="gameover-title" style="color: #dc2626;">⚠️ ARRÊT D'URGENCE</h1>
+            <p id="final-stats"></p>
+            <button class="btn-main" ontouchstart="startGame(); event.stopPropagation();" onclick="startGame(); event.stopPropagation();">NOUVELLE SESSION</button>
+        </div>
+    </div>
+
+    <script>
+        let production = 0; 
+        let biodiversityPercent = 100; 
+        let levelTime = 60; 
+        let currentLevel = 1;
+        let gameTime = 0; 
+        let isPlaying = false;
+        let isPaused = false;
+        let gameInterval, creatureInterval, animFrameId;
+        let curtailed = { 1: false, 2: false };
+        let isNight = false;
+
+        let savedFauna = 0;
+        let injuredFauna = 0;
+        let totalEnergyProduced = 0;
+
+        let rot1 = 0;
+        let rot2 = 0;
+        let lastTimestamp = 0;
+
+        function handleContainerClick(event) {
+            if (!isPlaying) return;
+            togglePause();
+        }
+
+        function handleContainerTouch(event) {
+            if (!isPlaying) return;
+            event.preventDefault();
+            togglePause();
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('gameover-screen').classList.add('hidden');
+            
+            production = 0;
+            biodiversityPercent = 100;
+            levelTime = 60;
+            currentLevel = 1;
+            gameTime = 0;
+            savedFauna = 0;
+            injuredFauna = 0;
+            totalEnergyProduced = 0;
+            curtailed = { 1: false, 2: false };
+            isPlaying = true;
+            isPaused = false;
+            updateUI();
+
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                if (!isPlaying || isPaused) return;
+
+                let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
+                let addedPower = 0;
+                
+                if (activeTurbines === 2) addedPower = 3.5;
+                else if (activeTurbines === 1.5) addedPower = 1.8;
+                else if (activeTurbines === 1) addedPower = 1.0;
+                else production -= 1.2; 
+
+                if (addedPower > 0) {
+                    production += addedPower;
+                    totalEnergyProduced += addedPower * 1.5;
+                }
+
+                production = Math.max(0, Math.min(100, production));
+
+                levelTime -= 0.4;
+                if (levelTime <= 0) {
+                    currentLevel++;
+                    levelTime = 60; 
+                    triggerLevelUpAnimation();
+                }
+
+                if (gameTime > 5 && production <= 0) {
+                    endGame("Panne totale : la batterie de puissance est vide.");
+                }
+
+                if (biodiversityPercent < 90) {
+                    endGame("La biodiversité est passée sous le seuil critique des 90%.");
+                }
+
+                updateUI();
+            }, 400);
+
+            if (creatureInterval) clearInterval(creatureInterval);
+            creatureInterval = setInterval(manageCreatureSpawns, 1500);
+
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            lastTimestamp = performance.now();
+            animFrameId = requestAnimationFrame(runVisualLoop);
+        }
+
+        function triggerLevelUpAnimation() {
+            let badge = document.getElementById('level-badge');
+            if (badge) {
+                badge.classList.remove('level-up-anim');
+                void badge.offsetWidth; 
+                badge.classList.add('level-up-anim');
+            }
+        }
+
+        function runVisualLoop(timestamp) {
+            if (!isPlaying) return;
+            if (!isPaused) {
+                let dt = (timestamp - lastTimestamp) / 1000;
+                if (dt > 0.1) dt = 0.1;
+                gameTime += dt;
+
+                rot1 += (curtailed[1] ? 0.8 : 4) * (dt * 60);
+                rot2 += (curtailed[2] ? 0.9 : 4.5) * (dt * 60);
+                
+                document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`;
+                document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
+                updateEphemerisPoetic();
+            }
+            lastTimestamp = timestamp;
+            animFrameId = requestAnimationFrame(runVisualLoop);
+        }
+
+        function getMoonPhasePath(progress) {
+            let angle = progress * Math.PI * 2;
+            let cosVal = Math.cos(angle);
+            
+            if (progress < 0.02 || progress > 0.98) {
+                return "M26,0 A26,26 0 1,1 25.99,0 Z"; 
+            }
+            if (Math.abs(progress - 0.5) < 0.02) {
+                return "M26,0 A26,26 0 0,1 26,0 Z"; 
+            }
+            
+            let rx = Math.max(0.1, Math.abs(26 * cosVal));
+            let sweep1 = progress < 0.5 ? 1 : 0;
+            let sweep2 = progress < 0.5 ? 0 : 1;
+            return `M 26 0 A 26 26 0 0 1 26 52 A ${rx} 26 0 0 ${sweep2} 26 0`;
+        }
+
+        function interpolateColor(c1, c2, factor) {
+            factor = Math.max(0, Math.min(1, factor));
+            return [
+                Math.round(c1[0] + factor * (c2[0] - c1[0])),
+                Math.round(c1[1] + factor * (c2[1] - c1[1])),
+                Math.round(c1[2] + factor * (c2[2] - c1[2]))
+            ];
+        }
+
+        function updateEphemerisPoetic() {
+            let cycleProgress = (gameTime % 60) / 60;
+            let angle = cycleProgress * Math.PI * 2;
+            
+            let container = document.getElementById('game-container');
+            let sunEl = document.getElementById('sun-body');
+            let moonEl = document.getElementById('moon-body');
+            let moonShadowPath = document.getElementById('moon-shadow-path');
+
+            let sunFactor = Math.sin(angle); 
+            let moonFactor = Math.sin(angle + Math.PI);
+            isNight = sunFactor < 0; 
+
+            let topColor, botColor;
+            if (sunFactor >= 0.15) {
+                topColor = [56, 189, 248];
+                botColor = [186, 230, 253];
+            } else if (sunFactor <= -0.15) {
+                topColor = [2, 6, 23];
+                botColor = [15, 23, 42];
+            } else {
+                let t = (sunFactor + 0.15) / 0.3;
+                t = t * t * (3 - 2 * t);
+                if (sunFactor >= 0) {
+                    topColor = interpolateColor([255, 130, 110], [56, 189, 248], t);
+                    botColor = interpolateColor([255, 180, 140], [186, 230, 253], t);
+                } else {
+                    topColor = interpolateColor([2, 6, 23], [255, 130, 110], t);
+                    botColor = interpolateColor([15, 23, 42], [255, 180, 140], t);
+                }
+            }
+
+            container.style.background = `linear-gradient(to bottom, rgb(${topColor[0]}, ${topColor[1]}, ${topColor[2]}), rgb(${botColor[0]}, ${botColor[1]}, ${botColor[2]}))`;
+
+            let sunX = 50 + Math.cos(angle) * 46;
+            let sunY = 55 - Math.sin(angle) * 55;
+            sunEl.style.transform = `translate(${sunX}vw, ${sunY}vh)`;
+            sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.15) * 4));
+
+            let moonX = 50 + Math.cos(angle + Math.PI) * 46;
+            let moonY = 55 - Math.sin(angle + Math.PI) * 55;
+            moonEl.style.transform = `translate(${moonX}vw, ${moonY}vh)`;
+            moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.15) * 4));
+
+            let lunarCycleProgress = (gameTime / 240) % 1;
+            if (moonShadowPath) {
+                moonShadowPath.setAttribute('d', getMoonPhasePath(lunarCycleProgress));
+            }
+        }
+
+        function togglePause() {
+            if (!isPlaying) return;
+            isPaused = !isPaused;
+            const pauseScreen = document.getElementById('pause-screen');
+            if (isPaused) {
+                pauseScreen.classList.remove('hidden');
+            } else {
+                pauseScreen.classList.add('hidden');
+                lastTimestamp = performance.now();
+            }
+        }
+
+        function toggleCurtail(id) {
+            if (!isPlaying || isPaused) return;
+            curtailed[id] = !curtailed[id];
+            
+            const btn = document.getElementById(`btn-c${id}`);
+            const turbine = document.getElementById(`turbine-${id}`);
+            
+            if (curtailed[id]) {
+                btn.classList.add('active');
+                btn.innerText = "LIBÉRER";
+                turbine.classList.add('curtailed');
+            } else {
+                btn.classList.remove('active');
+                btn.innerText = "BRIDER";
+                turbine.classList.remove('curtailed');
+            }
+        }
+
+        function triggerGlobalUltrasound() {
+            if (!isPlaying || isPaused) return;
+            if (production < 30) return;
+
+            production -= 30;
+            let fillEl = document.getElementById('battery-fill');
+            fillEl.classList.add('power-drain');
+            setTimeout(() => fillEl.classList.remove('power-drain'), 400);
+
+            [1, 2].forEach(id => {
+                let turbine = document.getElementById(`turbine-${id}`);
+                turbine.style.filter = "drop-shadow(0 0 20px #0284c7)";
+                setTimeout(() => turbine.style.filter = "none", 400);
+            });
+
+            document.querySelectorAll('.creature').forEach(creature => {
+                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                creature.classList.add('fleeing');
+                biodiversityPercent = Math.min(100, biodiversityPercent + 1);
+                savedFauna++;
+                setTimeout(() => creature.remove(), 600);
+            });
+            updateUI();
+        }
+
+        function manageCreatureSpawns() {
+            if (!isPlaying || isPaused) return;
+            
+            if (isNight) {
+                let waveSize = Math.floor(Math.random() * 3) + 2;
+                for (let i = 0; i < waveSize; i++) {
+                    setTimeout(() => {
+                        if (isNight && isPlaying && !isPaused) spawnCreature('bat');
+                    }, i * 300);
+                }
+            } else {
+                if (Math.random() < 0.7) {
+                    spawnCreature('bird');
+                }
+            }
+        }
+
+        function spawnCreature(type) {
+            const container = document.getElementById('game-container');
+            let creature = document.createElement('div');
+            creature.className = `creature ${type}`;
+            let iconClass = type === 'bat' ? 'bat-icon' : 'bird-icon';
+            let emoji = type === 'bat' ? '🦇' : '🦅';
+
+            creature.innerHTML = `<div class="creature-icon ${iconClass}">${emoji}</div>`;
+            
+            let posX = Math.random() * (window.innerWidth - 120) + 60;
+            let posY = -40;
+            creature.style.left = posX + 'px';
+            creature.style.top = posY + 'px';
+            
+            container.appendChild(creature);
+
+            let fallSpeed = (type === 'bat') ? (3.2 + (currentLevel - 1) * 0.3) : 2.5;
+
+            let fallInterval = setInterval(() => {
+                if (!isPlaying) {
+                    creature.remove();
+                    clearInterval(fallInterval);
+                    return;
+                }
+                if (isPaused) return;
+                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+
+                posY += fallSpeed;
+                creature.style.top = posY + 'px';
+
+                let t1 = document.getElementById('turbine-1');
+                let t2 = document.getElementById('turbine-2');
+
+                let hit1 = checkTurbinePixelCollision(posX, posY, t1, rot1);
+                let hit2 = checkTurbinePixelCollision(posX, posY, t2, rot2);
+
+                if (hit1 || hit2) {
+                    let activeCurtail = (hit1 && curtailed[1]) || (hit2 && curtailed[2]);
+
+                    if (activeCurtail) {
+                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
+                        savedFauna++;
+                        creature.remove();
+                        clearInterval(fallInterval);
+                    } else {
+                        biodiversityPercent = Math.max(0, biodiversityPercent - 6);
+                        injuredFauna++;
+                        updateUI();
+                        
+                        creature.classList.add('crashing');
+                        setTimeout(() => creature.remove(), 800);
+                        clearInterval(fallInterval);
+
+                        if (biodiversityPercent < 90) {
+                            endGame("La biodiversité a chuté sous les 90% suite aux impacts.");
+                        }
+                    }
+                } else if (posY > window.innerHeight - 110) {
+                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
+                    savedFauna++;
+                    creature.remove();
+                    clearInterval(fallInterval);
+                }
+            }, 30);
+        }
+
+        function checkTurbinePixelCollision(px, py, turbineEl, rotationDeg) {
+            let towerEl = turbineEl.querySelector('.tower');
+            if (towerEl) {
+                let tRect = towerEl.getBoundingClientRect();
+                if (px >= tRect.left - 4 && px <= tRect.right + 4 && py >= tRect.top && py <= tRect.bottom) {
+                    return true;
+                }
+            }
+
+            let nacelleEl = turbineEl.querySelector('.nacelle');
+            if (nacelleEl) {
+                let nRect = nacelleEl.getBoundingClientRect();
+                if (px >= nRect.left - 4 && px <= nRect.right + 4 && py >= nRect.top - 4 && py <= nRect.bottom + 4) {
+                    return true;
+                }
+            }
+
+            let bladesEl = turbineEl.querySelector('.blades-container');
+            if (bladesEl) {
+                let bRect = bladesEl.getBoundingClientRect();
+                let hubX = bRect.left; 
+                let hubY = bRect.top;  
+                let bladeLength = turbineEl.id === 'turbine-1' ? 70 : 85; 
+                let radBase = rotationDeg * (Math.PI / 180);
+
+                for (let b = 0; b < 3; b++) {
+                    let angle = radBase + (b * 120 * Math.PI / 180);
+                    let tipX = hubX + bladeLength * Math.cos(angle - Math.PI / 2);
+                    let tipY = hubY + bladeLength * Math.sin(angle - Math.PI / 2);
+
+                    let d = pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY);
+                    if (d < 12) return true; 
+                }
+            }
+
+            return false;
+        }
+
+        function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
+            let A = px - x1;
+            let B = py - y1;
+            let C = x2 - x1;
+            let D = y2 - y1;
+            let dot = A * C + B * D;
+            let len_sq = C * C + D * D;
+            let param = -1;
+            if (len_sq != 0) param = dot / len_sq;
+            let xx, yy;
+            if (param < 0) { xx = x1; yy = y1; }
+            else if (param > 1) { xx = x2; yy = y2; }
+            else { xx = x1 + param * C; yy = y1 + param * D; }
+            let dx = px - xx;
+            let dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function updateUI() {
+            let prodVal = Math.round(production);
+            let bioVal = Math.round(biodiversityPercent);
+
+            document.getElementById('battery-fill').style.height = prodVal + '%';
+            document.getElementById('power-val').innerText = prodVal + '%';
+
+            document.getElementById('bio-fill').style.height = bioVal + '%';
+            document.getElementById('bio-val').innerText = bioVal + '%';
+
+            let timeVal = Math.max(0, Math.round(levelTime));
+            document.getElementById('time-text').innerText = timeVal;
+            document.getElementById('level-num').innerText = currentLevel;
+
+            document.getElementById('saved-count').innerText = savedFauna;
+            document.getElementById('injured-count').innerText = injuredFauna;
+            document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
+            document.getElementById('hud-bio-val').innerText = bioVal + '%';
+        }
+
+        function endGame(reason) {
+            isPlaying = false;
+            if (animFrameId) cancelAnimationFrame(animFrameId);
+            clearInterval(gameInterval);
+            clearInterval(creatureInterval);
+
+            document.querySelectorAll('.creature').forEach(b => b.remove());
+
+            document.getElementById('final-stats').innerHTML = 
+                `Niveau atteint : <b>Niveau ${currentLevel}</b><br>` +
+                `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
+                `Énergie produite : <b>${Math.round(totalEnergyProduced)} kWh</b><br>` +
+                `Raison de l'arrêt : <b>${reason}</b><br><br>` +
+                `<i>Ajustez la régulation de votre parc pour maintenir l'équilibre écologique et énergétique.</i>`;
+            
+            document.getElementById('gameover-screen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
