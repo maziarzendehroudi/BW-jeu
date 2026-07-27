@@ -679,10 +679,10 @@
             let cosVal = Math.cos(angle);
             
             if (progress < 0.02 || progress > 0.98) {
-                return "M26,2 A24,24 0 1,1 25.99,2 Z"; // Pleine ombre (Nouvelle lune)
+                return "M26,2 A24,24 0 1,1 25.99,2 Z"; 
             }
             if (Math.abs(progress - 0.5) < 0.02) {
-                return "M26,2 A24,24 0 0,1 26,2 Z"; // Pas d'ombre (Pleine lune)
+                return "M26,2 A24,24 0 0,1 26,2 Z"; 
             }
             
             let rx = Math.max(0.1, Math.abs(24 * cosVal));
@@ -704,14 +704,15 @@
             let moonFactor = Math.sin(angle + Math.PI);
             isNight = sunFactor < 0; 
 
+            // Répartition des paliers : longs plateaux de jour et de nuit, transitions plus courtes
             const frames = [
                 { pos: 0.00, top: [255, 130, 110], bot: [255, 180, 140] }, // Aube
-                { pos: 0.15, top: [56, 189, 248],  bot: [186, 230, 253] }, // Jour
-                { pos: 0.35, top: [249, 115, 22],  bot: [254, 215, 170] }, // Crépuscule
-                { pos: 0.50, top: [15, 23, 42],    bot: [30, 41, 59] },     // Début de nuit
-                { pos: 0.75, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit
-                { pos: 0.90, top: [40, 20, 60],    bot: [100, 60, 100] },   // Pré-aube
-                { pos: 1.00, top: [255, 130, 110], bot: [255, 180, 140] }  // Aube
+                { pos: 0.08, top: [56, 189, 248],  bot: [186, 230, 253] }, // Plein jour (début)
+                { pos: 0.42, top: [56, 189, 248],  bot: [186, 230, 253] }, // Plein jour (fin)
+                { pos: 0.50, top: [249, 115, 22],  bot: [254, 215, 170] }, // Crépuscule
+                { pos: 0.58, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit (début)
+                { pos: 0.92, top: [2, 6, 23],      bot: [15, 23, 42] },     // Pleine nuit (fin)
+                { pos: 1.00, top: [255, 130, 110], bot: [255, 180, 140] }  // Retour aube
             ];
 
             let i = 0;
@@ -733,7 +734,6 @@
 
             container.style.background = `linear-gradient(to bottom, rgb(${topR}, ${topG}, ${topB}), rgb(${botR}, ${botG}, ${botB}))`;
 
-            // Trajectoires continues et fluides pour le Soleil et la Lune (disparition naturelle sous l'horizon)
             let sunX = 50 + Math.cos(angle) * 46;
             let sunY = 55 - Math.sin(angle) * 55;
             sunEl.style.transform = `translate(${sunX}vw, ${sunY}vh)`;
@@ -744,7 +744,6 @@
             moonEl.style.transform = `translate(${moonX}vw, ${moonY}vh)`;
             moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.15) * 4));
 
-            // Évolution lente des phases de la lune sur un cycle de 240 secondes
             let lunarCycleProgress = (gameTime / 240) % 1;
             if (moonShadowPath) {
                 moonShadowPath.setAttribute('d', getMoonPhasePath(lunarCycleProgress));
