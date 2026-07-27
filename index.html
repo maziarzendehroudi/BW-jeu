@@ -196,10 +196,9 @@
         .modern-fill {
             width: 100%;
             border-radius: 7px;
-            transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s;
+            transition: height 0.15s linear, background-color 0.3s;
         }
 
-        /* Effet visuel rouge d'impact/consommation sur la puissance */
         .modern-fill.power-fill {
             background: linear-gradient(to top, #ef4444, #f59e0b, #10b981);
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
@@ -219,7 +218,7 @@
             box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
         }
 
-        /* --- ÉOLIENNES : FIXATION DE L'AXE AU SOMMET DU MÂT --- */
+        /* --- ÉOLIENNES --- */
         .wind-turbine {
             position: absolute;
             z-index: 10;
@@ -482,7 +481,7 @@
             <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
         </div>
 
-        <!-- BARRE VERTICALE PUISSANCE (MODERNISÉE) -->
+        <!-- BARRE VERTICALE PUISSANCE -->
         <div class="vertical-bar-container" id="battery-left">
             <span class="bar-title-v">Puissance</span>
             <div class="modern-track">
@@ -491,7 +490,7 @@
             <span class="bar-value-v" id="power-val">0%</span>
         </div>
 
-        <!-- BARRE VERTICALE BIODIVERSITÉ (MODERNISÉE) -->
+        <!-- BARRE VERTICALE BIODIVERSITÉ -->
         <div class="vertical-bar-container" id="biodiversity-right">
             <span class="bar-title-v">Biodiversité</span>
             <div class="modern-track">
@@ -571,12 +570,13 @@
         let gameTime = 0; 
         let isPlaying = false;
         let isPaused = false;
-        let gameInterval, creatureInterval, animFrameId;
+        let creatureInterval, animFrameId;
         let curtailed = { 1: false, 2: false };
         let isNight = false;
 
         let rot1 = 0;
         let rot2 = 0;
+        let lastFrameTime = 0;
 
         function startGame() {
             document.getElementById('start-screen').classList.add('hidden');
@@ -591,335 +591,14 @@
             curtailed = { 1: false, 2: false };
             isPlaying = true;
             isPaused = false;
+            lastFrameTime = performance.now();
             updateUI();
-
-            if (gameInterval) clearInterval(gameInterval);
-            gameInterval = setInterval(() => {
-                if (!isPlaying || isPaused) return;
-
-                gameTime += 0.4;
-
-                let activeTurbines = (curtailed[1] ? 0.5 : 1) + (curtailed[2] ? 0.5 : 1);
-                
-                // Recharge plus rapide selon la vitesse des éoliennes
-                if (activeTurbines === 2) production += 3.5;
-                else if (activeTurbines === 1.5) production += 1.8;
-                else if (activeTurbines === 1) production += 1.0;
-                else production -= 1.2; 
-
-                production = Math.max(0, Math.min(100, production));
-
-                levelTime -= 0.4;
-                if (levelTime <= 0) {
-                    currentLevel++;
-                    levelTime = 60; 
-                }
-
-                // Condition de défaite si la puissance tombe à 0 après le début ou si la biodiversité chute sous les 90%
-                if (gameTime > 5 && production <= 0) {
-                    endGame("Panne totale : la batterie de puissance est vide.");
-                }
-
-                if (biodiversityPercent < 90) {
-                    endGame("La biodiversité est passée sous le seuil critique des 90%.");
-                }
-
-                updateUI();
-            }, 400);
 
             if (creatureInterval) clearInterval(creatureInterval);
             creatureInterval = setInterval(manageCreatureSpawns, 1500);
 
             if (animFrameId) cancelAnimationFrame(animFrameId);
-            runVisualLoop();
+            animFrameId = requestAnimationFrame(runGameLoop);
         }
 
-        function runVisualLoop() {
-            if (!isPlaying) return;
-            if (!isPaused) {
-                rot1 += curtailed[1] ? 0.8 : 4;
-                rot2 += curtailed[2] ? 0.9 : 4.5;
-                document.getElementById('blades-1').style.transform = `translateX(-50%) rotate(${rot1}deg)`;
-                document.getElementById('blades-2').style.transform = `translateX(-50%) rotate(${rot2}deg)`;
-                updateEphemerisPoetic();
-            }
-            animFrameId = requestAnimationFrame(runVisualLoop);
-        }
-
-        function updateEphemerisPoetic() {
-            let cycleProgress = (gameTime % 30) / 30;
-            let angle = cycleProgress * Math.PI * 2;
-            
-            let container = document.getElementById('game-container');
-            let celestial = document.getElementById('celestial-body');
-
-            let sunFactor = Math.sin(angle); 
-            isNight = sunFactor < 0; 
-
-            const frames = [
-                { pos: 0.00, top: [255, 117, 140], bot: [255, 126, 179] }, 
-                { pos: 0.25, top: [56, 189, 248],  bot: [186, 230, 253] }, 
-                { pos: 0.50, top: [249, 115, 22],  bot: [254, 215, 170] }, 
-                { pos: 0.75, top: [2, 6, 23],      bot: [30, 27, 75] },     
-                { pos: 1.00, top: [255, 117, 140], bot: [255, 126, 179] }  
-            ];
-
-            let i = 0;
-            while (i < frames.length - 1 && cycleProgress > frames[i+1].pos) {
-                i++;
-            }
-            let f1 = frames[i];
-            let f2 = frames[i+1];
-            let localP = (cycleProgress - f1.pos) / (f2.pos - f1.pos);
-            localP = localP * localP * (3 - 2 * localP); 
-
-            let topR = Math.round(f1.top[0] + localP * (f2.top[0] - f1.top[0]));
-            let topG = Math.round(f1.top[1] + localP * (f2.top[1] - f1.top[1]));
-            let topB = Math.round(f1.top[2] + localP * (f2.top[2] - f1.top[2]));
-
-            let botR = Math.round(f1.bot[0] + localP * (f2.bot[0] - f1.bot[0]));
-            let botG = Math.round(f1.bot[1] + localP * (f2.bot[1] - f1.bot[1]));
-            let botB = Math.round(f1.bot[2] + localP * (f2.bot[2] - f1.bot[2]));
-
-            container.style.background = `linear-gradient(to bottom, rgb(${topR}, ${topG}, ${topB}), rgb(${botR}, ${botG}, ${botB}))`;
-
-            let posX = 15 + ((Math.cos(angle) + 1) / 2) * 70; 
-            let posY = 15 + (1 - sunFactor) * 35; 
-            celestial.style.transform = `translate(${posX}vw, ${posY}vh)`;
-
-            if (sunFactor > -0.1) {
-                celestial.style.background = "#fde047";
-                celestial.style.boxShadow = "0 0 45px #facc15";
-            } else {
-                celestial.style.background = "#fef08a"; 
-                celestial.style.boxShadow = "0 0 30px rgba(254, 240, 138, 0.4)";
-            }
-        }
-
-        function togglePause() {
-            if (!isPlaying) return;
-            isPaused = !isPaused;
-            const pauseScreen = document.getElementById('pause-screen');
-            if (isPaused) {
-                pauseScreen.classList.remove('hidden');
-            } else {
-                pauseScreen.classList.add('hidden');
-            }
-        }
-
-        function toggleCurtail(id) {
-            if (!isPlaying || isPaused) return;
-            curtailed[id] = !curtailed[id];
-            
-            const btn = document.getElementById(`btn-c${id}`);
-            const turbine = document.getElementById(`turbine-${id}`);
-            
-            if (curtailed[id]) {
-                btn.classList.add('active');
-                btn.innerText = "LIBÉRER";
-                turbine.classList.add('curtailed');
-            } else {
-                btn.classList.remove('active');
-                btn.innerText = "BRIDER";
-                turbine.classList.remove('curtailed');
-            }
-        }
-
-        function triggerGlobalUltrasound() {
-            if (!isPlaying || isPaused) return;
-            if (production < 30) return; // Coûte 30% de puissance
-
-            // Consommation de puissance avec animation rouge (effet visuel de drain)
-            production -= 30;
-            let fillEl = document.getElementById('battery-fill');
-            fillEl.classList.add('power-drain');
-            setTimeout(() => fillEl.classList.remove('power-drain'), 400);
-
-            [1, 2].forEach(id => {
-                let turbine = document.getElementById(`turbine-${id}`);
-                turbine.style.filter = "drop-shadow(0 0 20px #0284c7)";
-                setTimeout(() => turbine.style.filter = "none", 400);
-            });
-
-            document.querySelectorAll('.creature').forEach(creature => {
-                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
-                creature.classList.add('fleeing');
-                // Gagner un peu de biodiversité (+1%) lorsqu'on sauve des animaux avec succès
-                biodiversityPercent = Math.min(100, biodiversityPercent + 1);
-                setTimeout(() => creature.remove(), 600);
-            });
-            updateUI();
-        }
-
-        function manageCreatureSpawns() {
-            if (!isPlaying || isPaused) return;
-            
-            if (isNight) {
-                let waveSize = Math.floor(Math.random() * 3) + 2;
-                for (let i = 0; i < waveSize; i++) {
-                    setTimeout(() => {
-                        if (isNight && isPlaying && !isPaused) spawnCreature('bat');
-                    }, i * 300);
-                }
-            } else {
-                if (Math.random() < 0.7) {
-                    spawnCreature('bird');
-                }
-            }
-        }
-
-        function spawnCreature(type) {
-            const container = document.getElementById('game-container');
-            let creature = document.createElement('div');
-            creature.className = `creature ${type}`;
-            let iconClass = type === 'bat' ? 'bat-icon' : 'bird-icon';
-            let emoji = type === 'bat' ? '🦇' : '🦅';
-
-            creature.innerHTML = `<div class="creature-icon ${iconClass}">${emoji}</div>`;
-            
-            let posX = Math.random() * (window.innerWidth - 120) + 60;
-            let posY = -40;
-            creature.style.left = posX + 'px';
-            creature.style.top = posY + 'px';
-            
-            container.appendChild(creature);
-
-            let fallSpeed = (type === 'bat') ? (3.2 + (currentLevel - 1) * 0.3) : 2.5;
-
-            let fallInterval = setInterval(() => {
-                if (!isPlaying) {
-                    creature.remove();
-                    clearInterval(fallInterval);
-                    return;
-                }
-                if (isPaused) return;
-                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
-
-                posY += fallSpeed;
-                creature.style.top = posY + 'px';
-
-                let t1 = document.getElementById('turbine-1');
-                let t2 = document.getElementById('turbine-2');
-
-                let hit1 = checkTurbinePixelCollision(posX, posY, t1, rot1);
-                let hit2 = checkTurbinePixelCollision(posX, posY, t2, rot2);
-
-                if (hit1 || hit2) {
-                    let activeCurtail = (hit1 && curtailed[1]) || (hit2 && curtailed[2]);
-
-                    if (activeCurtail) {
-                        // Animal sauvé grâce au bridage
-                        biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                        creature.remove();
-                        clearInterval(fallInterval);
-                    } else {
-                        // Animal blessé -> perte de 6% de biodiversité
-                        biodiversityPercent = Math.max(0, biodiversityPercent - 6);
-                        updateUI();
-                        
-                        creature.classList.add('crashing');
-                        setTimeout(() => creature.remove(), 800);
-                        clearInterval(fallInterval);
-
-                        if (biodiversityPercent < 90) {
-                            endGame("La biodiversité a chuté sous les 90% suite aux impacts.");
-                        }
-                    }
-                } else if (posY > window.innerHeight - 110) {
-                    // Animal passé en toute sécurité
-                    biodiversityPercent = Math.min(100, biodiversityPercent + 0.5);
-                    creature.remove();
-                    clearInterval(fallInterval);
-                }
-            }, 30);
-        }
-
-        function checkTurbinePixelCollision(px, py, turbineEl, rotationDeg) {
-            let towerEl = turbineEl.querySelector('.tower');
-            if (towerEl) {
-                let tRect = towerEl.getBoundingClientRect();
-                if (px >= tRect.left - 4 && px <= tRect.right + 4 && py >= tRect.top && py <= tRect.bottom) {
-                    return true;
-                }
-            }
-
-            let nacelleEl = turbineEl.querySelector('.nacelle');
-            if (nacelleEl) {
-                let nRect = nacelleEl.getBoundingClientRect();
-                if (px >= nRect.left - 4 && px <= nRect.right + 4 && py >= nRect.top - 4 && py <= nRect.bottom + 4) {
-                    return true;
-                }
-            }
-
-            let bladesEl = turbineEl.querySelector('.blades-container');
-            if (bladesEl) {
-                let bRect = bladesEl.getBoundingClientRect();
-                let hubX = bRect.left + bRect.width / 2;
-                let hubY = bRect.top + (turbineEl.id === 'turbine-1' ? 42 : 50); 
-                let bladeLength = turbineEl.id === 'turbine-1' ? 68 : 82; 
-                let radBase = rotationDeg * (Math.PI / 180);
-
-                for (let b = 0; b < 3; b++) {
-                    let angle = radBase + (b * 120 * Math.PI / 180);
-                    let tipX = hubX + bladeLength * Math.cos(angle);
-                    let tipY = hubY + bladeLength * Math.sin(angle);
-
-                    let d = pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY);
-                    if (d < 12) return true; 
-                }
-            }
-
-            return false;
-        }
-
-        function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
-            let A = px - x1;
-            let B = py - y1;
-            let C = x2 - x1;
-            let D = y2 - y1;
-            let dot = A * C + B * D;
-            let len_sq = C * C + D * D;
-            let param = -1;
-            if (len_sq != 0) param = dot / len_sq;
-            let xx, yy;
-            if (param < 0) { xx = x1; yy = y1; }
-            else if (param > 1) { xx = x2; yy = y2; }
-            else { xx = x1 + param * C; yy = y1 + param * D; }
-            let dx = px - xx;
-            let dy = py - yy;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-
-        function updateUI() {
-            let prodVal = Math.round(production);
-            let bioVal = Math.round(biodiversityPercent);
-
-            document.getElementById('battery-fill').style.height = prodVal + '%';
-            document.getElementById('power-val').innerText = prodVal + '%';
-
-            document.getElementById('bio-fill').style.height = bioVal + '%';
-            document.getElementById('bio-val').innerText = bioVal + '%';
-
-            let timeVal = Math.max(0, Math.round(levelTime));
-            document.getElementById('time-text').innerText = timeVal;
-            document.getElementById('level-num').innerText = currentLevel;
-        }
-
-        function endGame(reason) {
-            isPlaying = false;
-            if (animFrameId) cancelAnimationFrame(animFrameId);
-            clearInterval(gameInterval);
-            clearInterval(creatureInterval);
-
-            document.querySelectorAll('.creature').forEach(b => b.remove());
-
-            document.getElementById('final-stats').innerHTML = 
-                `Niveau atteint : <b>Niveau ${currentLevel}</b><br>` +
-                `Raison : <b>${reason}</b><br><br>` +
-                `<i>Ajustez la régulation de votre parc pour maintenir l'équilibre écologique et énergétique.</i>`;
-            
-            document.getElementById('gameover-screen').classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+        function
