@@ -45,7 +45,7 @@
             overflow: hidden;
         }
 
-        /* --- ÉTOILES ET NUAGES --- */
+        /* --- ÉTOILES --- */
         #stars-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
@@ -59,14 +59,27 @@
             z-index: 0;
         }
 
+        /* --- NUAGES (Style Vectoriel / Flat Design) --- */
         .cloud {
             position: absolute;
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 50px;
-            filter: blur(4px);
-            z-index: 1;
+            z-index: 2;
             animation: floatCloud linear infinite;
+            /* Ombre interne pour l'effet volume */
+            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1);
         }
+        /* Ajout de formes géométriques pour sculpter le nuage */
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: inherit;
+            border-radius: inherit;
+            box-shadow: inherit;
+        }
+        .cloud::before { bottom: 40%; left: 15%; width: 50%; height: 100%; }
+        .cloud::after { bottom: 20%; right: 10%; width: 40%; height: 80%; }
+
         @keyframes floatCloud {
             from { transform: translateX(110vw); }
             to { transform: translateX(-30vw); }
@@ -77,18 +90,18 @@
             position: absolute;
             width: 52px; height: 52px;
             border-radius: 50%;
-            z-index: 2;
+            z-index: 1; /* Derrière les nuages et montagnes */
             will-change: transform, opacity;
         }
         .sun { background: #fde047; box-shadow: 0 0 50px #facc15; }
         .moon { background: #f1f5f9; box-shadow: 0 0 35px rgba(226, 232, 240, 0.5); overflow: hidden; }
 
-     /* --- DÉCOR RÉTRO-MODERNE (Vector / Low-Poly Style) --- */
+        /* --- DÉCOR RÉTRO-MODERNE (Vector / Low-Poly Style) --- */
         .mountain-bg-left {
             position: absolute; bottom: 130px; left: -5%; width: 65%; height: 240px;
             background: linear-gradient(135deg, rgba(71, 85, 105, 0.85), rgba(15, 23, 42, 0.95));
             clip-path: polygon(0% 100%, 0% 70%, 20% 35%, 45% 65%, 75% 15%, 95% 60%, 100% 100%);
-            z-index: 3;
+            z-index: 4;
             backdrop-filter: blur(2px);
         }
 
@@ -96,22 +109,39 @@
             position: absolute; bottom: 120px; right: -5%; width: 75%; height: 280px;
             background: linear-gradient(135deg, rgba(100, 116, 139, 0.7), rgba(2, 6, 23, 0.9));
             clip-path: polygon(0% 100%, 10% 80%, 30% 25%, 55% 55%, 80% 20%, 100% 60%, 100% 100%);
-            z-index: 2; /* Positionnée derrière la montagne gauche pour donner de la profondeur */
+            z-index: 3;
         }
 
         .hill-mid {
             position: absolute; bottom: 90px; left: -5%; width: 110%; height: 160px;
-            background: linear-gradient(to bottom, #0f766e, #042f2e); /* Teal rétro profond */
+            background: linear-gradient(to bottom, #0f766e, #042f2e);
             clip-path: polygon(0% 100%, 0% 30%, 25% 15%, 50% 40%, 80% 15%, 100% 35%, 100% 100%);
-            z-index: 4;
+            z-index: 5;
         }
 
         .hill-foreground {
             position: absolute; bottom: 70px; left: -5%; width: 110%; height: 120px;
-            background: linear-gradient(to bottom, #064e3b, #020617); /* Vert forêt sombre vers noir */
+            background: linear-gradient(to bottom, #064e3b, #020617);
             clip-path: polygon(0% 100%, 0% 25%, 35% 40%, 65% 10%, 100% 35%, 100% 100%);
-            z-index: 5;
+            z-index: 6;
         }
+
+        /* --- BRUME LUMINEUSE --- */
+        .mist-layer {
+            position: absolute;
+            bottom: 70px; /* S'appuie sur le premier plan */
+            left: -10%; width: 120%; height: 100px;
+            background: linear-gradient(to top, rgba(45, 212, 191, 0.3), transparent);
+            filter: blur(10px);
+            z-index: 7; /* Entre le décor et les éoliennes */
+            pointer-events: none;
+            animation: mistBreathe 8s infinite alternate ease-in-out;
+        }
+        @keyframes mistBreathe {
+            0% { transform: translateY(0) scaleY(1); opacity: 0.4; }
+            100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; }
+        }
+
         /* --- HUD --- */
         .top-hud {
             position: absolute; top: 0; left: 0; width: 100%;
@@ -220,7 +250,7 @@
         <!-- Décor de fond -->
         <div id="stars-container"></div>
         <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
-        <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.4;"></div>
+        <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.6;"></div>
 
         <!-- Astres Célestes -->
         <div id="sun-body" class="celestial sun"></div>
@@ -234,8 +264,14 @@
             </svg>
         </div>
 
-        <div class="mountain-bg-left"></div><div class="mountain-bg-right"></div>
-        <div class="hill-mid"></div><div class="hill-foreground"></div>
+        <!-- Montagnes Rétro-Modernes -->
+        <div class="mountain-bg-left"></div>
+        <div class="mountain-bg-right"></div>
+        <div class="hill-mid"></div>
+        <div class="hill-foreground"></div>
+        
+        <!-- Brume lumineuse d'ambiance -->
+        <div class="mist-layer"></div>
 
         <!-- HUD -->
         <div class="top-hud">
