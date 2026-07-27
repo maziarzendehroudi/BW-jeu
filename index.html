@@ -3,33 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Watt & Bats - Alignement Axe & Rotor Parfait</title>
+    <title>Bat&Watt-v0.1 - Alignement Axe & Rotor Parfait</title>
     
+    <!-- Paramètres PWA et Mobile -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Watt & Bats">
+    <meta name="apple-mobile-web-app-title" content="Bat&Watt v0.1">
     <meta name="theme-color" content="#0f172a">
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦇</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%230f172a%22/><text x=%2250%25%22 y=%2255%25%22 font-size=%2260%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>🦇</text></svg>">
+    <!-- Icônes & Favicons multi-navigateurs / PWA -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
     
-    <link rel="manifest" href="data:application/manifest+json,{
-        %22name%22: %22Watt & Bats - Centrale & Biodiversité%22,
-        %22short_name%22: %22Watt&Bats%22,
-        %22start_url%22: %22.%22,
-        %22display%22: %22standalone%22,
-        %22background_color%22: %22%230f172a%22,
-        %22theme_color%22: %22%230f172a%22,
-        %22icons%22: [
-            {
-                %22src%22: %22data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><rect width=%22512%22 height=%22512%22 fill=%22%230f172a%22/><text x=%2250%25%22 y=%2255%25%22 font-size=%22320%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22>🦇</text></svg>%22,
-                %22sizes%22: %22512x512%22,
-                %22type%22: %22image/svg+xml%22,
-                %22purpose%22: %22any maskable%22
-            }
-        ]
-    }">
+    <!-- Manifest PWA externe -->
+    <link rel="manifest" href="manifest.json">
 
     <style>
         * {
@@ -497,11 +485,13 @@
         <div class="hill-mid"></div>
         <div class="hill-foreground"></div>
 
+        <!-- TOP HUD -->
         <div class="top-hud">
             <span>Niveau <span id="level-num">1</span> (<span id="time-text">60</span>s)</span>
             <button class="btn-pause" id="btn-pause" onclick="togglePause()">PAUSE</button>
         </div>
 
+        <!-- BARRE VERTICALE GAUCHE -->
         <div class="vertical-bar-container" id="battery-left">
             <span class="bar-title-v">Puissance</span>
             <div class="battery-track">
@@ -509,11 +499,13 @@
             </div>
         </div>
 
+        <!-- BARRE VERTICALE DROITE -->
         <div class="vertical-bar-container" id="biodiversity-right">
             <span class="bar-title-v">Biodiversité</span>
             <div class="bio-track" id="bio-track"></div>
         </div>
 
+        <!-- Éoliennes -->
         <div class="wind-turbine" id="turbine-1" ontouchstart="toggleCurtail(1); event.preventDefault();" onclick="toggleCurtail(1)">
             <div class="nacelle"><div class="hub"></div></div>
             <div class="tower"></div>
@@ -534,6 +526,7 @@
             </div>
         </div>
 
+        <!-- Pupitre de contrôle -->
         <div class="control-deck">
             <div class="turbine-station">
                 <span class="station-title">ÉOLIENNE E-01</span>
@@ -554,18 +547,21 @@
             </div>
         </div>
 
+        <!-- Écran d'accueil -->
         <div id="start-screen" class="screen">
-            <h1>🦇 Watt & Bats // Alignement Parfait</h1>
+            <h1>🦇 Bat&Watt v0.1 // Alignement Parfait</h1>
             <p>Maintenez la <b>batterie de puissance</b> (gauche) dans le vert et protégez la <b>biodiversité</b> (droite, 10 barrettes). Utilisez les <b>ultrasons</b> pour éloigner la faune. Le bridage protège l'ensemble des animaux en cas de contact exact avec le mât, la nacelle ou les pales en rotation !</p>
             <button class="btn-main" ontouchstart="startGame(); event.preventDefault();" onclick="startGame()">LANCER LA CENTRALE</button>
         </div>
 
+        <!-- Écran de pause -->
         <div id="pause-screen" class="screen hidden">
             <h1>PAUSE</h1>
             <p>Centrale en maintenance.</p>
             <button class="btn-main" ontouchstart="togglePause(); event.preventDefault();" onclick="togglePause()">Reprendre</button>
         </div>
 
+        <!-- Écran de fin -->
         <div id="gameover-screen" class="screen hidden">
             <h1 id="gameover-title" style="color: #dc2626;">⚠️ ARRÊT D'URGENCE</h1>
             <p id="final-stats"></p>
