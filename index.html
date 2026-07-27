@@ -3,11 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bat&Watt - Alignement Parfait</title>
+    <title>Bat&Watt-v0.1 - Alignement Axe & Rotor Parfait</title>
     
+    <!-- Paramètres PWA et Mobile -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Bat&Watt v0.1">
     <meta name="theme-color" content="#0f172a">
+
+    <!-- Icônes & Favicons multi-navigateurs / PWA -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    
+    <!-- Manifest PWA externe -->
+    <link rel="manifest" href="manifest.json">
 
     <style>
         * {
@@ -403,6 +413,19 @@
             animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
+        function getMoonPhasePath(progress) {
+            let angle = progress * Math.PI * 2;
+            let cosVal = Math.cos(angle);
+            
+            if (progress < 0.02 || progress > 0.98) return "M26,0 A26,26 0 1,1 25.99,0 Z"; 
+            if (Math.abs(progress - 0.5) < 0.02) return "M26,0 A26,26 0 0,1 26,0 Z"; 
+            
+            let rx = Math.max(0.1, Math.abs(26 * cosVal));
+            let sweep1 = progress < 0.5 ? 1 : 0;
+            let sweep2 = progress < 0.5 ? 0 : 1;
+            return `M 26 0 A 26 26 0 0 1 26 52 A ${rx} 26 0 0 ${sweep2} 26 0`;
+        }
+
         function interpolateColor(c1, c2, factor) {
             factor = Math.max(0, Math.min(1, factor));
             return [Math.round(c1[0] + factor * (c2[0] - c1[0])), Math.round(c1[1] + factor * (c2[1] - c1[1])), Math.round(c1[2] + factor * (c2[2] - c1[2]))];
@@ -435,6 +458,12 @@
             let moonEl = document.getElementById('moon-body');
             moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh)`;
             moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.15) * 4));
+
+            let lunarCycleProgress = (gameTime / 240) % 1;
+            let moonShadowPath = document.getElementById('moon-shadow-path');
+            if (moonShadowPath) {
+                moonShadowPath.setAttribute('d', getMoonPhasePath(lunarCycleProgress));
+            }
         }
 
         function togglePause() {
@@ -600,7 +629,7 @@
         function endGame(reason) {
             isPlaying = false;
             cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
-            saveScores(); // Enregistrement du score
+            saveScores();
             
             document.querySelectorAll('.creature').forEach(b => b.remove());
             document.getElementById('final-stats').innerHTML = 
