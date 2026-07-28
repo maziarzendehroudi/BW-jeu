@@ -435,14 +435,8 @@
                 badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
             }
 
-            // Conditions de défaite (Avec Tolérance Biodiversité)
+            // Conditions de défaite
             if (production <= 0) endGame("Batterie vide ! La ville subit un Blackout total.");
-            
-            // Tolérance : On ne juge la biodiversité qu'après l'apparition d'au moins 10 animaux
-            let totalAnimalsSpawned = savedFauna + injuredFauna;
-            if (biodiversityPercent < 90 && totalAnimalsSpawned >= 10) {
-                endGame("Impact écologique inacceptable : la biodiversité préservée est passée sous les 90%.");
-            }
 
             updateUI();
         }
@@ -621,7 +615,6 @@
                 let hit2 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-2'), rot2);
 
                 if (hit1 || hit2) {
-                    // Vérification avec la vitesse réelle (si la pale a freiné sous 1.2, elle est considérée comme non mortelle)
                     let activeCurtail = (hit1 && tSpeed[1] < 1.2) || (hit2 && tSpeed[2] < 1.2);
 
                     if (activeCurtail) {
@@ -637,9 +630,6 @@
                         creature.classList.add('crashing');
                         setTimeout(() => creature.remove(), 800);
                         clearInterval(fallInterval);
-                        
-                        let totalAnimalsSpawned = savedFauna + injuredFauna;
-                        if (biodiversityPercent < 90 && totalAnimalsSpawned >= 10) endGame("La biodiversité préservée est tombée sous les 90%.");
                     }
                 } else if (posY > window.innerHeight - 100) {
                     savedFauna++;
