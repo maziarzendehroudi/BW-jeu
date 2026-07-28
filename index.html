@@ -112,20 +112,20 @@
         .power-fill { background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
         .bio-fill { background: linear-gradient(to top, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
 
-        /* Effets de clignotement / gonflement */
+        /* Effets de clignotement / gonflement adoucis */
         .danger-50 {
-            animation: pulse-danger-50 0.6s infinite alternate !important;
+            animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important;
         }
         .danger-25 {
-            animation: pulse-danger-25 0.25s infinite alternate !important;
+            animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important;
         }
         @keyframes pulse-danger-50 {
-            0% { transform: translateY(-50%) scale(1.1); box-shadow: 0 0 10px red; border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.2); }
-            100% { transform: translateY(-50%) scale(1.2); box-shadow: 0 0 30px red, inset 0 0 15px red; border-color: rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.6); }
+            0% { transform: translateY(-50%) scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.4); }
+            100% { transform: translateY(-50%) scale(1.15); box-shadow: 0 0 30px rgba(239, 68, 68, 1), inset 0 0 15px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.3); }
         }
         @keyframes pulse-danger-25 {
-            0% { transform: translateY(-50%) scale(1.25); box-shadow: 0 0 20px red; border-color: red; background: rgba(255, 0, 0, 0.4); }
-            100% { transform: translateY(-50%) scale(1.4); box-shadow: 0 0 50px red, inset 0 0 25px red; border-color: yellow; background: rgba(255, 0, 0, 0.8); }
+            0% { transform: translateY(-50%) scale(1.15); box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); border-color: rgba(255, 0, 0, 0.6); }
+            100% { transform: translateY(-50%) scale(1.35); box-shadow: 0 0 50px rgba(255, 0, 0, 1), inset 0 0 30px rgba(255, 0, 0, 0.9); border-color: #facc15; background: rgba(255, 0, 0, 0.6); }
         }
 
         /* --- ÉOLIENNES --- */
@@ -147,22 +147,53 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE --- */
+        /* --- PUPITRE DE CONTRÔLE (Usine d'Énergie Renouvelable) --- */
         .control-deck {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
-            padding-bottom: env(safe-area-inset-bottom, 0px); background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.5);
-            display: flex; justify-content: center; gap: 15px; align-items: center; z-index: 50; padding: 0 15px; box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+            position: absolute; bottom: 0; left: 0; right: 0; height: 115px;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+            background: linear-gradient(to bottom, #2d3748, #1a202c);
+            border-top: 4px solid #4a5568;
+            box-shadow: inset 0 4px 20px rgba(0,0,0,0.6), 0 -8px 20px rgba(0,0,0,0.4);
+            display: flex; justify-content: center; gap: 20px; align-items: center; z-index: 50; padding: 0 20px;
+            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 6px);
         }
-        .turbine-station, .ultrasound-station { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 220px; }
-        .station-title { font-size: 9px; color: #64748b; margin-bottom: 4px; font-weight: bold; }
-        .btn-control { width: 100%; border: none; padding: 12px 4px; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #e2e8f0; color: #1e293b; box-shadow: 0 4px 0 #cbd5e1; }
-        .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #cbd5e1; }
-        .btn-curtail.active { background: #ea580c; color: white; box-shadow: 0 4px 0 #c2410c; }
-        .btn-curtail.active:active { box-shadow: 0 0 0 #c2410c; }
-        .btn-ultrasound-global { width: 100%; border: none; font-size: 11px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: #0284c7; color: white; box-shadow: 0 4px 0 #0369a1; position: relative; overflow: hidden; padding: 12px 4px; }
-        .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0369a1; }
-        .btn-ultrasound-global:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; transform: none; box-shadow: 0 4px 0 #64748b; }
-        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: rgba(0, 0, 0, 0.4); transition: width 0.2s linear; }
+        .turbine-station, .ultrasound-station { 
+            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 220px;
+            background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 2px 0 rgba(255,255,255,0.1);
+        }
+        .station-title { 
+            font-size: 11px; color: #38bdf8; margin-bottom: 8px; font-weight: 900;
+            font-family: 'Courier New', Courier, monospace; letter-spacing: 1px;
+            text-transform: uppercase; text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .station-title::before {
+            content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+            background: #10b981; box-shadow: 0 0 8px #10b981;
+        }
+        .btn-control { 
+            width: 100%; border: none; padding: 14px 4px; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+            background: linear-gradient(to bottom, #cbd5e1, #94a3b8); color: #0f172a; 
+            box-shadow: 0 6px 0 #475569, 0 10px 15px rgba(0,0,0,0.5); border: 1px solid #e2e8f0; text-transform: uppercase;
+        }
+        .btn-control:active { transform: translateY(6px); box-shadow: 0 0 0 #475569, inset 0 4px 8px rgba(0,0,0,0.5); }
+        .btn-curtail.active { 
+            background: linear-gradient(to bottom, #f97316, #c2410c); color: white; 
+            box-shadow: 0 6px 0 #7c2d12, 0 10px 15px rgba(0,0,0,0.5); border-color: #fdba74;
+        }
+        .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #7c2d12, inset 0 4px 8px rgba(0,0,0,0.7); }
+        .btn-ultrasound-global { 
+            width: 100%; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+            background: linear-gradient(to bottom, #0ea5e9, #0369a1); color: white; 
+            box-shadow: 0 6px 0 #0c4a6e, 0 10px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; padding: 14px 4px; border: 1px solid #7dd3fc;
+        }
+        .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #0c4a6e, inset 0 4px 8px rgba(0,0,0,0.6); }
+        .btn-ultrasound-global:disabled { 
+            filter: grayscale(1); cursor: not-allowed; opacity: 0.6; transform: none; 
+            box-shadow: 0 6px 0 #334155; border-color: #475569;
+        }
+        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); transition: width 0.2s linear; }
         .btn-content { position: relative; z-index: 2; pointer-events: none; }
 
         /* --- OPTIMISATION MOBILE (Pixel 9a & Petits écrans) --- */
@@ -172,10 +203,17 @@
             .hud-item span { font-size: 20px; }
             .vertical-bar-container { height: 180px; width: 30px; }
             .modern-track { height: 110px; width: 10px; }
-            .control-deck { height: 85px; gap: 5px; padding: 0 5px; justify-content: space-between; }
-            .station-title { font-size: 8px; white-space: nowrap; }
-            .btn-control, .btn-ultrasound-global { font-size: 10px; padding: 10px 2px; }
-            /* Rapprochement des éoliennes pour ne pas se superposer avec les jauges sur mobile */
+            .control-deck { height: 95px; gap: 8px; padding: 0 10px; }
+            .turbine-station, .ultrasound-station { padding: 6px; }
+            .station-title { font-size: 8px; margin-bottom: 6px; }
+            .station-title::before { width: 6px; height: 6px; }
+            .btn-control, .btn-ultrasound-global { font-size: 11px; padding: 12px 2px; box-shadow: 0 4px 0 #475569, 0 6px 10px rgba(0,0,0,0.3); }
+            .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #475569, inset 0 3px 6px rgba(0,0,0,0.5); }
+            .btn-curtail.active { box-shadow: 0 4px 0 #7c2d12, 0 6px 10px rgba(0,0,0,0.3); }
+            .btn-curtail.active:active { transform: translateY(4px); box-shadow: 0 0 0 #7c2d12, inset 0 3px 6px rgba(0,0,0,0.6); }
+            .btn-ultrasound-global { box-shadow: 0 4px 0 #0c4a6e, 0 6px 10px rgba(0,0,0,0.3); }
+            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0c4a6e, inset 0 3px 6px rgba(0,0,0,0.6); }
+            .btn-ultrasound-global:disabled { box-shadow: 0 4px 0 #334155; }
             #turbine-1 { left: 22%; bottom: 100px; }
             #turbine-2 { left: 72%; bottom: 120px; }
         }
@@ -263,18 +301,18 @@
 
         <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
             <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE 1 (Touche 1)</span>
+                <span class="station-title">ÉOLIENNE 1</span>
                 <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
             </div>
             <div class="ultrasound-station">
-                <span class="station-title">RÉPULSIF (Espace)</span>
+                <span class="station-title">RÉPULSIF</span>
                 <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
                     <div id="us-progress" style="width: 0%;"></div>
                     <span class="btn-content">🔊 ULTRASONS</span>
                 </button>
             </div>
             <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE 2 (Touche 2)</span>
+                <span class="station-title">ÉOLIENNE 2</span>
                 <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
             </div>
         </div>
@@ -688,7 +726,7 @@
             document.getElementById('injured-count').innerText = injuredFauna;
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
 
-            // Gestions des effets de danger (clignotement et gonflement spectaculaire)
+            // Gestions des effets de danger (clignotement et gonflement adoucis)
             let batContainer = document.getElementById('battery-left');
             batContainer.classList.remove('danger-50', 'danger-25');
             if (production <= 25) {
