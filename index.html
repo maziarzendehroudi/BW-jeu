@@ -75,18 +75,11 @@
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
         .moon { background: transparent; box-shadow: none; overflow: visible; }
 
-        /* --- BANDE DU BAS (Usine) --- */
-        #bottom-band {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 85px;
-            background: #020617; border-top: 2px solid #064e3b;
-            z-index: 45;
-        }
-
-        /* --- DÉCOR (Remonté au-dessus de la bande) --- */
+        /* --- DÉCOR (Prolongé jusqu'en bas) --- */
         .mountain-back { position: absolute; bottom: 125px; left: -5%; width: 110%; height: 260px; background: linear-gradient(to bottom, #475569, #1e293b); clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%); z-index: 3; }
         .mountain-mid { position: absolute; bottom: 105px; left: -5%; width: 110%; height: 200px; background: linear-gradient(to bottom, #334155, #0f172a); clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%); z-index: 4; }
         .hill-mid { position: absolute; bottom: 85px; left: -5%; width: 110%; height: 140px; background: linear-gradient(to bottom, #0f766e, #042f2e); clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%); z-index: 5; }
-        .hill-foreground { position: absolute; bottom: 65px; left: -5%; width: 110%; height: 100px; background: linear-gradient(to bottom, #064e3b, #020617); clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%); z-index: 6; }
+        .hill-foreground { position: absolute; bottom: -20px; left: -5%; width: 110%; height: 220px; background: linear-gradient(to bottom, #064e3b 0%, #020617 70%); clip-path: polygon(0% 100%, 0% 10%, 30% 20%, 60% 5%, 90% 15%, 100% 5%, 100% 100%); z-index: 6; }
         .mist-layer { position: absolute; bottom: 85px; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
         @keyframes mistBreathe { 0% { transform: translateY(0) scaleY(1); opacity: 0.4; } 100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; } }
 
@@ -120,10 +113,11 @@
         .hud-center { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; justify-self: center;
             background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5); border: none; 
-            color: white; padding: 12px 30px; border-radius: 16px; pointer-events: auto;
+            color: white; padding: 16px 40px; border-radius: 20px; pointer-events: auto;
+            position: relative; z-index: 50; /* PREMIER PLAN ASSURÉ */
         }
-        .day-text { font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
-        .day-num { font-size: 42px; font-weight: 900; line-height: 1; }
+        .day-text { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
+        .day-num { font-size: 54px; font-weight: 900; line-height: 1; }
         .level-up-anim { animation: dayUpSpectacular 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes dayUpSpectacular { 
             0% { transform: scale(1); filter: brightness(1); } 
@@ -145,7 +139,7 @@
             100% { transform: scale(1.15); box-shadow: 0 0 40px rgba(255, 0, 0, 1), inset 0 0 25px rgba(255, 0, 0, 0.9); border-color: #facc15; background: rgba(255, 0, 0, 0.6); }
         }
 
-        /* --- ÉOLIENNES (Remontées) --- */
+        /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
         #turbine-1 { left: 28%; bottom: 110px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         #turbine-2 { left: 68%; bottom: 130px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
@@ -164,7 +158,7 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Boutons flottants sans fond) --- */
+        /* --- PUPITRE DE CONTRÔLE (Boutons flottants) --- */
         .control-deck {
             position: absolute; bottom: 20px; left: 0; right: 0;
             display: flex; justify-content: center; gap: 20px; align-items: center; z-index: 50; padding: 0 20px;
@@ -180,17 +174,26 @@
             box-shadow: 0 6px 0 #7c2d12, 0 10px 15px rgba(0,0,0,0.5); border-color: #fdba74;
         }
         .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #7c2d12, inset 0 4px 8px rgba(0,0,0,0.7); }
+        
+        /* Bouton ULTRASONS : Fond sombre, barre de progression colorée */
         .btn-ultrasound-global { 
             flex: 1; max-width: 180px; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
-            background: linear-gradient(to bottom, #0ea5e9, #0369a1); color: white; 
-            box-shadow: 0 6px 0 #0c4a6e, 0 10px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; padding: 14px 4px; border: 1px solid #7dd3fc;
+            background: #0f172a; color: white; 
+            box-shadow: 0 6px 0 #020617, 0 10px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; padding: 14px 4px; border: 1px solid #1e293b;
+        }
+        .btn-ultrasound-global:not(:disabled) {
+            border-color: #38bdf8;
+            box-shadow: 0 6px 0 #0c4a6e, 0 0 15px rgba(56, 189, 248, 0.4);
         }
         .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #0c4a6e, inset 0 4px 8px rgba(0,0,0,0.6); }
         .btn-ultrasound-global:disabled { 
-            filter: grayscale(1); cursor: not-allowed; opacity: 0.6; transform: none; 
-            box-shadow: 0 6px 0 #334155; border-color: #475569;
+            cursor: not-allowed; opacity: 0.8; transform: none; 
         }
-        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.4) 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); transition: width 0.2s linear; }
+        #us-progress { 
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
+            background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.15), rgba(255,255,255,0.15) 15px, transparent 15px, transparent 30px), linear-gradient(to bottom, #0ea5e9, #0369a1); 
+            transition: width 0.2s linear; 
+        }
         .btn-content { position: relative; z-index: 2; pointer-events: none; }
 
         /* --- OPTIMISATION MOBILE (Pixel 9a & Petits écrans) --- */
@@ -201,18 +204,12 @@
             .hud-stats .hud-icon { font-size: 14px; }
             .hud-stats .hud-value span:last-child { font-size: 10px !important; }
             .modern-track { height: 10px; }
-            .hud-center { padding: 8px 20px; border-radius: 12px; }
-            .day-text { font-size: 12px; }
-            .day-num { font-size: 32px; }
+            .hud-center { padding: 10px 25px; border-radius: 16px; }
+            .day-text { font-size: 14px; }
+            .day-num { font-size: 40px; }
 
             .control-deck { bottom: 20px; gap: 8px; padding: 0 10px; }
-            .btn-control, .btn-ultrasound-global { font-size: 11px; padding: 12px 2px; box-shadow: 0 4px 0 #475569, 0 6px 10px rgba(0,0,0,0.3); }
-            .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #475569, inset 0 3px 6px rgba(0,0,0,0.5); }
-            .btn-curtail.active { box-shadow: 0 4px 0 #7c2d12, 0 6px 10px rgba(0,0,0,0.3); }
-            .btn-curtail.active:active { transform: translateY(4px); box-shadow: 0 0 0 #7c2d12, inset 0 3px 6px rgba(0,0,0,0.6); }
-            .btn-ultrasound-global { box-shadow: 0 4px 0 #0c4a6e, 0 6px 10px rgba(0,0,0,0.3); }
-            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0c4a6e, inset 0 3px 6px rgba(0,0,0,0.6); }
-            .btn-ultrasound-global:disabled { box-shadow: 0 4px 0 #334155; }
+            .btn-control, .btn-ultrasound-global { font-size: 11px; padding: 12px 2px; }
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
         }
@@ -260,8 +257,6 @@
             </svg>
         </div>
 
-        <div id="bottom-band"></div>
-
         <div class="mountain-back"></div>
         <div class="mountain-mid"></div>
         <div class="hill-mid"></div>
@@ -278,7 +273,7 @@
                 <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="width: 0%;"></div></div>
             </div>
 
-            <!-- Bloc Jour Centre -->
+            <!-- Bloc Jour Centre (Premier Plan) -->
             <div class="hud-center" id="level-badge">
                 <div class="day-text">Jour</div>
                 <div class="day-num" id="level-num">1</div>
