@@ -75,12 +75,12 @@
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
         .moon { background: transparent; box-shadow: none; overflow: visible; }
 
-        /* --- DÉCOR --- */
-        .mountain-back { position: absolute; bottom: 120px; left: -5%; width: 110%; height: 260px; background: linear-gradient(to bottom, #475569, #1e293b); clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%); z-index: 3; }
-        .mountain-mid { position: absolute; bottom: 100px; left: -5%; width: 110%; height: 200px; background: linear-gradient(to bottom, #334155, #0f172a); clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%); z-index: 4; }
-        .hill-mid { position: absolute; bottom: 80px; left: -5%; width: 110%; height: 140px; background: linear-gradient(to bottom, #0f766e, #042f2e); clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%); z-index: 5; }
-        .hill-foreground { position: absolute; bottom: 60px; left: -5%; width: 110%; height: 100px; background: linear-gradient(to bottom, #064e3b, #020617); clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%); z-index: 6; }
-        .mist-layer { position: absolute; bottom: 60px; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
+        /* --- DÉCOR (Descendu tout en bas) --- */
+        .mountain-back { position: absolute; bottom: 40px; left: -5%; width: 110%; height: 260px; background: linear-gradient(to bottom, #475569, #1e293b); clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%); z-index: 3; }
+        .mountain-mid { position: absolute; bottom: 20px; left: -5%; width: 110%; height: 200px; background: linear-gradient(to bottom, #334155, #0f172a); clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%); z-index: 4; }
+        .hill-mid { position: absolute; bottom: 0px; left: -5%; width: 110%; height: 140px; background: linear-gradient(to bottom, #0f766e, #042f2e); clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%); z-index: 5; }
+        .hill-foreground { position: absolute; bottom: -20px; left: -5%; width: 110%; height: 100px; background: linear-gradient(to bottom, #064e3b, #020617); clip-path: polygon(0% 100%, 0% 20%, 30% 40%, 60% 10%, 90% 30%, 100% 10%, 100% 100%); z-index: 6; }
+        .mist-layer { position: absolute; bottom: 0px; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
         @keyframes mistBreathe { 0% { transform: translateY(0) scaleY(1); opacity: 0.4; } 100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; } }
 
         /* --- HUD --- */
@@ -96,32 +96,32 @@
         .hud-item span { font-size: 24px; font-weight: 900; color: #ffffff; }
         .level-badge { 
             background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); border: none; 
-            color: white; padding: 10px 24px; font-size: 18px; z-index: 60; flex: 0 1 auto; min-width: 130px;
+            color: white; padding: 12px 30px; font-size: 22px; z-index: 60; flex: 0 1 auto; min-width: 140px; font-weight: 800;
         }
-        .level-up-anim { animation: dayUpSpectacular 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .level-badge span { font-size: 32px; font-weight: 900; }
+        .level-up-anim { animation: dayUpSpectacular 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         @keyframes dayUpSpectacular { 
             0% { transform: scale(1); filter: brightness(1); } 
-            20% { transform: scale(3) translateY(20px) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 30px #facc15); color: #fef08a; } 
-            40% { transform: scale(3.5) translateY(25px) rotate(10deg); filter: brightness(3) drop-shadow(0 0 50px #f59e0b); color: #ffffff; }
-            60% { transform: scale(3) translateY(20px) rotate(-5deg); filter: brightness(2) drop-shadow(0 0 30px #facc15); color: #fef08a; } 
-            80% { transform: scale(1.3) rotate(5deg); filter: brightness(1.5); }
+            30% { transform: scale(1.6) translateY(5px) rotate(-3deg); filter: brightness(1.5) drop-shadow(0 0 20px #facc15); color: #fef08a; } 
+            50% { transform: scale(1.8) translateY(8px) rotate(3deg); filter: brightness(2) drop-shadow(0 0 30px #f59e0b); color: #ffffff; }
+            70% { transform: scale(1.6) translateY(5px) rotate(-2deg); filter: brightness(1.5) drop-shadow(0 0 20px #facc15); color: #fef08a; } 
             100% { transform: scale(1); filter: brightness(1); } 
         }
 
-        /* --- BARRES VERTICALES & EFFETS SPECTACULAIRES --- */
+        /* --- BARRES VERTICALES (Plus fines, plus hautes) --- */
         .vertical-bar-container {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 320px;
+            position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 420px;
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; z-index: 35; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
         }
-        .bar-title-icon { font-size: 24px; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .bar-title-icon { font-size: 20px; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         #battery-left { left: 16px; } #biodiversity-right { right: 16px; }
-        .modern-track { width: 20px; height: 240px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+        .modern-track { width: 12px; height: 350px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
         .modern-fill { width: 100%; border-radius: 10px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
         .power-fill { background: linear-gradient(to top, #ef4444, #fef08a); box-shadow: 0 0 12px rgba(254, 240, 138, 0.5); }
         .bio-fill { background: linear-gradient(to top, #ef4444, #10b981); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
 
-        /* Effets de clignotement / gonflement adoucis */
+        /* Effets de clignotement / gonflement */
         .danger-50 { animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important; }
         .danger-25 { animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important; }
         @keyframes pulse-danger-50 {
@@ -133,10 +133,10 @@
             100% { transform: translateY(-50%) scale(1.35); box-shadow: 0 0 50px rgba(255, 0, 0, 1), inset 0 0 30px rgba(255, 0, 0, 0.9); border-color: #facc15; background: rgba(255, 0, 0, 0.6); }
         }
 
-        /* --- ÉOLIENNES --- */
+        /* --- ÉOLIENNES (Descendues tout en bas) --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
-        #turbine-1 { left: 28%; bottom: 95px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
-        #turbine-2 { left: 68%; bottom: 115px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-1 { left: 28%; bottom: 25px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
+        #turbine-2 { left: 68%; bottom: 45px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         .tower { background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); border-radius: 2px; position: relative; }
         .tower::after { content: ''; position: absolute; bottom: 0; left: -25%; width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
         .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
@@ -152,35 +152,13 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Usine d'Énergie Renouvelable - Fond opaque industriel) --- */
+        /* --- PUPITRE DE CONTRÔLE (Boutons flottants sans fond) --- */
         .control-deck {
-            position: absolute; bottom: 0; left: 0; right: 0; height: 115px;
-            padding-bottom: env(safe-area-inset-bottom, 0px);
-            background-color: #1a202c;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(0,0,0,0.3) 15px, rgba(0,0,0,0.3) 30px),
-                linear-gradient(to bottom, #2d3748, #0f172a);
-            border-top: 6px solid #475569;
-            box-shadow: inset 0 6px 20px rgba(0,0,0,0.8), 0 -8px 20px rgba(0,0,0,0.4);
+            position: absolute; bottom: 30px; left: 0; right: 0;
             display: flex; justify-content: center; gap: 20px; align-items: center; z-index: 50; padding: 0 20px;
         }
-        .turbine-station, .ultrasound-station { 
-            display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 220px;
-            background: #0f172a; padding: 10px; border-radius: 8px; border: 2px solid #334155;
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 2px 0 rgba(255,255,255,0.1);
-        }
-        .station-title { 
-            font-size: 11px; color: #38bdf8; margin-bottom: 8px; font-weight: 900;
-            font-family: 'Courier New', Courier, monospace; letter-spacing: 1px;
-            text-transform: uppercase; text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
-            display: flex; align-items: center; gap: 6px;
-        }
-        .station-title::before {
-            content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-            background: #10b981; box-shadow: 0 0 8px #10b981;
-        }
         .btn-control { 
-            width: 100%; border: none; padding: 14px 4px; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+            flex: 1; max-width: 180px; border: none; padding: 14px 4px; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
             background: linear-gradient(to bottom, #cbd5e1, #94a3b8); color: #0f172a; 
             box-shadow: 0 6px 0 #475569, 0 10px 15px rgba(0,0,0,0.5); border: 1px solid #e2e8f0; text-transform: uppercase;
         }
@@ -191,7 +169,7 @@
         }
         .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #7c2d12, inset 0 4px 8px rgba(0,0,0,0.7); }
         .btn-ultrasound-global { 
-            width: 100%; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+            flex: 1; max-width: 180px; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
             background: linear-gradient(to bottom, #0ea5e9, #0369a1); color: white; 
             box-shadow: 0 6px 0 #0c4a6e, 0 10px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; padding: 14px 4px; border: 1px solid #7dd3fc;
         }
@@ -208,14 +186,12 @@
             .top-hud { padding: 10px 8px; gap: 4px; justify-content: space-between; }
             .hud-item { padding: 8px 10px; font-size: 14px; max-width: 110px; gap: 4px; }
             .hud-item span { font-size: 20px; }
-            .level-badge { min-width: 90px; padding: 8px 14px; }
-            .vertical-bar-container { height: 220px; width: 40px; }
-            .modern-track { height: 160px; width: 14px; }
-            .bar-title-icon { font-size: 18px; margin-bottom: 8px; }
-            .control-deck { height: 95px; gap: 8px; padding: 0 10px; }
-            .turbine-station, .ultrasound-station { padding: 6px; }
-            .station-title { font-size: 8px; margin-bottom: 6px; }
-            .station-title::before { width: 6px; height: 6px; }
+            .level-badge { min-width: 90px; padding: 8px 14px; font-size: 16px; }
+            .level-badge span { font-size: 24px; }
+            .vertical-bar-container { height: 300px; width: 28px; }
+            .modern-track { height: 250px; width: 10px; }
+            .bar-title-icon { font-size: 16px; margin-bottom: 8px; }
+            .control-deck { bottom: 20px; gap: 8px; padding: 0 10px; }
             .btn-control, .btn-ultrasound-global { font-size: 11px; padding: 12px 2px; box-shadow: 0 4px 0 #475569, 0 6px 10px rgba(0,0,0,0.3); }
             .btn-control:active { transform: translateY(4px); box-shadow: 0 0 0 #475569, inset 0 3px 6px rgba(0,0,0,0.5); }
             .btn-curtail.active { box-shadow: 0 4px 0 #7c2d12, 0 6px 10px rgba(0,0,0,0.3); }
@@ -223,8 +199,8 @@
             .btn-ultrasound-global { box-shadow: 0 4px 0 #0c4a6e, 0 6px 10px rgba(0,0,0,0.3); }
             .btn-ultrasound-global:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #0c4a6e, inset 0 3px 6px rgba(0,0,0,0.6); }
             .btn-ultrasound-global:disabled { box-shadow: 0 4px 0 #334155; }
-            #turbine-1 { left: 22%; bottom: 100px; }
-            #turbine-2 { left: 72%; bottom: 120px; }
+            #turbine-1 { bottom: 30px; }
+            #turbine-2 { bottom: 50px; }
         }
 
         /* --- ANIMAUX & FEEDBACKS --- */
@@ -307,21 +283,12 @@
         </div>
 
         <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
-            <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE 1</span>
-                <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
-            </div>
-            <div class="ultrasound-station">
-                <span class="station-title">RÉPULSIF</span>
-                <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
-                    <div id="us-progress" style="width: 0%;"></div>
-                    <span class="btn-content">🔊 ULTRASONS</span>
-                </button>
-            </div>
-            <div class="turbine-station">
-                <span class="station-title">ÉOLIENNE 2</span>
-                <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
-            </div>
+            <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
+            <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
+                <div id="us-progress" style="width: 0%;"></div>
+                <span class="btn-content">🔊 ULTRASONS</span>
+            </button>
+            <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
         </div>
     </div>
 
