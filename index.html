@@ -86,39 +86,44 @@
         /* --- HUD --- */
         .top-hud {
             position: absolute; top: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 16px 20px; z-index: 40; display: flex; gap: 15px; justify-content: space-around; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 16px 20px; z-index: 40; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
         .hud-item { 
-            background: rgba(255, 255, 255, 0.1); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; 
+            background: rgba(255, 255, 255, 0.1); padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 8px; justify-content: center;
             font-size: 18px; font-weight: 600; color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            flex: 1; max-width: 150px;
         }
         .hud-item span { font-size: 24px; font-weight: 900; color: #ffffff; }
-        .level-badge { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); border: none; color: white; padding: 10px 24px; font-size: 18px; }
-        .level-up-anim { animation: levelUpSpectacular 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes levelUpSpectacular { 0%, 100% { transform: scale(1); filter: brightness(1); } 20%, 60% { transform: scale(2) rotate(10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); } 40% { transform: scale(1.8) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 20px #60a5fa); } }
+        .level-badge { 
+            background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); border: none; 
+            color: white; padding: 10px 24px; font-size: 18px; z-index: 60; flex: 0 1 auto; min-width: 130px;
+        }
+        .level-up-anim { animation: dayUpSpectacular 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes dayUpSpectacular { 
+            0% { transform: scale(1); filter: brightness(1); } 
+            20% { transform: scale(3) translateY(20px) rotate(-10deg); filter: brightness(2) drop-shadow(0 0 30px #facc15); color: #fef08a; } 
+            40% { transform: scale(3.5) translateY(25px) rotate(10deg); filter: brightness(3) drop-shadow(0 0 50px #f59e0b); color: #ffffff; }
+            60% { transform: scale(3) translateY(20px) rotate(-5deg); filter: brightness(2) drop-shadow(0 0 30px #facc15); color: #fef08a; } 
+            80% { transform: scale(1.3) rotate(5deg); filter: brightness(1.5); }
+            100% { transform: scale(1); filter: brightness(1); } 
+        }
 
         /* --- BARRES VERTICALES & EFFETS SPECTACULAIRES --- */
         .vertical-bar-container {
-            position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 260px;
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; z-index: 35; display: flex; flex-direction: column; align-items: center; padding: 8px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 320px;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; z-index: 35; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; box-shadow: 0 8px 25px rgba(0,0,0,0.3);
             transition: all 0.2s ease;
         }
-        .bar-title-v { font-size: 8px; font-weight: 800; color: #94a3b8; margin-bottom: 6px; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); }
-        .kwh-title { font-family: 'Impact', 'Comic Sans MS', cursive, sans-serif !important; font-size: 14px !important; color: #fbbf24 !important; text-shadow: 0px 0px 4px #f59e0b !important; font-weight: bold; }
-        .bar-value-v { font-size: 9px; font-weight: bold; margin-top: 6px; }
-        #battery-left { left: 12px; } #biodiversity-right { right: 12px; }
-        .modern-track { width: 14px; height: 170px; background: rgba(255, 255, 255, 0.1); border-radius: 7px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
-        .modern-fill { width: 100%; border-radius: 7px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
-        .power-fill { background: linear-gradient(to top, #ef4444, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
-        .bio-fill { background: linear-gradient(to top, #f59e0b, #10b981); box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+        .bar-title-icon { font-size: 24px; margin-bottom: 12px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        #battery-left { left: 16px; } #biodiversity-right { right: 16px; }
+        .modern-track { width: 20px; height: 240px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; display: flex; flex-direction: column-reverse; box-shadow: inset 0 2px 4px rgba(0,0,0,0.4); }
+        .modern-fill { width: 100%; border-radius: 10px; transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        .power-fill { background: linear-gradient(to top, #ef4444, #fef08a); box-shadow: 0 0 12px rgba(254, 240, 138, 0.5); }
+        .bio-fill { background: linear-gradient(to top, #ef4444, #10b981); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
 
         /* Effets de clignotement / gonflement adoucis */
-        .danger-50 {
-            animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important;
-        }
-        .danger-25 {
-            animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important;
-        }
+        .danger-50 { animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important; }
+        .danger-25 { animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important; }
         @keyframes pulse-danger-50 {
             0% { transform: translateY(-50%) scale(1); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.4); }
             100% { transform: translateY(-50%) scale(1.15); box-shadow: 0 0 30px rgba(239, 68, 68, 1), inset 0 0 15px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.3); }
@@ -147,15 +152,17 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Usine d'Énergie Renouvelable) --- */
+        /* --- PUPITRE DE CONTRÔLE (Usine d'Énergie Renouvelable - Fond opaque industriel) --- */
         .control-deck {
             position: absolute; bottom: 0; left: 0; right: 0; height: 115px;
             padding-bottom: env(safe-area-inset-bottom, 0px);
-            background: linear-gradient(to bottom, #2d3748, #1a202c);
-            border-top: 4px solid #4a5568;
-            box-shadow: inset 0 4px 20px rgba(0,0,0,0.6), 0 -8px 20px rgba(0,0,0,0.4);
+            background-color: #1a202c;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(0,0,0,0.3) 15px, rgba(0,0,0,0.3) 30px),
+                linear-gradient(to bottom, #2d3748, #0f172a);
+            border-top: 6px solid #475569;
+            box-shadow: inset 0 6px 20px rgba(0,0,0,0.8), 0 -8px 20px rgba(0,0,0,0.4);
             display: flex; justify-content: center; gap: 20px; align-items: center; z-index: 50; padding: 0 20px;
-            background-image: repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 2px, transparent 2px, transparent 6px);
         }
         .turbine-station, .ultrasound-station { 
             display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 220px;
@@ -193,16 +200,18 @@
             filter: grayscale(1); cursor: not-allowed; opacity: 0.6; transform: none; 
             box-shadow: 0 6px 0 #334155; border-color: #475569;
         }
-        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); transition: width 0.2s linear; }
+        #us-progress { position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: repeating-linear-gradient(-45deg, rgba(0,0,0,0.4), rgba(0,0,0,0.4) 15px, rgba(0,0,0,0.1) 15px, rgba(0,0,0,0.1) 30px); transition: width 0.2s linear; }
         .btn-content { position: relative; z-index: 2; pointer-events: none; }
 
         /* --- OPTIMISATION MOBILE (Pixel 9a & Petits écrans) --- */
         @media (max-width: 768px) {
-            .top-hud { padding: 10px 8px; gap: 6px; }
-            .hud-item { padding: 8px 14px; font-size: 14px; }
+            .top-hud { padding: 10px 8px; gap: 4px; justify-content: space-between; }
+            .hud-item { padding: 8px 10px; font-size: 14px; max-width: 110px; gap: 4px; }
             .hud-item span { font-size: 20px; }
-            .vertical-bar-container { height: 180px; width: 30px; }
-            .modern-track { height: 110px; width: 10px; }
+            .level-badge { min-width: 90px; padding: 8px 14px; }
+            .vertical-bar-container { height: 220px; width: 40px; }
+            .modern-track { height: 160px; width: 14px; }
+            .bar-title-icon { font-size: 18px; margin-bottom: 8px; }
             .control-deck { height: 95px; gap: 8px; padding: 0 10px; }
             .turbine-station, .ultrasound-station { padding: 6px; }
             .station-title { font-size: 8px; margin-bottom: 6px; }
@@ -268,21 +277,19 @@
         <div class="mist-layer"></div>
 
         <div class="top-hud">
-            <div class="hud-item level-badge" id="level-badge">Niv. <span id="level-num">1</span></div>
-            <div class="hud-item">💚 <span id="saved-count">0</span> &nbsp;|&nbsp; 💔 <span id="injured-count">0</span></div>
-            <div class="hud-item">⚡ <span id="energy-count">0</span> kWh</div>
+            <div class="hud-item" style="justify-content: flex-start;">⚡ <span id="energy-count">0</span> &nbsp;kWh</div>
+            <div class="hud-item level-badge" id="level-badge">Jour <span id="level-num">1</span></div>
+            <div class="hud-item" style="justify-content: flex-end;">💚 <span id="saved-count">0</span></div>
         </div>
 
         <div class="vertical-bar-container" id="battery-left">
-            <span class="bar-title-v kwh-title">kWh</span>
+            <div class="bar-title-icon">⚡</div>
             <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="height: 0%;"></div></div>
-            <span class="bar-value-v" id="power-val">0%</span>
         </div>
 
         <div class="vertical-bar-container" id="biodiversity-right">
-            <span class="bar-title-v">Bio</span>
+            <div class="bar-title-icon">💚</div>
             <div class="modern-track"><div class="modern-fill bio-fill" id="bio-fill" style="height: 100%;"></div></div>
-            <span class="bar-value-v" id="bio-val">100%</span>
         </div>
 
         <div class="wind-turbine" id="turbine-1">
@@ -325,7 +332,7 @@
             <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale (Oiseaux de jour, Chauves-souris la nuit).</p>
             <div class="stats-box">
                 <b>🏆 Meilleurs Scores :</b><br>
-                Niveau max : <span id="menu-high-level">1</span><br>
+                Jour max : <span id="menu-high-level">1</span><br>
                 Énergie max : <span id="menu-high-energy">0</span> kWh
             </div>
             <button class="btn-main" onclick="startGame()">LANCER LA CENTRALE</button>
@@ -718,12 +725,9 @@
 
         function updateUI() {
             document.getElementById('battery-fill').style.height = Math.round(production) + '%';
-            document.getElementById('power-val').innerText = Math.round(production) + '%';
             document.getElementById('bio-fill').style.height = Math.round(biodiversityPercent) + '%';
-            document.getElementById('bio-val').innerText = Math.round(biodiversityPercent) + '%';
             document.getElementById('level-num').innerText = currentLevel;
             document.getElementById('saved-count').innerText = savedFauna;
-            document.getElementById('injured-count').innerText = injuredFauna;
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
 
             // Gestions des effets de danger (clignotement et gonflement adoucis)
@@ -751,7 +755,7 @@
             
             document.querySelectorAll('.creature').forEach(b => b.remove());
             document.getElementById('final-stats').innerHTML = 
-                `Niveau atteint : <b>${currentLevel}</b><br>` +
+                `Jour atteint : <b>${currentLevel}</b><br>` +
                 `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
                 `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` +
                 `<span style="color:#ef4444">${reason}</span>`;
