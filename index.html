@@ -108,16 +108,12 @@
         
         #battery-container .modern-track { 
             border-radius: 6px 0 0 6px; 
-            display: flex; 
-            justify-content: flex-end; 
+            display: flex; justify-content: flex-end; 
         }
-        #bio-container .modern-track { 
-            border-radius: 0 6px 6px 0; 
-        }
+        #bio-container .modern-track { border-radius: 0 6px 6px 0; }
 
         .modern-fill { height: 100%; border-radius: inherit; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
         
-        /* Dégradé inversé pour l'énergie */
         .power-fill { background: linear-gradient(to right, #fef08a, #ef4444); box-shadow: 0 0 15px rgba(254, 240, 138, 0.8), 0 0 5px rgba(254, 240, 138, 0.5); }
         .bio-fill { background: linear-gradient(to right, #ef4444, #10b981); box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.5); }
 
@@ -167,14 +163,14 @@
         .danger-25 .hud-stats { color: #ef4444; }
 
         /* --- ÉOLIENNES --- */
-        .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s; }
-        .wind-turbine:active { transform: scale(0.95); filter: brightness(0.8); }
+        .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: filter 0.2s; pointer-events: none; }
+        .wind-turbine.active-click { transform: scale(0.95); filter: brightness(0.8); }
         
         #turbine-1 { left: 28%; bottom: 110px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         #turbine-2 { left: 68%; bottom: 130px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         .tower { background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); border-radius: 2px; position: relative; }
         .tower::after { content: ''; position: absolute; bottom: 0; left: -25%; width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
-        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; pointer-events: none; }
+        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
         .nacelle::after { content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: blinkAviation 2s infinite; }
         @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
         #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
@@ -189,42 +185,60 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Bouton Ultrasons Plus Large et Moins Haut) --- */
+        /* HITBOX MAGIQUE : Rend le clic sur l'éolienne ultra-fluide et immanquable */
+        .turbine-hitbox {
+            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 220px; z-index: 20;
+            background: rgba(255, 0, 0, 0); /* Invisible mais cliquable */
+            cursor: pointer; pointer-events: auto;
+        }
+
+        /* --- PUPITRE DE CONTRÔLE (Boutons Doubles : Chauves-souris / Oiseaux) --- */
         .control-deck {
             position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; align-items: flex-end; 
+            display: flex; justify-content: center; align-items: flex-end; gap: 15px;
             z-index: 50; padding: 0 20px; pointer-events: none; 
         }
         
-        .btn-ultrasound-global { 
+        .btn-action-global { 
             pointer-events: auto;
-            flex: 1; max-width: 320px; height: 55px; border: none; font-size: 15px; font-weight: 900; letter-spacing: 1px; 
+            flex: 1; max-width: 200px; height: 55px; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; 
             border-radius: 28px; cursor: pointer; transition: all 0.2s; 
             background: #0f172a; color: white; 
             box-shadow: 0 6px 0 #020617, 0 12px 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
             border: 2px solid #1e293b;
         }
-        .btn-ultrasound-global:not(:disabled) {
+        .btn-action-global:disabled { cursor: not-allowed; opacity: 0.8; transform: none; }
+        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.9); pointer-events: none; }
+        .btn-icon { font-size: 16px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+
+        /* Style spécifique ULTRASONS (Jaune) */
+        #btn-ultrasound:not(:disabled) {
             border-color: #facc15;
             box-shadow: 0 6px 0 #854d0e, 0 0 20px rgba(250, 204, 21, 0.5);
-            animation: pulse-ultrasound 1.5s infinite alternate;
+            animation: pulse-us 1.5s infinite alternate;
         }
-        @keyframes pulse-ultrasound {
-            0% { filter: brightness(1); }
-            100% { filter: brightness(1.2); box-shadow: 0 6px 0 #854d0e, 0 0 40px rgba(250, 204, 21, 0.8); }
-        }
-        .btn-ultrasound-global:active:not(:disabled) { 
-            transform: translateY(6px); box-shadow: 0 0 0 #854d0e, inset 0 4px 10px rgba(0,0,0,0.8); 
-        }
-        .btn-ultrasound-global:disabled { cursor: not-allowed; opacity: 0.8; transform: none; }
-        
+        @keyframes pulse-us { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); box-shadow: 0 6px 0 #854d0e, 0 0 40px rgba(250, 204, 21, 0.8); } }
+        #btn-ultrasound:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #854d0e, inset 0 4px 10px rgba(0,0,0,0.8); }
         #us-progress { 
             position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
-            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), 
-                              linear-gradient(to bottom, #facc15, #ca8a04); 
+            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), linear-gradient(to bottom, #facc15, #ca8a04); 
             transition: width 0.2s linear; 
         }
-        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.9); pointer-events: none; }
+
+        /* Style spécifique EFFAROUCHAGE (Orange) */
+        #btn-scare:not(:disabled) {
+            border-color: #f97316;
+            box-shadow: 0 6px 0 #9a3412, 0 0 20px rgba(249, 115, 22, 0.5);
+            animation: pulse-scare 1.5s infinite alternate;
+        }
+        @keyframes pulse-scare { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); box-shadow: 0 6px 0 #9a3412, 0 0 40px rgba(249, 115, 22, 0.8); } }
+        #btn-scare:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #9a3412, inset 0 4px 10px rgba(0,0,0,0.8); }
+        #scare-progress { 
+            position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
+            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), linear-gradient(to bottom, #f97316, #c2410c); 
+            transition: width 0.2s linear; 
+        }
 
         /* --- OPTIMISATION MOBILE --- */
         @media (max-width: 768px) {
@@ -237,17 +251,18 @@
             .hud-icon { font-size: 14px; }
             .unit { font-size: 11px; }
 
-            .control-deck { bottom: 20px; padding: 0 10px; }
+            .control-deck { bottom: 20px; padding: 0 10px; gap: 8px; }
             
-            .btn-ultrasound-global { max-width: 260px; height: 46px; font-size: 13px; border-radius: 23px; box-shadow: 0 5px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
-            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.8); }
+            .btn-action-global { max-width: 170px; height: 46px; font-size: 11px; border-radius: 23px; box-shadow: 0 5px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
+            .btn-action-global:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.8); }
+            .btn-icon { font-size: 14px; }
             
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
         }
 
         /* --- ANIMAUX & FEEDBACKS --- */
-        .creature { position: absolute; z-index: 30; font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); will-change: transform; }
+        .creature { position: absolute; z-index: 30; font-size: 28px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); will-change: transform; pointer-events: none; }
         .bat-icon { animation: flapWings 0.35s ease-in-out infinite alternate; }
         .bird-icon { animation: flapBird 0.4s ease-in-out infinite alternate; }
         @keyframes flapWings { 0% { transform: scaleY(1) scaleX(1); } 100% { transform: scaleY(0.7) scaleX(0.9) translateY(2px); } }
@@ -261,7 +276,7 @@
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
         /* --- MODALES & MENUS --- */
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; }
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; pointer-events: auto; }
         .menu-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .menu-box p { font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px; }
@@ -270,12 +285,12 @@
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #047857; }
         .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
         .btn-secondary:hover { background: rgba(255,255,255,0.2); }
-        .hidden { display: none !important; }
+        .hidden { display: none !important; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="game-container" ontouchstart="handleContainerTouch(event)" onclick="handleContainerClick(event)">
+    <div id="game-container" onpointerdown="handleContainerClick(event)">
         <div id="stars-container"></div>
         <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
         <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.6;"></div>
@@ -321,24 +336,32 @@
             </div>
         </div>
 
-        <div class="wind-turbine" id="turbine-1" onclick="toggleCurtail(1); event.stopPropagation();" ontouchstart="toggleCurtail(1); event.stopPropagation();">
+        <div class="wind-turbine" id="turbine-1">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
+            <!-- Hitbox magique pour clic parfait -->
+            <div class="turbine-hitbox" onpointerdown="toggleCurtail(1); event.stopPropagation();" onpointerup="resetTurbineClick(1);" onpointercancel="resetTurbineClick(1);" onpointerout="resetTurbineClick(1);"></div>
         </div>
 
-        <div class="wind-turbine" id="turbine-2" onclick="toggleCurtail(2); event.stopPropagation();" ontouchstart="toggleCurtail(2); event.stopPropagation();">
+        <div class="wind-turbine" id="turbine-2">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-2">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
+            <!-- Hitbox magique pour clic parfait -->
+            <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
-        <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
-            <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
+        <div class="control-deck" onpointerdown="event.stopPropagation();">
+            <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
                 <div id="us-progress" style="width: 0%;"></div>
-                <div class="btn-content">🔊 ULTRASONS</div>
+                <div class="btn-content"><span class="btn-icon">🦇</span> ULTRASONS</div>
+            </button>
+            <button class="btn-action-global" id="btn-scare" onclick="triggerScare()">
+                <div id="scare-progress" style="width: 0%;"></div>
+                <div class="btn-content"><span class="btn-icon">🦅</span> EFFAROUCHAGE</div>
             </button>
         </div>
     </div>
@@ -385,7 +408,10 @@
         
         let isNight = false;
         let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
-        let ultrasoundCharge = 100; 
+        
+        let ultrasoundCharge = 100; // Charge Chauves-souris
+        let scareCharge = 100;      // Charge Oiseaux
+        
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
         let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
@@ -404,20 +430,16 @@
             if (!isPlaying || isPaused) return;
             if (e.key === '1') toggleCurtail(1);
             if (e.key === '2') toggleCurtail(2);
-            if (e.key === ' ') { e.preventDefault(); triggerGlobalUltrasound(); }
+            if (e.key === ' ') { e.preventDefault(); triggerUltrasound(); }
             if (e.key === 'Escape') togglePause();
         });
 
         // La pause ne s'active que si on clique dans la MOITIÉ HAUTE de l'écran
         function handleContainerClick(e) { 
-            if (isPlaying && e.clientY < (window.innerHeight / 2)) togglePause(); 
-        }
-        
-        function handleContainerTouch(e) { 
-            if (isPlaying && e.touches[0].clientY < (window.innerHeight / 2)) { 
-                e.preventDefault(); 
+            // Unification souris / touch avec clientY
+            if (isPlaying && e.clientY < (window.innerHeight / 2)) {
                 togglePause(); 
-            } 
+            }
         }
 
         function quitToMenu() {
@@ -438,9 +460,14 @@
             production = 20; 
             biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
             savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
+            
+            // Réinitialisation des deux charges
             ultrasoundCharge = 100; 
+            scareCharge = 100;
             document.getElementById('us-progress').style.width = '100%';
+            document.getElementById('scare-progress').style.width = '100%';
             document.getElementById('btn-ultrasound').disabled = false;
+            document.getElementById('btn-scare').disabled = false;
 
             curtailed = { 1: false, 2: false };
             tSpeed = { 1: 4, 2: 4.5 };
@@ -486,6 +513,7 @@
                 let addedKwh = addedPower * 1.5;
                 totalEnergyProduced += addedKwh;
                 
+                // Rechargement Ultrasons (Chauves-souris)
                 if (ultrasoundCharge < 100) {
                     ultrasoundCharge += addedKwh;
                     if (ultrasoundCharge >= 100) {
@@ -493,6 +521,16 @@
                         document.getElementById('btn-ultrasound').disabled = false;
                     }
                     document.getElementById('us-progress').style.width = ultrasoundCharge + '%';
+                }
+                
+                // Rechargement Effarouchage (Oiseaux)
+                if (scareCharge < 100) {
+                    scareCharge += addedKwh;
+                    if (scareCharge >= 100) {
+                        scareCharge = 100;
+                        document.getElementById('btn-scare').disabled = false;
+                    }
+                    document.getElementById('scare-progress').style.width = scareCharge + '%';
                 }
             } else {
                 production += addedPower;
@@ -596,6 +634,11 @@
             
             const turbine = document.getElementById(`turbine-${id}`);
             turbine.classList.toggle('curtailed', curtailed[id]);
+            turbine.classList.add('active-click');
+        }
+        
+        function resetTurbineClick(id) {
+            document.getElementById(`turbine-${id}`).classList.remove('active-click');
         }
 
         function showFeedback(text, x, y, isGood) {
@@ -607,7 +650,8 @@
             setTimeout(() => el.remove(), 1000);
         }
 
-        function triggerGlobalUltrasound() {
+        // Action : Repousser uniquement les Chauves-souris
+        function triggerUltrasound() {
             if (!isPlaying || isPaused || production < 30 || ultrasoundCharge < 100) return;
             
             production -= 30;
@@ -621,11 +665,45 @@
 
             [1, 2].forEach(id => {
                 let turbine = document.getElementById(`turbine-${id}`);
-                turbine.style.filter = "drop-shadow(0 0 20px #facc15)";
+                turbine.style.filter = "drop-shadow(0 0 20px #facc15)"; // Halo Jaune
                 setTimeout(() => turbine.style.filter = "none", 400);
             });
 
-            document.querySelectorAll('.creature').forEach(creature => {
+            // Ne cible que les chauves-souris
+            document.querySelectorAll('.creature.bat-icon').forEach(creature => {
+                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                creature.classList.add('fleeing');
+                savedFauna++;
+                updateBiodiversity();
+                
+                let rect = creature.getBoundingClientRect();
+                showFeedback("💚", rect.left, rect.top, true);
+                setTimeout(() => creature.remove(), 600);
+            });
+            updateUI();
+        }
+
+        // Action : Repousser uniquement les Oiseaux
+        function triggerScare() {
+            if (!isPlaying || isPaused || production < 30 || scareCharge < 100) return;
+            
+            production -= 30;
+            scareCharge = 0;
+            
+            document.getElementById('scare-progress').style.width = '0%';
+            document.getElementById('btn-scare').disabled = true;
+
+            let fillEl = document.getElementById('battery-fill');
+            fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
+
+            [1, 2].forEach(id => {
+                let turbine = document.getElementById(`turbine-${id}`);
+                turbine.style.filter = "drop-shadow(0 0 20px #f97316)"; // Halo Orange
+                setTimeout(() => turbine.style.filter = "none", 400);
+            });
+
+            // Ne cible que les oiseaux
+            document.querySelectorAll('.creature.bird-icon').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
                 savedFauna++;
