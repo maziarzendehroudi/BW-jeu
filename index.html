@@ -75,7 +75,7 @@
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
         .moon { background: transparent; box-shadow: none; overflow: visible; }
 
-        /* --- DÉCOR (Prolongé jusqu'en bas) --- */
+        /* --- DÉCOR --- */
         .mountain-back { position: absolute; bottom: 125px; left: -5%; width: 110%; height: 260px; background: linear-gradient(to bottom, #475569, #1e293b); clip-path: polygon(0% 100%, 10% 40%, 25% 60%, 45% 15%, 65% 55%, 85% 25%, 100% 70%, 100% 100%); z-index: 3; }
         .mountain-mid { position: absolute; bottom: 105px; left: -5%; width: 110%; height: 200px; background: linear-gradient(to bottom, #334155, #0f172a); clip-path: polygon(0% 100%, 15% 50%, 35% 20%, 55% 70%, 75% 30%, 95% 60%, 100% 100%); z-index: 4; }
         .hill-mid { position: absolute; bottom: 85px; left: -5%; width: 110%; height: 140px; background: linear-gradient(to bottom, #0f766e, #042f2e); clip-path: polygon(0% 100%, 0% 30%, 20% 10%, 45% 35%, 70% 15%, 100% 40%, 100% 100%); z-index: 5; }
@@ -92,11 +92,10 @@
 
         .hud-side {
             flex-grow: 1; position: relative;
-            height: 12px; /* Épaisseur de la barre */
+            height: 12px;
             display: flex; align-items: center;
         }
         
-        /* On tire les barres sous le badge central pour une fusion parfaite */
         #battery-container { margin-right: -15px; }
         #bio-container { margin-left: -15px; }
 
@@ -106,17 +105,24 @@
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); 
             pointer-events: auto;
         }
-        /* Arrondir uniquement les côtés extérieurs */
-        #battery-container .modern-track { border-radius: 6px 0 0 6px; }
-        #bio-container .modern-track { border-radius: 0 6px 6px 0; }
+        
+        /* Barres inversées : celle de gauche s'aligne à droite (vers le centre) */
+        #battery-container .modern-track { 
+            border-radius: 6px 0 0 6px; 
+            display: flex; 
+            justify-content: flex-end; /* Inverse le sens visuel du remplissage */
+        }
+        #bio-container .modern-track { 
+            border-radius: 0 6px 6px 0; 
+        }
 
         .modern-fill { height: 100%; border-radius: inherit; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
         .power-fill { background: linear-gradient(to right, #ef4444, #fef08a); box-shadow: 0 0 15px rgba(254, 240, 138, 0.8), 0 0 5px rgba(254, 240, 138, 0.5); }
         .bio-fill { background: linear-gradient(to right, #ef4444, #10b981); box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.5); }
 
-        /* Textes flottants en dessous des barres */
+        /* Textes flottants en dessous des barres, abaissés */
         .hud-stats {
-            position: absolute; top: 18px; 
+            position: absolute; top: 24px; /* Abaissé */
             display: flex; align-items: center; gap: 6px;
             font-size: 24px; font-weight: 900; color: #ffffff;
             text-shadow: 0 2px 4px rgba(0,0,0,0.9);
@@ -125,7 +131,7 @@
         #battery-container .hud-stats { left: 0; }
         #bio-container .hud-stats { right: 0; }
         
-        .hud-icon { font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .hud-icon { font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); } /* Icônes réduites */
         .unit { font-size: 14px; font-weight: 700; color: #cbd5e1; }
 
         .hud-center { 
@@ -134,7 +140,7 @@
             box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255,255,255,0.3); 
             color: white; padding: 14px 40px; border-radius: 20px; pointer-events: auto;
             position: relative; z-index: 50; flex-shrink: 0;
-            border: 4px solid #0f172a; /* Cadre sombre qui superpose joliment les barres */
+            /* Le contour noir a été supprimé ici */
         }
         .day-text { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
         .day-num { font-size: 54px; font-weight: 900; line-height: 1; }
@@ -162,90 +168,83 @@
         .danger-25 .hud-stats { color: #ef4444; }
 
         /* --- ÉOLIENNES --- */
-        .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
+        .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s; }
+        /* Feedback visuel lors du clic sur l'éolienne */
+        .wind-turbine:active { transform: scale(0.95); filter: brightness(0.8); }
+        
         #turbine-1 { left: 28%; bottom: 110px; } #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         #turbine-2 { left: 68%; bottom: 130px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         .tower { background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); border-radius: 2px; position: relative; }
         .tower::after { content: ''; position: absolute; bottom: 0; left: -25%; width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
-        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
+        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; pointer-events: none; }
         .nacelle::after { content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: blinkAviation 2s infinite; }
         @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
         #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
         .hub { position: absolute; width: 12px; height: 12px; background: #475569; border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 13; }
         .blades-container { position: absolute; top: 50%; left: 50%; z-index: 12; will-change: transform; }
+        
         .curtailed .nacelle { background: linear-gradient(to bottom, #fdba74, #ea580c); }
+        
         .blade { position: absolute; background: linear-gradient(to bottom, #ffffff, #e2e8f0); border-radius: 50% 50% 4px 4px; transform-origin: top center; clip-path: polygon(30% 0%, 70% 0%, 90% 100%, 10% 100%); }
         #turbine-1 .blade { height: 70px; width: 8px; top: 0px; left: -4px; }
         #turbine-1 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-1 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-1 .blade:nth-child(3) { transform: rotate(240deg); }
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Boutons Pilules 3D) --- */
+        /* --- PUPITRE DE CONTRÔLE (Bouton Ultrasons Unique) --- */
         .control-deck {
             position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; align-items: flex-end; gap: 15px; 
-            z-index: 50; padding: 0 20px;
+            display: flex; justify-content: center; align-items: flex-end; 
+            z-index: 50; padding: 0 20px; pointer-events: none; /* Permet de cliquer à travers s'il y a du vide */
         }
-        .btn-control { 
-            flex: 1; max-width: 150px; height: 60px; border: none; font-size: 14px; font-weight: 900; letter-spacing: 1px; 
-            border-radius: 30px; cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); color: #1e293b; 
-            box-shadow: 0 6px 0 #94a3b8, 0 12px 20px rgba(0,0,0,0.4); text-transform: uppercase;
-        }
-        .btn-control:active { transform: translateY(6px); box-shadow: 0 0 0 #94a3b8, 0 4px 10px rgba(0,0,0,0.4); }
-        
-        .btn-curtail.active { 
-            background: linear-gradient(to bottom, #f97316, #ea580c); color: white; 
-            box-shadow: 0 6px 0 #9a3412, 0 12px 20px rgba(234,88,12,0.4); 
-        }
-        .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #9a3412, 0 4px 10px rgba(234,88,12,0.4); }
         
         .btn-ultrasound-global { 
-            flex: 1.2; max-width: 220px; height: 75px; border: none; font-size: 15px; font-weight: 900; letter-spacing: 1px; 
+            pointer-events: auto;
+            flex: 1; max-width: 250px; height: 75px; border: none; font-size: 15px; font-weight: 900; letter-spacing: 1px; 
             border-radius: 40px; cursor: pointer; transition: all 0.2s; 
             background: #0f172a; color: white; 
             box-shadow: 0 8px 0 #020617, 0 15px 25px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
             border: 2px solid #1e293b;
         }
+        /* Effet de charge max Jaune/Noir */
         .btn-ultrasound-global:not(:disabled) {
-            border-color: #38bdf8;
-            box-shadow: 0 8px 0 #0c4a6e, 0 0 20px rgba(56, 189, 248, 0.5);
+            border-color: #facc15;
+            box-shadow: 0 8px 0 #854d0e, 0 0 20px rgba(250, 204, 21, 0.5);
             animation: pulse-ultrasound 1.5s infinite alternate;
         }
         @keyframes pulse-ultrasound {
             0% { filter: brightness(1); }
-            100% { filter: brightness(1.2); box-shadow: 0 8px 0 #0c4a6e, 0 0 40px rgba(56, 189, 248, 0.8); }
+            100% { filter: brightness(1.2); box-shadow: 0 8px 0 #854d0e, 0 0 40px rgba(250, 204, 21, 0.8); }
         }
         .btn-ultrasound-global:active:not(:disabled) { 
-            transform: translateY(8px); box-shadow: 0 0 0 #0c4a6e, inset 0 4px 10px rgba(0,0,0,0.6); 
+            transform: translateY(8px); box-shadow: 0 0 0 #854d0e, inset 0 4px 10px rgba(0,0,0,0.8); 
         }
         .btn-ultrasound-global:disabled { cursor: not-allowed; opacity: 0.8; transform: none; }
         
+        /* Barre de rechargement Jaune/Noir */
         #us-progress { 
             position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
-            background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 20px, transparent 20px, transparent 40px), 
-                              linear-gradient(to bottom, #0ea5e9, #0284c7); 
+            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), 
+                              linear-gradient(to bottom, #facc15, #ca8a04); 
             transition: width 0.2s linear; 
         }
-        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
+        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.9); pointer-events: none; }
 
         /* --- OPTIMISATION MOBILE --- */
         @media (max-width: 768px) {
             .top-hud { padding: 20px 10px 0; }
-            .hud-center { padding: 10px 20px; border-radius: 16px; border-width: 2px; }
+            .hud-center { padding: 10px 20px; border-radius: 16px; }
             .day-text { font-size: 14px; }
             .day-num { font-size: 40px; }
             
-            .hud-stats { font-size: 18px; top: 14px; }
-            .hud-icon { font-size: 18px; }
+            .hud-stats { font-size: 18px; top: 20px; }
+            .hud-icon { font-size: 14px; }
             .unit { font-size: 11px; }
 
-            .control-deck { bottom: 20px; gap: 10px; padding: 0 10px; }
-            .btn-control { height: 50px; font-size: 11px; border-radius: 25px; box-shadow: 0 5px 0 #94a3b8, 0 8px 15px rgba(0,0,0,0.4); }
-            .btn-control:active { transform: translateY(5px); box-shadow: 0 0 0 #94a3b8, 0 4px 6px rgba(0,0,0,0.4); }
+            .control-deck { bottom: 20px; padding: 0 10px; }
             
-            .btn-ultrasound-global { height: 60px; font-size: 12px; border-radius: 30px; box-shadow: 0 6px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
-            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.6); }
+            .btn-ultrasound-global { max-width: 200px; height: 60px; font-size: 12px; border-radius: 30px; box-shadow: 0 6px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
+            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.8); }
             
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
@@ -326,27 +325,27 @@
             </div>
         </div>
 
-        <div class="wind-turbine" id="turbine-1">
+        <!-- Les éoliennes sont maintenant directement cliquables -->
+        <div class="wind-turbine" id="turbine-1" onclick="toggleCurtail(1); event.stopPropagation();" ontouchstart="toggleCurtail(1); event.stopPropagation();">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
         </div>
 
-        <div class="wind-turbine" id="turbine-2">
+        <div class="wind-turbine" id="turbine-2" onclick="toggleCurtail(2); event.stopPropagation();" ontouchstart="toggleCurtail(2); event.stopPropagation();">
             <div class="tower"></div>
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-2">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
         </div>
 
+        <!-- Bouton Ultrasons unique -->
         <div class="control-deck" ontouchstart="event.stopPropagation();" onclick="event.stopPropagation();">
-            <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
             <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
                 <div id="us-progress" style="width: 0%;"></div>
                 <div class="btn-content">🔊 ULTRASONS</div>
             </button>
-            <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
         </div>
     </div>
 
@@ -387,12 +386,12 @@
         let gameInterval, creatureInterval, animFrameId;
         
         let curtailed = { 1: false, 2: false };
-        let tSpeed = { 1: 4, 2: 4.5 }; // Vitesse instantanée (inertie)
-        let targetSpeed = { 1: 4, 2: 4.5 }; // Vitesse cible demandée
+        let tSpeed = { 1: 4, 2: 4.5 }; 
+        let targetSpeed = { 1: 4, 2: 4.5 }; 
         
         let isNight = false;
         let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
-        let ultrasoundCharge = 100; // Charge max (en kWh générés)
+        let ultrasoundCharge = 100; 
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
         let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
@@ -444,9 +443,8 @@
             tSpeed = { 1: 4, 2: 4.5 };
             targetSpeed = { 1: 4, 2: 4.5 };
 
-            document.getElementById('btn-c1').classList.remove('active'); document.getElementById('btn-c2').classList.remove('active');
-            document.getElementById('btn-c1').innerText = "BRIDER"; document.getElementById('btn-c2').innerText = "BRIDER";
-            document.getElementById('turbine-1').classList.remove('curtailed'); document.getElementById('turbine-2').classList.remove('curtailed');
+            document.getElementById('turbine-1').classList.remove('curtailed'); 
+            document.getElementById('turbine-2').classList.remove('curtailed');
 
             isPlaying = true; isPaused = false;
             updateUI();
@@ -474,14 +472,10 @@
         function gameLoop() {
             if (!isPlaying || isPaused) return;
 
-            // --- INERTIE DE L'ÉNERGIE (Basée sur la vitesse réelle des pales) ---
-            // tSpeed varie entre 0.8 (bridé) et 4 ou 4.5 (libre).
             let speedFactor1 = Math.max(0, (tSpeed[1] - 0.8) / (4 - 0.8));
             let speedFactor2 = Math.max(0, (tSpeed[2] - 0.8) / (4.5 - 0.8));
             
-            // Chaque éolienne peut fournir jusqu'à 1.75 (Total max = 3.5)
             let turbinePower = (speedFactor1 * 1.75) + (speedFactor2 * 1.75);
-            // La ville consomme de l'énergie en continu (-1.2)
             let addedPower = turbinePower - 1.2;
 
             if (addedPower > 0) {
@@ -489,7 +483,6 @@
                 let addedKwh = addedPower * 1.5;
                 totalEnergyProduced += addedKwh;
                 
-                // Rechargement progressif des ultrasons
                 if (ultrasoundCharge < 100) {
                     ultrasoundCharge += addedKwh;
                     if (ultrasoundCharge >= 100) {
@@ -499,7 +492,6 @@
                     document.getElementById('us-progress').style.width = ultrasoundCharge + '%';
                 }
             } else {
-                // Perte sèche
                 production += addedPower;
             }
 
@@ -512,7 +504,6 @@
                 badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
             }
 
-            // Conditions de défaite
             if (production <= 0) endGame("Batterie vide ! La ville subit un Blackout total.");
 
             updateUI();
@@ -524,7 +515,6 @@
                 let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
                 gameTime += dt;
                 
-                // INERTIE MÉCANIQUE : 1.5 secondes pour atteindre la vitesse cible
                 let accelRate = 2.46 * dt; 
                 
                 for (let i of [1, 2]) {
@@ -599,13 +589,9 @@
             if (!isPlaying || isPaused) return;
             curtailed[id] = !curtailed[id];
             
-            // Vitesse cible (l'inertie fait la transition)
             targetSpeed[id] = curtailed[id] ? 0.8 : (id === 1 ? 4 : 4.5);
             
-            const btn = document.getElementById(`btn-c${id}`);
             const turbine = document.getElementById(`turbine-${id}`);
-            btn.classList.toggle('active', curtailed[id]);
-            btn.innerText = curtailed[id] ? "LIBÉRER" : "BRIDER";
             turbine.classList.toggle('curtailed', curtailed[id]);
         }
 
@@ -632,7 +618,7 @@
 
             [1, 2].forEach(id => {
                 let turbine = document.getElementById(`turbine-${id}`);
-                turbine.style.filter = "drop-shadow(0 0 20px #0284c7)";
+                turbine.style.filter = "drop-shadow(0 0 20px #facc15)"; /* Glow d'ultrasons assorti au bouton jaune */
                 setTimeout(() => turbine.style.filter = "none", 400);
             });
 
@@ -755,7 +741,6 @@
             document.getElementById('saved-count').innerText = savedFauna;
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
 
-            // Gestions des effets de danger (clignotement et gonflement sur les conteneurs du HUD)
             let batContainer = document.getElementById('battery-container');
             batContainer.classList.remove('danger-50', 'danger-25');
             if (production <= 25) {
