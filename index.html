@@ -83,40 +83,58 @@
         .mist-layer { position: absolute; bottom: 85px; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.25), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
         @keyframes mistBreathe { 0% { transform: translateY(0) scaleY(1); opacity: 0.4; } 100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; } }
 
-        /* --- HUD (Fusionné Haut & Côtés) --- */
+        /* --- HUD : TABLEAU DE BORD UNIFIÉ --- */
         .top-hud {
             position: absolute; top: 0; left: 0; width: 100%;
-            padding: 24px 20px 16px 20px; z-index: 40; pointer-events: none;
-            display: grid; grid-template-columns: 1fr auto 1fr; align-items: start; gap: 15px;
+            padding: 30px 20px 0; z-index: 40; pointer-events: none;
+            display: flex; align-items: center; justify-content: space-between; gap: 0;
         }
+
         .hud-side {
-            display: flex; flex-direction: column; gap: 8px;
-            width: 100%; max-width: 200px;
-            transition: all 0.2s ease; pointer-events: auto;
-            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+            flex-grow: 1; position: relative;
+            height: 12px; /* Épaisseur de la barre */
+            display: flex; align-items: center;
         }
-        #battery-container { justify-self: start; }
-        #bio-container { justify-self: end; }
+        
+        /* On tire les barres sous le badge central pour une fusion parfaite */
+        #battery-container { margin-right: -15px; }
+        #bio-container { margin-left: -15px; }
 
-        .hud-stats {
-            font-size: 22px; font-weight: 900; color: #ffffff;
-            display: flex; align-items: center; justify-content: space-between;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            padding: 0 4px;
+        .modern-track {
+            width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.5); 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); 
+            pointer-events: auto;
         }
-        .hud-icon { font-size: 20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        .hud-value { display: flex; align-items: baseline; gap: 4px; }
+        /* Arrondir uniquement les côtés extérieurs */
+        #battery-container .modern-track { border-radius: 6px 0 0 6px; }
+        #bio-container .modern-track { border-radius: 0 6px 6px 0; }
 
-        .modern-track { width: 100%; height: 8px; background: rgba(0, 0, 0, 0.4); border-radius: 4px; display: block; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); }
-        .modern-fill { height: 100%; border-radius: 4px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        .modern-fill { height: 100%; border-radius: inherit; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
         .power-fill { background: linear-gradient(to right, #ef4444, #fef08a); box-shadow: 0 0 15px rgba(254, 240, 138, 0.8), 0 0 5px rgba(254, 240, 138, 0.5); }
         .bio-fill { background: linear-gradient(to right, #ef4444, #10b981); box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.5); }
 
+        /* Textes flottants en dessous des barres */
+        .hud-stats {
+            position: absolute; top: 18px; 
+            display: flex; align-items: center; gap: 6px;
+            font-size: 24px; font-weight: 900; color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+            transition: color 0.3s;
+        }
+        #battery-container .hud-stats { left: 0; }
+        #bio-container .hud-stats { right: 0; }
+        
+        .hud-icon { font-size: 22px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .unit { font-size: 14px; font-weight: 700; color: #cbd5e1; }
+
         .hud-center { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; justify-self: center;
-            background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5); border: none; 
-            color: white; padding: 16px 40px; border-radius: 20px; pointer-events: auto;
-            position: relative; z-index: 50; /* PREMIER PLAN ASSURÉ */
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #2563eb, #3b82f6); 
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255,255,255,0.3); 
+            color: white; padding: 14px 40px; border-radius: 20px; pointer-events: auto;
+            position: relative; z-index: 50; flex-shrink: 0;
+            border: 4px solid #0f172a; /* Cadre sombre qui superpose joliment les barres */
         }
         .day-text { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
         .day-num { font-size: 54px; font-weight: 900; line-height: 1; }
@@ -129,17 +147,19 @@
             100% { transform: scale(1); filter: brightness(1); } 
         }
 
-        /* --- EFFETS SPECTACULAIRES --- */
+        /* --- EFFETS SPECTACULAIRES DANGER --- */
         .danger-50 { animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important; }
         .danger-25 { animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important; }
         @keyframes pulse-danger-50 {
-            0% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5)); }
-            100% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(239, 68, 68, 1)); color: #fca5a5; }
+            0% { filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5)); }
+            100% { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 1)); }
         }
         @keyframes pulse-danger-25 {
-            0% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8)); color: #fca5a5; }
-            100% { transform: scale(1.12); filter: drop-shadow(0 0 25px rgba(255, 0, 0, 1)); color: #ef4444; }
+            0% { filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8)); }
+            100% { filter: drop-shadow(0 0 25px rgba(255, 0, 0, 1)); }
         }
+        .danger-50 .hud-stats { color: #fca5a5; }
+        .danger-25 .hud-stats { color: #ef4444; }
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: filter 0.3s; }
@@ -160,58 +180,73 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* --- PUPITRE DE CONTRÔLE (Boutons flottants) --- */
+        /* --- PUPITRE DE CONTRÔLE (Boutons Pilules 3D) --- */
         .control-deck {
-            position: absolute; bottom: 20px; left: 0; right: 0;
-            display: flex; justify-content: center; gap: 20px; align-items: center; z-index: 50; padding: 0 20px;
+            position: absolute; bottom: 30px; left: 0; right: 0;
+            display: flex; justify-content: center; align-items: flex-end; gap: 15px; 
+            z-index: 50; padding: 0 20px;
         }
         .btn-control { 
-            flex: 1; max-width: 180px; border: none; padding: 14px 4px; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
-            background: linear-gradient(to bottom, #cbd5e1, #94a3b8); color: #0f172a; 
-            box-shadow: 0 6px 0 #475569, 0 10px 15px rgba(0,0,0,0.5); border: 1px solid #e2e8f0; text-transform: uppercase;
+            flex: 1; max-width: 150px; height: 60px; border: none; font-size: 14px; font-weight: 900; letter-spacing: 1px; 
+            border-radius: 30px; cursor: pointer; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); color: #1e293b; 
+            box-shadow: 0 6px 0 #94a3b8, 0 12px 20px rgba(0,0,0,0.4); text-transform: uppercase;
         }
-        .btn-control:active { transform: translateY(6px); box-shadow: 0 0 0 #475569, inset 0 4px 8px rgba(0,0,0,0.5); }
-        .btn-curtail.active { 
-            background: linear-gradient(to bottom, #f97316, #c2410c); color: white; 
-            box-shadow: 0 6px 0 #7c2d12, 0 10px 15px rgba(0,0,0,0.5); border-color: #fdba74;
-        }
-        .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #7c2d12, inset 0 4px 8px rgba(0,0,0,0.7); }
+        .btn-control:active { transform: translateY(6px); box-shadow: 0 0 0 #94a3b8, 0 4px 10px rgba(0,0,0,0.4); }
         
-        /* Bouton ULTRASONS : Fond sombre, barre de progression colorée */
+        .btn-curtail.active { 
+            background: linear-gradient(to bottom, #f97316, #ea580c); color: white; 
+            box-shadow: 0 6px 0 #9a3412, 0 12px 20px rgba(234,88,12,0.4); 
+        }
+        .btn-curtail.active:active { transform: translateY(6px); box-shadow: 0 0 0 #9a3412, 0 4px 10px rgba(234,88,12,0.4); }
+        
         .btn-ultrasound-global { 
-            flex: 1; max-width: 180px; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; border-radius: 6px; cursor: pointer; transition: all 0.2s; 
+            flex: 1.2; max-width: 220px; height: 75px; border: none; font-size: 15px; font-weight: 900; letter-spacing: 1px; 
+            border-radius: 40px; cursor: pointer; transition: all 0.2s; 
             background: #0f172a; color: white; 
-            box-shadow: 0 6px 0 #020617, 0 10px 15px rgba(0,0,0,0.5); position: relative; overflow: hidden; padding: 14px 4px; border: 1px solid #1e293b;
+            box-shadow: 0 8px 0 #020617, 0 15px 25px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
+            border: 2px solid #1e293b;
         }
         .btn-ultrasound-global:not(:disabled) {
             border-color: #38bdf8;
-            box-shadow: 0 6px 0 #0c4a6e, 0 0 15px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 8px 0 #0c4a6e, 0 0 20px rgba(56, 189, 248, 0.5);
+            animation: pulse-ultrasound 1.5s infinite alternate;
         }
-        .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #0c4a6e, inset 0 4px 8px rgba(0,0,0,0.6); }
-        .btn-ultrasound-global:disabled { 
-            cursor: not-allowed; opacity: 0.8; transform: none; 
+        @keyframes pulse-ultrasound {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(1.2); box-shadow: 0 8px 0 #0c4a6e, 0 0 40px rgba(56, 189, 248, 0.8); }
         }
+        .btn-ultrasound-global:active:not(:disabled) { 
+            transform: translateY(8px); box-shadow: 0 0 0 #0c4a6e, inset 0 4px 10px rgba(0,0,0,0.6); 
+        }
+        .btn-ultrasound-global:disabled { cursor: not-allowed; opacity: 0.8; transform: none; }
+        
         #us-progress { 
             position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
-            background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.15), rgba(255,255,255,0.15) 15px, transparent 15px, transparent 30px), linear-gradient(to bottom, #0ea5e9, #0369a1); 
+            background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 20px, transparent 20px, transparent 40px), 
+                              linear-gradient(to bottom, #0ea5e9, #0284c7); 
             transition: width 0.2s linear; 
         }
-        .btn-content { position: relative; z-index: 2; pointer-events: none; }
+        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.8); pointer-events: none; }
 
-        /* --- OPTIMISATION MOBILE (Pixel 9a & Petits écrans) --- */
+        /* --- OPTIMISATION MOBILE --- */
         @media (max-width: 768px) {
-            .top-hud { gap: 8px; padding: 20px 10px 10px 10px; }
-            .hud-side { max-width: 130px; gap: 6px; }
-            .hud-stats { font-size: 18px; }
-            .hud-stats .hud-icon { font-size: 14px; }
-            .hud-stats .hud-value span:last-child { font-size: 10px !important; }
-            .modern-track { height: 6px; }
-            .hud-center { padding: 10px 25px; border-radius: 16px; }
+            .top-hud { padding: 20px 10px 0; }
+            .hud-center { padding: 10px 20px; border-radius: 16px; border-width: 2px; }
             .day-text { font-size: 14px; }
             .day-num { font-size: 40px; }
+            
+            .hud-stats { font-size: 18px; top: 14px; }
+            .hud-icon { font-size: 18px; }
+            .unit { font-size: 11px; }
 
-            .control-deck { bottom: 20px; gap: 8px; padding: 0 10px; }
-            .btn-control, .btn-ultrasound-global { font-size: 11px; padding: 12px 2px; }
+            .control-deck { bottom: 20px; gap: 10px; padding: 0 10px; }
+            .btn-control { height: 50px; font-size: 11px; border-radius: 25px; box-shadow: 0 5px 0 #94a3b8, 0 8px 15px rgba(0,0,0,0.4); }
+            .btn-control:active { transform: translateY(5px); box-shadow: 0 0 0 #94a3b8, 0 4px 6px rgba(0,0,0,0.4); }
+            
+            .btn-ultrasound-global { height: 60px; font-size: 12px; border-radius: 30px; box-shadow: 0 6px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
+            .btn-ultrasound-global:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.6); }
+            
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
         }
@@ -271,11 +306,11 @@
                 <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="width: 0%;"></div></div>
                 <div class="hud-stats">
                     <span class="hud-icon">⚡</span>
-                    <span class="hud-value"><span id="energy-count">0</span> <span style="font-size: 14px; font-weight: 700; color: #cbd5e1; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">kWh</span></span>
+                    <span class="hud-value"><span id="energy-count">0</span> <span class="unit">kWh</span></span>
                 </div>
             </div>
 
-            <!-- Bloc Jour Centre (Premier Plan) -->
+            <!-- Bloc Jour Centre -->
             <div class="hud-center" id="level-badge">
                 <div class="day-text">Jour</div>
                 <div class="day-num" id="level-num">1</div>
@@ -309,7 +344,7 @@
             <button class="btn-control btn-curtail" id="btn-c1" onclick="toggleCurtail(1)">BRIDER</button>
             <button class="btn-ultrasound-global" id="btn-ultrasound" onclick="triggerGlobalUltrasound()">
                 <div id="us-progress" style="width: 0%;"></div>
-                <span class="btn-content">🔊 ULTRASONS</span>
+                <div class="btn-content">🔊 ULTRASONS</div>
             </button>
             <button class="btn-control btn-curtail" id="btn-c2" onclick="toggleCurtail(2)">BRIDER</button>
         </div>
