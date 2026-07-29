@@ -104,6 +104,7 @@
             background: rgba(0, 0, 0, 0.5); 
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); 
             pointer-events: auto;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
         
         #battery-container .modern-track { 
@@ -122,7 +123,7 @@
             display: flex; align-items: center; gap: 6px;
             font-size: 24px; font-weight: 900; color: #ffffff;
             text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            transition: color 0.3s;
+            transition: all 0.3s ease;
         }
         #battery-container .hud-stats { left: 0; }
         #bio-container .hud-stats { right: 0; }
@@ -148,19 +149,21 @@
             100% { transform: scale(1); filter: brightness(1); } 
         }
 
-        /* --- EFFETS SPECTACULAIRES DANGER --- */
-        .danger-50 { animation: pulse-danger-50 0.8s ease-in-out infinite alternate !important; }
-        .danger-25 { animation: pulse-danger-25 0.35s ease-in-out infinite alternate !important; }
-        @keyframes pulse-danger-50 {
-            0% { filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5)); }
-            100% { filter: drop-shadow(0 0 15px rgba(239, 68, 68, 1)); }
+        /* --- EFFETS ALARME PROGRESSIFS --- */
+        .danger-50 .modern-track { animation: track-swell-50 0.8s infinite alternate ease-in-out; }
+        .danger-25 .modern-track { animation: track-swell-25 0.35s infinite alternate ease-in-out; }
+        
+        @keyframes track-swell-50 {
+            0% { transform: scaleY(1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 5px rgba(239, 68, 68, 0.5); }
+            100% { transform: scaleY(1.6); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.4); }
         }
-        @keyframes pulse-danger-25 {
-            0% { filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.8)); }
-            100% { filter: drop-shadow(0 0 25px rgba(255, 0, 0, 1)); }
+        @keyframes track-swell-25 {
+            0% { transform: scaleY(1.3); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 0, 0, 0.8); background: rgba(239, 68, 68, 0.5); }
+            100% { transform: scaleY(2.2); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 25px rgba(255, 0, 0, 1); background: rgba(255, 0, 0, 0.8); }
         }
-        .danger-50 .hud-stats { color: #fca5a5; }
-        .danger-25 .hud-stats { color: #ef4444; }
+
+        .danger-50 .hud-stats { color: #fca5a5; transform: scale(1.08) translateY(2px); text-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
+        .danger-25 .hud-stats { color: #ef4444; transform: scale(1.15) translateY(4px); text-shadow: 0 0 20px rgba(255, 0, 0, 1); }
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: filter 0.2s; pointer-events: none; }
@@ -170,7 +173,7 @@
         #turbine-2 { left: 68%; bottom: 130px; } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%); }
         .tower { background: linear-gradient(to right, #475569 0%, #ffffff 40%, #e2e8f0 70%, #334155 100%); border-radius: 2px; position: relative; }
         .tower::after { content: ''; position: absolute; bottom: 0; left: -25%; width: 150%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
-        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; }
+        .nacelle { position: absolute; top: -6px; background: linear-gradient(to bottom, #f1f5f9, #cbd5e1); border-radius: 8px 12px 6px 6px; z-index: 11; transition: background 0.3s; pointer-events: none; }
         .nacelle::after { content: ''; position: absolute; top: -3px; right: 6px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: blinkAviation 2s infinite; }
         @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
         #turbine-1 .nacelle { width: 22px; height: 12px; } #turbine-2 .nacelle { width: 26px; height: 14px; }
@@ -189,55 +192,63 @@
         .turbine-hitbox {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 120px; height: 220px; z-index: 20;
-            background: rgba(255, 0, 0, 0); /* Invisible mais cliquable */
+            background: rgba(255, 0, 0, 0); 
             cursor: pointer; pointer-events: auto;
         }
 
-        /* --- PUPITRE DE CONTRÔLE (Boutons Doubles : Chauves-souris / Oiseaux) --- */
+        /* --- BOUTONS D'ACTION RONDS (FABs) --- */
         .control-deck {
             position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; align-items: flex-end; gap: 15px;
-            z-index: 50; padding: 0 20px; pointer-events: none; 
+            display: flex; justify-content: center; align-items: center; gap: 30px;
+            z-index: 50; pointer-events: none; 
         }
         
         .btn-action-global { 
             pointer-events: auto;
-            flex: 1; max-width: 200px; height: 55px; border: none; font-size: 13px; font-weight: 900; letter-spacing: 1px; 
-            border-radius: 28px; cursor: pointer; transition: all 0.2s; 
-            background: #0f172a; color: white; 
-            box-shadow: 0 6px 0 #020617, 0 12px 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
-            border: 2px solid #1e293b;
+            width: 72px; height: 72px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.1);
+            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
+            display: flex; align-items: center; justify-content: center;
         }
-        .btn-action-global:disabled { cursor: not-allowed; opacity: 0.8; transform: none; }
-        .btn-content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; z-index: 2; text-shadow: 0 2px 4px rgba(0,0,0,0.9); pointer-events: none; }
-        .btn-icon { font-size: 16px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+        
+        .btn-action-global:disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(80%); }
+        .btn-action-global:active:not(:disabled) { transform: scale(0.9); }
+        
+        .btn-icon { font-size: 32px; z-index: 2; position: relative; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); pointer-events: none; }
 
         /* Style spécifique ULTRASONS (Jaune) */
         #btn-ultrasound:not(:disabled) {
             border-color: #facc15;
-            box-shadow: 0 6px 0 #854d0e, 0 0 20px rgba(250, 204, 21, 0.5);
-            animation: pulse-us 1.5s infinite alternate;
+            box-shadow: 0 0 20px rgba(250, 204, 21, 0.3), inset 0 0 15px rgba(250, 204, 21, 0.3);
+            animation: float-us 2s infinite alternate ease-in-out;
         }
-        @keyframes pulse-us { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); box-shadow: 0 6px 0 #854d0e, 0 0 40px rgba(250, 204, 21, 0.8); } }
-        #btn-ultrasound:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #854d0e, inset 0 4px 10px rgba(0,0,0,0.8); }
+        @keyframes float-us { 
+            0% { transform: translateY(0) scale(1); filter: brightness(1); } 
+            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 30px rgba(250, 204, 21, 0.6), inset 0 0 20px rgba(250, 204, 21, 0.6); } 
+        }
+        
         #us-progress { 
-            position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
-            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), linear-gradient(to bottom, #facc15, #ca8a04); 
-            transition: width 0.2s linear; 
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
+            background: linear-gradient(to top, #ca8a04, #facc15); opacity: 0.85;
+            transition: height 0.2s linear; 
         }
 
         /* Style spécifique EFFAROUCHAGE (Orange) */
         #btn-scare:not(:disabled) {
             border-color: #f97316;
-            box-shadow: 0 6px 0 #9a3412, 0 0 20px rgba(249, 115, 22, 0.5);
-            animation: pulse-scare 1.5s infinite alternate;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3), inset 0 0 15px rgba(249, 115, 22, 0.3);
+            animation: float-scare 2s infinite alternate ease-in-out;
         }
-        @keyframes pulse-scare { 0% { filter: brightness(1); } 100% { filter: brightness(1.2); box-shadow: 0 6px 0 #9a3412, 0 0 40px rgba(249, 115, 22, 0.8); } }
-        #btn-scare:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 #9a3412, inset 0 4px 10px rgba(0,0,0,0.8); }
+        @keyframes float-scare { 
+            0% { transform: translateY(0) scale(1); filter: brightness(1); } 
+            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.6), inset 0 0 20px rgba(249, 115, 22, 0.6); } 
+        }
+
         #scare-progress { 
-            position: absolute; top: 0; left: 0; height: 100%; width: 0%; 
-            background-image: repeating-linear-gradient(-45deg, rgba(0,0,0,0.3), rgba(0,0,0,0.3) 20px, transparent 20px, transparent 40px), linear-gradient(to bottom, #f97316, #c2410c); 
-            transition: width 0.2s linear; 
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
+            background: linear-gradient(to top, #c2410c, #f97316); opacity: 0.85;
+            transition: height 0.2s linear; 
         }
 
         /* --- OPTIMISATION MOBILE --- */
@@ -251,11 +262,9 @@
             .hud-icon { font-size: 14px; }
             .unit { font-size: 11px; }
 
-            .control-deck { bottom: 20px; padding: 0 10px; gap: 8px; }
-            
-            .btn-action-global { max-width: 170px; height: 46px; font-size: 11px; border-radius: 23px; box-shadow: 0 5px 0 #020617, 0 10px 20px rgba(0,0,0,0.5); }
-            .btn-action-global:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 #020617, inset 0 4px 8px rgba(0,0,0,0.8); }
-            .btn-icon { font-size: 14px; }
+            .control-deck { bottom: 20px; gap: 20px; }
+            .btn-action-global { width: 64px; height: 64px; }
+            .btn-icon { font-size: 28px; }
             
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
@@ -299,7 +308,7 @@
         
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
-                <circle cx="26" cy="26" r="26" fill="#0f172a" opacity="0.4" />
+                <!-- Le cache sombre (cercle de fond) a été supprimé -->
                 <path d="M26,0 A26,26 0 0,1 26,52 A14,26 0 0,0 26,0 Z" fill="#f1f5f9" />
             </svg>
         </div>
@@ -354,14 +363,15 @@
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
+        <!-- Boutons d'Action Ronds -->
         <div class="control-deck" onpointerdown="event.stopPropagation();">
             <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
-                <div id="us-progress" style="width: 0%;"></div>
-                <div class="btn-content"><span class="btn-icon">🦇</span> ULTRASONS</div>
+                <div id="us-progress" style="height: 0%;"></div>
+                <span class="btn-icon">🦇</span>
             </button>
             <button class="btn-action-global" id="btn-scare" onclick="triggerScare()">
-                <div id="scare-progress" style="width: 0%;"></div>
-                <div class="btn-content"><span class="btn-icon">🦅</span> EFFAROUCHAGE</div>
+                <div id="scare-progress" style="height: 0%;"></div>
+                <span class="btn-icon">🦅</span>
             </button>
         </div>
     </div>
@@ -436,7 +446,6 @@
 
         // La pause ne s'active que si on clique dans la MOITIÉ HAUTE de l'écran
         function handleContainerClick(e) { 
-            // Unification souris / touch avec clientY
             if (isPlaying && e.clientY < (window.innerHeight / 2)) {
                 togglePause(); 
             }
@@ -464,8 +473,8 @@
             // Réinitialisation des deux charges
             ultrasoundCharge = 100; 
             scareCharge = 100;
-            document.getElementById('us-progress').style.width = '100%';
-            document.getElementById('scare-progress').style.width = '100%';
+            document.getElementById('us-progress').style.height = '100%';
+            document.getElementById('scare-progress').style.height = '100%';
             document.getElementById('btn-ultrasound').disabled = false;
             document.getElementById('btn-scare').disabled = false;
 
@@ -520,7 +529,7 @@
                         ultrasoundCharge = 100;
                         document.getElementById('btn-ultrasound').disabled = false;
                     }
-                    document.getElementById('us-progress').style.width = ultrasoundCharge + '%';
+                    document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
                 }
                 
                 // Rechargement Effarouchage (Oiseaux)
@@ -530,7 +539,7 @@
                         scareCharge = 100;
                         document.getElementById('btn-scare').disabled = false;
                     }
-                    document.getElementById('scare-progress').style.width = scareCharge + '%';
+                    document.getElementById('scare-progress').style.height = scareCharge + '%';
                 }
             } else {
                 production += addedPower;
@@ -609,13 +618,14 @@
 
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
             
+            // Trajectoire abaissée pour passer bien en dessous des barres du haut
             let sunEl = document.getElementById('sun-body');
-            sunEl.style.transform = `translate(${50 + Math.cos(angle)*46}vw, ${55 - Math.sin(angle)*55}vh)`;
+            sunEl.style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`;
             sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
 
             let moonEl = document.getElementById('moon-body');
             let moonRotation = -(angle * 180 / Math.PI);
-            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*46}vw, ${55 - Math.sin(angle + Math.PI)*55}vh) rotate(${moonRotation}deg)`;
+            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*45}vw, ${65 - Math.sin(angle + Math.PI)*45}vh) rotate(${moonRotation}deg)`;
             moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
         }
 
@@ -657,7 +667,7 @@
             production -= 30;
             ultrasoundCharge = 0;
             
-            document.getElementById('us-progress').style.width = '0%';
+            document.getElementById('us-progress').style.height = '0%';
             document.getElementById('btn-ultrasound').disabled = true;
 
             let fillEl = document.getElementById('battery-fill');
@@ -690,7 +700,7 @@
             production -= 30;
             scareCharge = 0;
             
-            document.getElementById('scare-progress').style.width = '0%';
+            document.getElementById('scare-progress').style.height = '0%';
             document.getElementById('btn-scare').disabled = true;
 
             let fillEl = document.getElementById('battery-fill');
