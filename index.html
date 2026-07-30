@@ -265,14 +265,14 @@
             
             // --- DURÉE DU FREINAGE ---
             // 0.4 = Durée en secondes du grincement de freinage
-            let brakeDuration = 0.4; 
+            let brakeDuration = 0.2; 
 
             osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + brakeDuration);
 
             // --- VOLUME DU FREIN ---
             // 0.01 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.15; 
+            let brakeVolume = 0.01; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
@@ -358,7 +358,7 @@
             let crashDuration = 0.3; // 0.3 seconde
             
             // --- VOLUME DU CHOC ---
-            let crashVolume = 0.2; // Volume entre 0.0 et 1.0
+            let crashVolume = 0.05; // Volume entre 0.0 et 1.0
 
             osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
