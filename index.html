@@ -244,7 +244,7 @@
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.4);
 
-            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
 
             osc.connect(gain);
@@ -276,7 +276,7 @@
                 if (speciesClass === 'sp-eagle') startFreq = 1200;
                 else if (speciesClass === 'sp-pigeon') startFreq = 450;
                 else if (speciesClass === 'sp-crow') startFreq = 300;
-                else if (speciesClass === 'sp-parrot') startFreq = 1500;
+                else if (speciesClass === 'sp-parrot') startFreq = 1500;0
 
                 osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, audioCtx.currentTime + 0.15);
@@ -320,7 +320,7 @@
             osc.frequency.setValueAtTime(880, audioCtx.currentTime);
             osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.1);
 
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
 
             osc.connect(gain);
