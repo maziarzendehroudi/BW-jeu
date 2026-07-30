@@ -1,4 +1,8 @@
-// sw.js - Service Worker minimal pour valider l'installation PWA
-self.addEventListener('fetch', function(event) {
-    // Ne rien faire, laisse le réseau gérer les requêtes
+self.addEventListener('install', (e) => {
+    console.log('[Service Worker] Installation');
+    self.skipWaiting();
+});
+
+self.addEventListener('fetch', (e) => {
+    // Le strict minimum pour tromper le navigateur et valider le critère d'installation PWA
 });
