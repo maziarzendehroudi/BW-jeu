@@ -12,38 +12,14 @@
     <meta name="apple-mobile-web-app-title" content="Bat&Watt v0.1">
     <meta name="theme-color" content="#0f172a">
 
-    <!-- Icônes & Favicons multi-navigateurs / PWA -->
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="apple-touch-icon" href="icon.svg">
-    
-    <!-- Manifest PWA externe -->
     <link rel="manifest" href="manifest.json">
 
     <style>
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-            margin: 0; padding: 0;
-        }
-
-        body {
-            background: #0f172a;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            width: 100vw; height: 100dvh;
-            overflow: hidden;
-            color: #ffffff;
-            touch-action: none;
-        }
-
-        #game-container {
-            position: relative;
-            width: 100%; height: 100%;
-            background: linear-gradient(to bottom, #ff758c, #ff7eb3);
-            overflow: hidden;
-        }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        body { background: #0f172a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 100vw; height: 100dvh; overflow: hidden; color: #ffffff; touch-action: none; }
+        #game-container { position: relative; width: 100%; height: 100%; background: linear-gradient(to bottom, #ff758c, #ff7eb3); overflow: hidden; }
 
         /* --- CONTENEUR ONDES ULTRASONS --- */
         #wave-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 45; overflow: hidden; }
@@ -54,260 +30,85 @@
             animation: expandGlobalWave 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
             box-shadow: 0 0 40px rgba(250, 204, 21, 0.4), inset 0 0 40px rgba(250, 204, 21, 0.4);
         }
-        @keyframes expandGlobalWave {
-            0% { width: 0; height: 0; opacity: 1; border-width: 40px; }
-            100% { width: 250vw; height: 250vw; opacity: 0; border-width: 2px; }
-        }
+        @keyframes expandGlobalWave { 0% { width: 0; height: 0; opacity: 1; border-width: 40px; } 100% { width: 250vw; height: 250vw; opacity: 0; border-width: 2px; } }
 
-        /* --- ÉTOILES --- */
-        #stars-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-                              radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
-                              radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
-                              radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0));
-            background-repeat: repeat;
-            background-size: 200px 200px;
-            opacity: 0;
-            transition: opacity 2s ease-in-out;
-            z-index: 0;
-        }
-
-        /* --- NUAGES --- */
-        .cloud {
-            position: absolute; background: rgba(255, 255, 255, 0.8);
-            border-radius: 50px; z-index: 2; animation: floatCloud linear infinite;
-            box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1);
-        }
+        /* --- ÉTOILES & ASTRES & NUAGES --- */
+        #stars-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; opacity: 0; transition: opacity 2s ease-in-out; z-index: 0; }
+        .cloud { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50px; z-index: 2; animation: floatCloud linear infinite; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1); }
         .cloud::before, .cloud::after { content: ''; position: absolute; background: inherit; border-radius: inherit; box-shadow: inherit; }
-        .cloud::before { bottom: 40%; left: 15%; width: 50%; height: 100%; }
-        .cloud::after { bottom: 20%; right: 10%; width: 40%; height: 80%; }
+        .cloud::before { bottom: 40%; left: 15%; width: 50%; height: 100%; } .cloud::after { bottom: 20%; right: 10%; width: 40%; height: 80%; }
         @keyframes floatCloud { from { transform: translateX(110vw); } to { transform: translateX(-30vw); } }
-
-        /* --- ASTRES --- */
         .celestial { position: absolute; width: 52px; height: 52px; z-index: 1; will-change: transform, opacity; }
         .sun { border-radius: 50%; background: #fde047; box-shadow: 0 0 60px #facc15; }
         .moon { background: transparent; box-shadow: none; overflow: visible; }
 
-        /* --- NOUVEAU DÉCOR : PAYSAGE ÉLÉGANT --- */
-        .mountain-back {
-            position: absolute; bottom: 15%; left: 0; width: 100%; height: 35%;
-            background: linear-gradient(to bottom, #64748b, #1e293b);
-            clip-path: polygon(0% 100%, 15% 30%, 30% 60%, 50% 10%, 70% 50%, 85% 20%, 100% 100%);
-            z-index: 3;
-        }
-        .hill-mid-left {
-            position: absolute; bottom: -5%; left: -10%; width: 65%; height: 30%;
-            background: linear-gradient(to bottom, #0f766e, #042f2e);
-            border-radius: 50%; z-index: 4;
-        }
-        .hill-mid-right {
-            position: absolute; bottom: -8%; right: -10%; width: 75%; height: 35%;
-            background: linear-gradient(to bottom, #0d9488, #022c22);
-            border-radius: 50%; z-index: 5;
-        }
-        .hill-foreground {
-            position: absolute; bottom: -15%; left: -10%; width: 120%; height: 30%;
-            background: linear-gradient(to bottom, #064e3b, #020617);
-            border-radius: 50% 50% 0 0; z-index: 6;
-        }
-        .mist-layer { 
-            position: absolute; bottom: 10%; left: -10%; width: 120%; height: 100px; 
-            background: linear-gradient(to top, rgba(45, 212, 191, 0.2), transparent); filter: blur(12px); 
-            z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; 
-        }
+        /* --- DÉCOR : PAYSAGE ÉLÉGANT --- */
+        .mountain-back { position: absolute; bottom: 15%; left: 0; width: 100%; height: 35%; background: linear-gradient(to bottom, #64748b, #1e293b); clip-path: polygon(0% 100%, 15% 30%, 30% 60%, 50% 10%, 70% 50%, 85% 20%, 100% 100%); z-index: 3; }
+        .hill-mid-left { position: absolute; bottom: -5%; left: -10%; width: 65%; height: 30%; background: linear-gradient(to bottom, #0f766e, #042f2e); border-radius: 50%; z-index: 4; }
+        .hill-mid-right { position: absolute; bottom: -8%; right: -10%; width: 75%; height: 35%; background: linear-gradient(to bottom, #0d9488, #022c22); border-radius: 50%; z-index: 5; }
+        .hill-foreground { position: absolute; bottom: -15%; left: -10%; width: 120%; height: 30%; background: linear-gradient(to bottom, #064e3b, #020617); border-radius: 50% 50% 0 0; z-index: 6; }
+        .mist-layer { position: absolute; bottom: 10%; left: -10%; width: 120%; height: 100px; background: linear-gradient(to top, rgba(45, 212, 191, 0.2), transparent); filter: blur(12px); z-index: 7; pointer-events: none; animation: mistBreathe 8s infinite alternate ease-in-out; }
         @keyframes mistBreathe { 0% { transform: translateY(0) scaleY(1); opacity: 0.4; } 100% { transform: translateY(-10px) scaleY(1.3); opacity: 0.8; } }
 
-        /* --- HUD : TABLEAU DE BORD UNIFIÉ --- */
-        .top-hud {
-            position: absolute; top: 0; left: 0; width: 100%;
-            padding: 30px 20px 0; z-index: 40; pointer-events: none;
-            display: flex; align-items: center; justify-content: space-between; gap: 0;
-        }
-
-        .hud-side {
-            flex-grow: 1; position: relative;
-            height: 12px;
-            display: flex; align-items: center;
-        }
-        
-        #battery-container { margin-right: -15px; }
-        #bio-container { margin-left: -15px; }
-
-        .modern-track {
-            width: 100%; height: 100%; 
-            background: rgba(0, 0, 0, 0.5); 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); 
-            pointer-events: auto;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
+        /* --- HUD --- */
+        .top-hud { position: absolute; top: 0; left: 0; width: 100%; padding: 30px 20px 0; z-index: 40; pointer-events: none; display: flex; align-items: center; justify-content: space-between; gap: 0; }
+        .hud-side { flex-grow: 1; position: relative; height: 12px; display: flex; align-items: center; }
+        #battery-container { margin-right: -15px; } #bio-container { margin-left: -15px; }
+        .modern-track { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); pointer-events: auto; transition: transform 0.2s, box-shadow 0.2s; }
         #battery-container .modern-track { border-radius: 6px 0 0 6px; display: flex; justify-content: flex-end; }
         #bio-container .modern-track { border-radius: 0 6px 6px 0; }
-
         .modern-fill { height: 100%; border-radius: inherit; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
-        
         .power-fill { background: linear-gradient(to right, #fef08a, #ef4444); box-shadow: 0 0 15px rgba(254, 240, 138, 0.8), 0 0 5px rgba(254, 240, 138, 0.5); }
         .bio-fill { background: linear-gradient(to right, #ef4444, #10b981); box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.5); }
-
-        .hud-stats {
-            position: absolute; top: 24px; 
-            display: flex; align-items: center; gap: 6px;
-            font-size: 24px; font-weight: 900; color: #ffffff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            transition: all 0.3s ease;
-        }
-        #battery-container .hud-stats { left: 0; }
-        #bio-container .hud-stats { right: 0; }
-        
-        .hud-icon { font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); } 
-        .unit { font-size: 14px; font-weight: 700; color: #cbd5e1; }
-
-        .hud-center { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #2563eb, #3b82f6); 
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255,255,255,0.3); 
-            color: white; padding: 14px 40px; border-radius: 20px; pointer-events: auto;
-            position: relative; z-index: 50; flex-shrink: 0;
-        }
+        .hud-stats { position: absolute; top: 24px; display: flex; align-items: center; gap: 6px; font-size: 24px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.9); transition: all 0.3s ease; }
+        #battery-container .hud-stats { left: 0; } #bio-container .hud-stats { right: 0; }
+        .hud-icon { font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); } .unit { font-size: 14px; font-weight: 700; color: #cbd5e1; }
+        .hud-center { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255,255,255,0.3); color: white; padding: 14px 40px; border-radius: 20px; pointer-events: auto; position: relative; z-index: 50; flex-shrink: 0; }
         .day-text { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
         .day-num { font-size: 54px; font-weight: 900; line-height: 1; }
-        .level-up-anim { animation: dayUpSpectacular 2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes dayUpSpectacular { 
-            0% { transform: scale(1); filter: brightness(1); } 
-            30% { transform: scale(1.4) translateY(5px) rotate(-3deg); filter: brightness(1.5) drop-shadow(0 0 20px #facc15); color: #fef08a; } 
-            50% { transform: scale(1.6) translateY(8px) rotate(3deg); filter: brightness(2) drop-shadow(0 0 30px #f59e0b); color: #ffffff; }
-            70% { transform: scale(1.4) translateY(5px) rotate(-2deg); filter: brightness(1.5) drop-shadow(0 0 20px #facc15); color: #fef08a; } 
-            100% { transform: scale(1); filter: brightness(1); } 
-        }
+        .level-up-anim { animation: dayUpSpectacular 2s forwards; }
+        @keyframes dayUpSpectacular { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.6) translateY(8px); filter: brightness(2) drop-shadow(0 0 30px #f59e0b); color: #ffffff; } 100% { transform: scale(1); filter: brightness(1); } }
+        .danger-50 .modern-track { animation: track-swell-50 0.8s infinite alternate ease-in-out; } .danger-25 .modern-track { animation: track-swell-25 0.35s infinite alternate ease-in-out; }
+        @keyframes track-swell-50 { 0% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 5px rgba(239, 68, 68, 0.5); } 100% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.4); } }
+        @keyframes track-swell-25 { 0% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 0, 0, 0.8); background: rgba(239, 68, 68, 0.5); } 100% { box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 25px rgba(255, 0, 0, 1); background: rgba(255, 0, 0, 0.8); } }
+        .danger-50 .hud-stats { color: #fca5a5; transform: scale(1.08); } .danger-25 .hud-stats { color: #ef4444; transform: scale(1.15); }
 
-        /* --- EFFETS ALARME PROGRESSIFS --- */
-        .danger-50 .modern-track { animation: track-swell-50 0.8s infinite alternate ease-in-out; }
-        .danger-25 .modern-track { animation: track-swell-25 0.35s infinite alternate ease-in-out; }
-        @keyframes track-swell-50 { 0% { transform: scaleY(1); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 5px rgba(239, 68, 68, 0.5); } 100% { transform: scaleY(1.6); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 15px rgba(239, 68, 68, 1); background: rgba(239, 68, 68, 0.4); } }
-        @keyframes track-swell-25 { 0% { transform: scaleY(1.3); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 10px rgba(255, 0, 0, 0.8); background: rgba(239, 68, 68, 0.5); } 100% { transform: scaleY(2.2); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 0 25px rgba(255, 0, 0, 1); background: rgba(255, 0, 0, 0.8); } }
-        .danger-50 .hud-stats { color: #fca5a5; transform: scale(1.08) translateY(2px); text-shadow: 0 0 10px rgba(239, 68, 68, 0.8); }
-        .danger-25 .hud-stats { color: #ef4444; transform: scale(1.15) translateY(4px); text-shadow: 0 0 20px rgba(255, 0, 0, 1); }
-
-        /* --- NOUVELLES ÉOLIENNES : DESIGN AÉRODYNAMIQUE & AXE PARFAIT --- */
+        /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: filter 0.2s; pointer-events: none; }
         .wind-turbine.active-click { transform: scale(0.95); filter: brightness(0.8); }
-        
-        #turbine-1 { left: 28%; bottom: 10%; }
-        #turbine-2 { left: 68%; bottom: 12%; }
-        
+        #turbine-1 { left: 28%; bottom: 10%; } #turbine-2 { left: 68%; bottom: 12%; }
         .tower { position: relative; background: linear-gradient(to right, #64748b 0%, #ffffff 40%, #e2e8f0 60%, #475569 100%); border-radius: 2px; }
-        #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
-        #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
-        
+        #turbine-1 .tower { height: 135px; width: 14px; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); } #turbine-2 .tower { height: 165px; width: 16px; clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
         .tower::after { content: ''; position: absolute; bottom: 0; left: -50%; width: 200%; height: 6px; background: #1e293b; border-radius: 3px 3px 0 0; }
-        
         .nacelle-group { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; z-index: 11; }
-        
-        /* Nacelle moderne type Vestas */
         .nacelle { position: absolute; top: -8px; left: -12px; width: 38px; height: 16px; background: linear-gradient(to bottom, #ffffff, #94a3b8); border-radius: 8px 16px 16px 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .nacelle::after { content: ''; position: absolute; top: -3px; right: 8px; width: 4px; height: 4px; background: #ef4444; border-radius: 50%; box-shadow: 0 0 6px #ef4444; animation: blinkAviation 2s infinite; }
         @keyframes blinkAviation { 0%, 15% { opacity: 1; } 20%, 100% { opacity: 0; } }
-        
         .curtailed .nacelle { background: linear-gradient(to bottom, #fdba74, #ea580c); }
-
-        /* Le hub sort par l'avant de la nacelle */
         .hub { position: absolute; top: -2px; left: -8px; width: 20px; height: 20px; background: linear-gradient(135deg, #f8fafc, #64748b); border-radius: 50%; box-shadow: -2px 0 4px rgba(0,0,0,0.2); z-index: 12; }
-        
-        /* Container magique 0x0 pile au centre du hub. Rotation parfaite. */
         .blades-container { position: absolute; top: 50%; left: 50%; width: 0; height: 0; z-index: 13; }
-        
-        /* Pales aérodynamiques. Pivotent exactement depuis le bas-centre (le coeur du hub) */
         .blade { position: absolute; bottom: 0; left: -4px; width: 8px; background: linear-gradient(to bottom, #cbd5e1, #ffffff); border-radius: 4px; transform-origin: bottom center; clip-path: polygon(15% 0%, 85% 0%, 100% 90%, 50% 100%, 0% 90%); }
-        #turbine-1 .blade { height: 75px; }
-        #turbine-2 .blade { height: 90px; width: 9px; left: -4.5px; }
-        
-        /* Placement des pales par rotation simple (car transform-origin = bottom center) */
-        .blade:nth-child(1) { transform: rotate(0deg); }
-        .blade:nth-child(2) { transform: rotate(120deg); }
-        .blade:nth-child(3) { transform: rotate(240deg); }
+        #turbine-1 .blade { height: 75px; } #turbine-2 .blade { height: 90px; width: 9px; left: -4.5px; }
+        .blade:nth-child(1) { transform: rotate(0deg); } .blade:nth-child(2) { transform: rotate(120deg); } .blade:nth-child(3) { transform: rotate(240deg); }
+        .turbine-hitbox { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 240px; z-index: 20; cursor: pointer; pointer-events: auto; }
 
-        /* HITBOX MAGIQUE */
-        .turbine-hitbox {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 140px; height: 240px; z-index: 20;
-            background: rgba(255, 0, 0, 0); 
-            cursor: pointer; pointer-events: auto;
-        }
-
-        /* --- BOUTON D'ACTION CENTRAL ÉLÉGANT --- */
-        .control-deck {
-            position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 50; pointer-events: none; 
-        }
-        
-        .ultrasound-wrapper {
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .btn-action-global { 
-            pointer-events: auto;
-            padding: 14px 40px; 
-            border-radius: 20px;
-            border: 2px solid #facc15;
-            cursor: pointer; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(8px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
-            position: relative; overflow: hidden; 
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2;
-        }
-        
-        .btn-action-global:disabled { cursor: not-allowed; opacity: 0.6; filter: grayscale(90%); border-color: #475569; }
-        .btn-action-global:active:not(:disabled) { transform: scale(0.95); }
-        
-        .btn-icon { 
-            font-size: 18px; font-weight: 800; color: #facc15; letter-spacing: 1px;
-            z-index: 2; position: relative; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
-            pointer-events: none; display: flex; align-items: center; gap: 8px;
-        }
-
-        #us-progress { 
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
-            background: repeating-linear-gradient(-45deg, rgba(250, 204, 21, 0.25), rgba(250, 204, 21, 0.25) 15px, rgba(0, 0, 0, 0.4) 15px, rgba(0, 0, 0, 0.4) 30px);
-            transition: height 0.2s linear; z-index: 1;
-        }
-
-        .sound-waves { position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 20px; border: 2px solid #facc15; opacity: 0; pointer-events: none; z-index: 1; }
-        #btn-ultrasound:not(:disabled) + .sound-waves { animation: emit-sound 2s infinite ease-out; }
-        @keyframes emit-sound { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.3, 1.6); opacity: 0; border-width: 0; } }
-        #btn-ultrasound:not(:disabled) { box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 0 15px rgba(250, 204, 21, 0.25); }
-
-        /* --- OPTIMISATION MOBILE --- */
-        @media (max-width: 768px) {
-            .top-hud { padding: 20px 10px 0; }
-            .hud-center { padding: 10px 20px; border-radius: 16px; }
-            .day-text { font-size: 14px; }
-            .day-num { font-size: 40px; }
-            .hud-stats { font-size: 18px; top: 20px; }
-            .hud-icon { font-size: 14px; }
-            .unit { font-size: 11px; }
-            .control-deck { bottom: 20px; }
-            .btn-action-global { padding: 12px 30px; border-radius: 16px; }
-            .btn-icon { font-size: 15px; }
-            .sound-waves { border-radius: 16px; }
-        }
-
-        /* --- NOUVEAUX ANIMAUX CSS ANIMÉS --- */
+        /* --- ANIMAUX CSS --- */
         .creature { position: absolute; z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); will-change: transform; pointer-events: none; transform: scale(0.9); }
         
-        /* Oiseau */
-        .bird .body { width: 14px; height: 26px; background: #facc15; border-radius: 50% 50% 40% 40%; position: absolute; left: -7px; top: -13px; z-index: 2; }
-        .bird .body::after { content:''; position:absolute; bottom:-6px; left:4px; width:6px; height:8px; background: #f97316; clip-path: polygon(0 0, 100% 0, 50% 100%); }
-        .bird .wing { width: 28px; height: 16px; background: #eab308; position: absolute; top: -8px; }
+        /* Base Oiseau */
+        .bird .body { width: 14px; height: 26px; border-radius: 50% 50% 40% 40%; position: absolute; left: -7px; top: -13px; z-index: 2; }
+        .bird .body::after { content:''; position:absolute; bottom:-6px; left:4px; width:6px; height:8px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+        .bird .wing { width: 28px; height: 16px; position: absolute; top: -8px; }
         .bird .wing.left { left: -30px; transform-origin: right center; border-radius: 20px 0 0 20px; animation: flapBirdL 0.35s infinite alternate ease-in-out; }
         .bird .wing.right { right: -30px; transform-origin: left center; border-radius: 0 20px 20px 0; animation: flapBirdR 0.35s infinite alternate ease-in-out; }
         @keyframes flapBirdL { 0% { transform: rotate(15deg); } 100% { transform: rotate(-50deg); } }
         @keyframes flapBirdR { 0% { transform: rotate(-15deg); } 100% { transform: rotate(50deg); } }
+
+        /* Espèces d'oiseaux */
+        .sp-eagle .body { background: #8b5a2b; } .sp-eagle .body::after { background: #facc15; } .sp-eagle .wing { background: #654321; }
+        .sp-pigeon .body { background: #94a3b8; } .sp-pigeon .body::after { background: #cbd5e1; } .sp-pigeon .wing { background: #64748b; }
+        .sp-crow .body { background: #1e293b; } .sp-crow .body::after { background: #0f172a; } .sp-crow .wing { background: #020617; }
+        .sp-parrot .body { background: #ef4444; } .sp-parrot .body::after { background: #eab308; } .sp-parrot .wing { background: #3b82f6; }
 
         /* Chauve-souris */
         .bat .body { width: 12px; height: 22px; background: #1e293b; border-radius: 40% 40% 60% 60%; position: absolute; left: -6px; top: -11px; z-index: 2; }
@@ -320,46 +121,77 @@
 
         .crashing { animation: crashFall 0.8s ease-in forwards; }
         @keyframes crashFall { 0% { transform: rotate(0deg) scale(0.9); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(540deg) scale(0.5); opacity: 0; } }
-        
         .feedback-text { position: absolute; font-weight: bold; font-size: 16px; z-index: 60; animation: floatUp 1s ease-out forwards; pointer-events: none; }
         .feedback-good { color: #10b981; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .feedback-bad { color: #ef4444; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
-        /* --- MODALES & MENUS --- */
+        /* --- MENUS & PANNEAU TESTS BOUTONS --- */
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; pointer-events: auto; }
         .menu-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .menu-box p { font-size: 14px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px; }
-        .stats-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         .btn-main { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 6px 0 #047857; transition: all 0.1s; width: 100%; margin-bottom: 10px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #047857; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; margin-bottom: 10px;}
-        .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px;}
         .hidden { display: none !important; pointer-events: none; }
-        .input-name { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3); background: rgba(0, 0, 0, 0.4); color: white; font-size: 16px; text-align: center; font-weight: bold; outline: none; transition: border-color 0.3s; }
-        .input-name:focus { border-color: #34d399; }
-        .input-name::placeholder { color: rgba(255, 255, 255, 0.5); font-weight: normal; }
-        .btn-resume { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 0 #b45309; }
-        .btn-resume:active { box-shadow: 0 0 0 #b45309; }
-        .leaderboard-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 14px; }
-        .leaderboard-table th { color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 8px; text-align: center; }
-        .leaderboard-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .settings-list { text-align: left; margin-bottom: 20px; font-size: 16px; color: #cbd5e1; }
-        .settings-list label { display: block; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
-        .settings-list input { transform: scale(1.5); accent-color: #34d399; }
+        .input-name { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3); background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-weight: bold; outline: none; }
+
+        /* PANNEAU PROPOSITIONS BOUTONS (TEMPORAIRE) */
+        #button-proposals {
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px;
+            background: rgba(15, 23, 42, 0.95); border-top: 2px solid #334155;
+            display: flex; flex-wrap: wrap; justify-content: space-evenly; align-items: center;
+            z-index: 1000; pointer-events: auto;
+        }
+        .proposal-title { width: 100%; text-align: center; font-size: 14px; font-weight: bold; color: #cbd5e1; margin-bottom: 15px; }
+        
+        /* 1. SONAR RADAR */
+        .btn-d1 {
+            background: #083344; color: #22d3ee; border: 2px solid #06b6d4;
+            border-radius: 50%; width: 70px; height: 70px;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; flex-direction: column;
+        }
+        .btn-d1::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border: 1px solid #22d3ee; border-radius: 50%; animation: radar-ping 1.5s infinite; }
+        @keyframes radar-ping { 100% { width: 70px; height: 70px; opacity: 0; } }
+        
+        /* 2. NEUMORPHIC (Plastique doux) */
+        .btn-d2 {
+            background: #1e293b; color: #facc15; border: none;
+            padding: 15px 20px; border-radius: 12px;
+            box-shadow: 4px 4px 8px #0f172a, -4px -4px 8px #334155;
+            font-weight: bold; cursor: pointer; font-size: 12px; transition: all 0.1s;
+        }
+        .btn-d2:active { box-shadow: inset 4px 4px 8px #0f172a, inset -4px -4px 8px #334155; }
+
+        /* 3. HOLOGRAPHIC (Cyberpunk / Verre) */
+        .btn-d3 {
+            background: rgba(255, 255, 255, 0.05); color: #fff;
+            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 20px; border-radius: 30px;
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.4);
+            text-shadow: 0 0 5px #fff; cursor: pointer; font-weight: bold; font-size: 12px;
+        }
+
+        /* 4. RETRO ARCADE (Physique) */
+        .btn-d4 {
+            background: #dc2626; color: white; border: none;
+            border-bottom: 6px solid #991b1b; border-radius: 10px;
+            padding: 15px 20px; font-weight: 900; font-size: 12px;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: all 0.1s;
+        }
+        .btn-d4:active { transform: translateY(4px); border-bottom: 2px solid #991b1b; }
+
     </style>
 </head>
 <body>
 
     <div id="game-container" onpointerdown="handleContainerClick(event)">
-        <!-- Effets visuels de l'onde de choc -->
         <div id="wave-container"></div>
-
         <div id="stars-container"></div>
         <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
         <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.6;"></div>
-
+        
         <div id="sun-body" class="celestial sun"></div>
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%"><path d="M26,0 A26,26 0 0,1 26,52 A14,26 0 0,0 26,0 Z" fill="#f1f5f9" /></svg>
@@ -372,55 +204,36 @@
         <div class="mist-layer"></div>
 
         <div class="top-hud">
-            <!-- Bloc Énergie Gauche -->
             <div class="hud-side" id="battery-container">
                 <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="width: 0%;"></div></div>
                 <div class="hud-stats"><span class="hud-icon">⚡</span><span class="hud-value"><span id="energy-count">0</span> <span class="unit">kWh</span></span></div>
             </div>
-            <!-- Bloc Jour Centre -->
             <div class="hud-center" id="level-badge"><div class="day-text">Jour</div><div class="day-num" id="level-num">1</div></div>
-            <!-- Bloc Biodiversité Droite -->
             <div class="hud-side" id="bio-container">
                 <div class="modern-track"><div class="modern-fill bio-fill" id="bio-fill" style="width: 100%;"></div></div>
+                <!-- Le score affiche désormais les Animaux Sauvés MOINS les Blessés -->
                 <div class="hud-stats"><span class="hud-icon">💚</span><span class="hud-value" id="saved-count">0</span></div>
             </div>
         </div>
 
         <div class="wind-turbine" id="turbine-1">
             <div class="tower"></div>
-            <div class="nacelle-group">
-                <div class="nacelle"></div>
-                <div class="hub">
-                    <div class="blades-container" id="blades-1">
-                        <div class="blade"></div><div class="blade"></div><div class="blade"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="nacelle-group"><div class="nacelle"></div><div class="hub"><div class="blades-container" id="blades-1"><div class="blade"></div><div class="blade"></div><div class="blade"></div></div></div></div>
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(1); event.stopPropagation();" onpointerup="resetTurbineClick(1);" onpointercancel="resetTurbineClick(1);" onpointerout="resetTurbineClick(1);"></div>
         </div>
-
         <div class="wind-turbine" id="turbine-2">
             <div class="tower"></div>
-            <div class="nacelle-group">
-                <div class="nacelle"></div>
-                <div class="hub">
-                    <div class="blades-container" id="blades-2">
-                        <div class="blade"></div><div class="blade"></div><div class="blade"></div>
-                    </div>
-                </div>
-            </div>
+            <div class="nacelle-group"><div class="nacelle"></div><div class="hub"><div class="blades-container" id="blades-2"><div class="blade"></div><div class="blade"></div><div class="blade"></div></div></div></div>
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
-        <!-- Bouton d'Action Central Élégant avec Ondes Sonores -->
-        <div class="control-deck" onpointerdown="event.stopPropagation();">
-            <div class="ultrasound-wrapper">
-                <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
-                    <div id="us-progress" style="height: 0%;"></div>
-                    <span class="btn-icon">🔊 ULTRASONS</span>
-                </button>
-                <div class="sound-waves"></div>
-            </div>
+        <!-- PANNEAU DES 4 PROPOSITIONS DE BOUTONS (Ils fonctionnent tous !) -->
+        <div id="button-proposals" onpointerdown="event.stopPropagation();">
+            <div class="proposal-title">CHOISIS LE DESIGN DU BOUTON (Ils déclenchent tous l'onde) :</div>
+            <button class="btn-d1" onclick="triggerUltrasound()"><span>🔊</span><span>SONAR</span></button>
+            <button class="btn-d2" onclick="triggerUltrasound()">🔊 NEUMORPHIC</button>
+            <button class="btn-d3" onclick="triggerUltrasound()">🔊 HOLOGRAPHIC</button>
+            <button class="btn-d4" onclick="triggerUltrasound()">🔊 ARCADE</button>
         </div>
     </div>
 
@@ -428,37 +241,15 @@
     <div id="start-screen" class="screen">
         <div class="menu-box">
             <h1>🦇 Bat&Watt</h1>
-            <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale.</p>
+            <p>Régulez la production, préservez la faune.</p>
             <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15">
             <div class="stats-box">
                 <b>🏆 Meilleurs Scores :</b><br>
                 Jour max : <span id="menu-high-level">1</span><br>
                 Énergie max : <span id="menu-high-energy">0</span> kWh
             </div>
-            <button class="btn-main btn-resume hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
+            <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
-            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Local</button>
-            <button class="btn-secondary" onclick="showSettings()">⚙️ Paramètres</button>
-        </div>
-    </div>
-
-    <div id="leaderboard-screen" class="screen hidden">
-        <div class="menu-box">
-            <h1>🏆 Classement</h1>
-            <table class="leaderboard-table"><tbody id="leaderboard-list"></tbody></table>
-            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
-        </div>
-    </div>
-
-    <div id="settings-screen" class="screen hidden">
-        <div class="menu-box">
-            <h1>⚙️ Paramètres</h1>
-            <div class="settings-list">
-                <label><input type="checkbox" id="opt-music" onchange="toggleSetting('music')"> 🎵 Musique (Prochainement)</label>
-                <label><input type="checkbox" id="opt-sfx" onchange="toggleSetting('sfx')"> 🔊 Effets sonores (Prochainement)</label>
-                <label><input type="checkbox" id="opt-fx" onchange="toggleSetting('particles')"> ✨ Particules magiques</label>
-            </div>
-            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
         </div>
     </div>
 
@@ -484,31 +275,16 @@
         let production = 100, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
         let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
-        
-        let curtailed = { 1: false, 2: false };
-        let tSpeed = { 1: 4, 2: 4.5 }; 
-        let targetSpeed = { 1: 4, 2: 4.5 }; 
-        
-        let isNight = false;
-        let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
-        let ultrasoundCharge = 100;
+        let curtailed = { 1: false, 2: false }; let tSpeed = { 1: 4, 2: 4.5 }; let targetSpeed = { 1: 4, 2: 4.5 }; 
+        let isNight = false, savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0, ultrasoundCharge = 100;
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
         let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
         document.getElementById('menu-high-level').innerText = highScores.maxLevel;
         document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
 
-        let batWattLeaderboard = JSON.parse(localStorage.getItem('batWattLeaderboard')) || [];
-        let gameSettings = JSON.parse(localStorage.getItem('batWattSettings')) || { sfx: true, music: true, particles: true };
-
         document.addEventListener("DOMContentLoaded", () => {
-            let lastPlayerName = localStorage.getItem('batWattLastPlayer') || "";
-            document.getElementById('player-name').value = lastPlayerName;
-            
-            document.getElementById('opt-music').checked = gameSettings.music;
-            document.getElementById('opt-sfx').checked = gameSettings.sfx;
-            document.getElementById('opt-fx').checked = gameSettings.particles;
-            
+            document.getElementById('player-name').value = localStorage.getItem('batWattLastPlayer') || "";
             checkSavedGame();
         });
 
@@ -518,126 +294,44 @@
             localStorage.setItem('batWattScores', JSON.stringify(highScores));
             document.getElementById('menu-high-level').innerText = highScores.maxLevel;
             document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
-
-            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
-            localStorage.setItem('batWattLastPlayer', pName);
-            
-            batWattLeaderboard.push({ name: pName, level: currentLevel, energy: Math.round(totalEnergyProduced) });
-            batWattLeaderboard.sort((a, b) => b.energy - a.energy);
-            batWattLeaderboard = batWattLeaderboard.slice(0, 5);
-            localStorage.setItem('batWattLeaderboard', JSON.stringify(batWattLeaderboard));
+            localStorage.setItem('batWattLastPlayer', document.getElementById('player-name').value.trim() || "Anonyme");
         }
 
         window.addEventListener('keydown', (e) => {
             if (!isPlaying || isPaused) return;
-            if (e.key === '1') toggleCurtail(1);
-            if (e.key === '2') toggleCurtail(2);
+            if (e.key === '1') toggleCurtail(1); if (e.key === '2') toggleCurtail(2);
             if (e.key === ' ') { e.preventDefault(); triggerUltrasound(); }
             if (e.key === 'Escape') togglePause();
         });
 
         function handleContainerClick(e) { if (isPlaying && e.clientY < (window.innerHeight / 2)) togglePause(); }
-
-        function showStartScreen() {
-            document.getElementById('leaderboard-screen').classList.add('hidden');
-            document.getElementById('settings-screen').classList.add('hidden');
-            document.getElementById('start-screen').classList.remove('hidden');
-            checkSavedGame();
-        }
-
-        function showLeaderboard() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('leaderboard-screen').classList.remove('hidden');
-            
-            let tbody = document.getElementById('leaderboard-list');
-            tbody.innerHTML = `<tr><th>Joueur</th><th>Jour</th><th>Énergie</th></tr>`;
-            if (batWattLeaderboard.length === 0) {
-                tbody.innerHTML += `<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment</td></tr>`;
-            } else {
-                batWattLeaderboard.forEach(score => {
-                    tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.level}</td><td>${score.energy} kWh</td></tr>`;
-                });
-            }
-        }
-
-        function showSettings() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('settings-screen').classList.remove('hidden');
-        }
-
-        function toggleSetting(key) {
-            gameSettings[key] = !gameSettings[key];
-            localStorage.setItem('batWattSettings', JSON.stringify(gameSettings));
-        }
-
+        function showStartScreen() { document.getElementById('start-screen').classList.remove('hidden'); checkSavedGame(); }
+        
         function saveCurrentGame() {
-            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
-            let state = { playerName: pName, production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced, ultrasoundCharge };
-            localStorage.setItem('batWattSaveGame', JSON.stringify(state));
-            alert("✅ Partie sauvegardée avec succès !");
-            quitToMenu();
+            let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced, ultrasoundCharge };
+            localStorage.setItem('batWattSaveGame', JSON.stringify(state)); alert("✅ Partie sauvegardée !"); quitToMenu();
         }
-
-        function loadGame() {
-            let save = JSON.parse(localStorage.getItem('batWattSaveGame'));
-            if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); }
-        }
-
-        function checkSavedGame() {
-            let save = localStorage.getItem('batWattSaveGame');
-            document.getElementById('btn-load').classList.toggle('hidden', !save);
-        }
-
-        function quitToMenu() {
-            isPlaying = false; isPaused = false;
-            cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
-            document.querySelectorAll('.creature').forEach(c => c.remove());
-            document.getElementById('pause-screen').classList.add('hidden');
-            document.getElementById('gameover-screen').classList.add('hidden');
-            showStartScreen();
-        }
+        function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
+        function checkSavedGame() { document.getElementById('btn-load').classList.toggle('hidden', !localStorage.getItem('batWattSaveGame')); }
+        function quitToMenu() { isPlaying = false; isPaused = false; cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval); document.querySelectorAll('.creature').forEach(c => c.remove()); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('gameover-screen').classList.add('hidden'); showStartScreen(); }
 
         function startGame(loadedData = null) {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('pause-screen').classList.add('hidden');
-            document.getElementById('gameover-screen').classList.add('hidden');
-            document.querySelectorAll('.creature').forEach(c => c.remove());
-            
-            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
-            localStorage.setItem('batWattLastPlayer', pName);
+            document.getElementById('start-screen').classList.add('hidden'); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('gameover-screen').classList.add('hidden'); document.querySelectorAll('.creature').forEach(c => c.remove());
+            localStorage.setItem('batWattLastPlayer', document.getElementById('player-name').value.trim() || "Anonyme");
             
             if (loadedData && loadedData.currentLevel) {
-                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent;
-                levelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime;
-                savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna;
-                totalEnergyProduced = loadedData.totalEnergyProduced; ultrasoundCharge = loadedData.ultrasoundCharge;
+                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent; levelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime; savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna; totalEnergyProduced = loadedData.totalEnergyProduced; ultrasoundCharge = loadedData.ultrasoundCharge;
             } else {
-                production = 100; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
-                savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; ultrasoundCharge = 100; 
+                production = 100; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0; savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; ultrasoundCharge = 100; 
             }
             
-            document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
-            document.getElementById('btn-ultrasound').disabled = ultrasoundCharge < 100;
-
-            curtailed = { 1: false, 2: false };
-            tSpeed = { 1: 4, 2: 4.5 };
-            targetSpeed = { 1: 4, 2: 4.5 };
-
-            document.getElementById('turbine-1').classList.remove('curtailed'); 
-            document.getElementById('turbine-2').classList.remove('curtailed');
-
-            isPlaying = true; isPaused = false;
-            updateUI();
-
-            if (gameInterval) clearInterval(gameInterval);
-            gameInterval = setInterval(gameLoop, 400);
-
-            if (creatureInterval) clearInterval(creatureInterval);
-            creatureInterval = setInterval(manageCreatureSpawns, 1500);
-
-            if (animFrameId) cancelAnimationFrame(animFrameId);
-            lastTimestamp = performance.now();
-            animFrameId = requestAnimationFrame(runVisualLoop);
+            curtailed = { 1: false, 2: false }; tSpeed = { 1: 4, 2: 4.5 }; targetSpeed = { 1: 4, 2: 4.5 };
+            document.getElementById('turbine-1').classList.remove('curtailed'); document.getElementById('turbine-2').classList.remove('curtailed');
+            isPlaying = true; isPaused = false; updateUI();
+            
+            if (gameInterval) clearInterval(gameInterval); gameInterval = setInterval(gameLoop, 400);
+            if (creatureInterval) clearInterval(creatureInterval); creatureInterval = setInterval(manageCreatureSpawns, 1500);
+            if (animFrameId) cancelAnimationFrame(animFrameId); lastTimestamp = performance.now(); animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
         function updateBiodiversity() {
@@ -647,34 +341,17 @@
 
         function gameLoop() {
             if (!isPlaying || isPaused) return;
-
-            let speedFactor1 = Math.max(0, (tSpeed[1] - 0.8) / (4 - 0.8));
-            let speedFactor2 = Math.max(0, (tSpeed[2] - 0.8) / (4.5 - 0.8));
-            let turbinePower = (speedFactor1 * 1.75) + (speedFactor2 * 1.75);
-            let addedPower = turbinePower - 1.2;
+            let speedFactor1 = Math.max(0, (tSpeed[1] - 0.8) / (4 - 0.8)); let speedFactor2 = Math.max(0, (tSpeed[2] - 0.8) / (4.5 - 0.8));
+            let turbinePower = (speedFactor1 * 1.75) + (speedFactor2 * 1.75); let addedPower = turbinePower - 1.2;
 
             if (addedPower > 0) {
-                production += addedPower;
-                let addedKwh = addedPower * 1.5;
-                totalEnergyProduced += addedKwh;
-                
-                if (ultrasoundCharge < 100) {
-                    ultrasoundCharge += addedKwh;
-                    if (ultrasoundCharge >= 100) { ultrasoundCharge = 100; document.getElementById('btn-ultrasound').disabled = false; }
-                    document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
-                }
-            } else {
-                production += addedPower;
-            }
+                production += addedPower; let addedKwh = addedPower * 1.5; totalEnergyProduced += addedKwh;
+                if (ultrasoundCharge < 100) ultrasoundCharge = Math.min(100, ultrasoundCharge + addedKwh);
+            } else { production += addedPower; }
 
             production = Math.max(0, Math.min(100, production));
             levelTime -= 0.4;
-            if (levelTime <= 0) {
-                currentLevel++; levelTime = 60;
-                let badge = document.getElementById('level-badge');
-                badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim');
-            }
-
+            if (levelTime <= 0) { currentLevel++; levelTime = 60; let badge = document.getElementById('level-badge'); badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim'); }
             if (production <= 0) endGame("Batterie vide ! La ville subit un Blackout total.");
             updateUI();
         }
@@ -682,141 +359,53 @@
         function runVisualLoop(timestamp) {
             if (!isPlaying) return;
             if (!isPaused) {
-                let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
-                gameTime += dt;
-                
-                // Freinage et accélération plus agressifs (x3.5)
-                let accelRate = 8.5 * dt; 
-                
-                for (let i of [1, 2]) {
-                    if (tSpeed[i] < targetSpeed[i]) { tSpeed[i] = Math.min(targetSpeed[i], tSpeed[i] + accelRate); } 
-                    else if (tSpeed[i] > targetSpeed[i]) { tSpeed[i] = Math.max(targetSpeed[i], tSpeed[i] - accelRate); }
-                }
-
-                rot1 += tSpeed[1] * (dt * 60);
-                rot2 += tSpeed[2] * (dt * 60);
-                
-                document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`;
-                document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
-                
+                let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1); gameTime += dt; let accelRate = 8.5 * dt; 
+                for (let i of [1, 2]) { if (tSpeed[i] < targetSpeed[i]) tSpeed[i] = Math.min(targetSpeed[i], tSpeed[i] + accelRate); else if (tSpeed[i] > targetSpeed[i]) tSpeed[i] = Math.max(targetSpeed[i], tSpeed[i] - accelRate); }
+                rot1 += tSpeed[1] * (dt * 60); rot2 += tSpeed[2] * (dt * 60);
+                document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`; document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
                 updateEphemerisPoetic();
             }
-            lastTimestamp = timestamp;
-            animFrameId = requestAnimationFrame(runVisualLoop);
-        }
-
-        function interpolateColor(c1, c2, factor) {
-            factor = Math.max(0, Math.min(1, factor));
-            return [Math.round(c1[0] + factor * (c2[0] - c1[0])), Math.round(c1[1] + factor * (c2[1] - c1[1])), Math.round(c1[2] + factor * (c2[2] - c1[2]))];
+            lastTimestamp = timestamp; animFrameId = requestAnimationFrame(runVisualLoop);
         }
 
         function updateEphemerisPoetic() {
-            let cycleProgress = (gameTime % 60) / 60;
-            let angle = cycleProgress * Math.PI * 2;
-            let sunFactor = Math.sin(angle);
-            let moonFactor = Math.sin(angle + Math.PI);
-            isNight = sunFactor < 0;
-
-            document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
-
-            let topColor, botColor;
-            let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); 
-            let t = (sf + 0.4) / 0.8; t = t * t * (3 - 2 * t); 
-
-            if (t > 0.5) { 
-                let tr = (t - 0.5) * 2; 
-                topColor = interpolateColor([255,130,110], [56,189,248], tr);
-                botColor = interpolateColor([255,180,140], [186,230,253], tr);
-            } else {
-                let tr = t * 2; 
-                topColor = interpolateColor([2,6,23], [255,130,110], tr);
-                botColor = interpolateColor([15,23,42], [255,180,140], tr);
-            }
-
+            let angle = ((gameTime % 60) / 60) * Math.PI * 2; let sunFactor = Math.sin(angle); let moonFactor = Math.sin(angle + Math.PI);
+            isNight = sunFactor < 0; document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
+            let topColor, botColor; let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); let t = (sf + 0.4) / 0.8; t = t * t * (3 - 2 * t); 
+            const interp = (c1, c2, f) => [Math.round(c1[0] + f * (c2[0] - c1[0])), Math.round(c1[1] + f * (c2[1] - c1[1])), Math.round(c1[2] + f * (c2[2] - c1[2]))];
+            if (t > 0.5) { let tr = (t - 0.5) * 2; topColor = interp([255,130,110], [56,189,248], tr); botColor = interp([255,180,140], [186,230,253], tr); }
+            else { let tr = t * 2; topColor = interp([2,6,23], [255,130,110], tr); botColor = interp([15,23,42], [255,180,140], tr); }
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
-            
-            let sunEl = document.getElementById('sun-body');
-            sunEl.style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`;
-            sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
-
-            let moonEl = document.getElementById('moon-body');
-            let moonRotation = -(angle * 180 / Math.PI);
-            moonEl.style.transform = `translate(${50 + Math.cos(angle + Math.PI)*45}vw, ${65 - Math.sin(angle + Math.PI)*45}vh) rotate(${moonRotation}deg)`;
-            moonEl.style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
+            document.getElementById('sun-body').style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`; document.getElementById('sun-body').style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
+            document.getElementById('moon-body').style.transform = `translate(${50 + Math.cos(angle + Math.PI)*45}vw, ${65 - Math.sin(angle + Math.PI)*45}vh) rotate(${-(angle * 180 / Math.PI)}deg)`; document.getElementById('moon-body').style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
         }
 
-        function togglePause() {
-            if (!isPlaying) return;
-            isPaused = !isPaused;
-            document.getElementById('pause-screen').classList.toggle('hidden', !isPaused);
-            if (!isPaused) lastTimestamp = performance.now();
-        }
-
-        function toggleCurtail(id) {
-            if (!isPlaying || isPaused) return;
-            curtailed[id] = !curtailed[id];
-            targetSpeed[id] = curtailed[id] ? 0.8 : (id === 1 ? 4 : 4.5);
-            const turbine = document.getElementById(`turbine-${id}`);
-            turbine.classList.toggle('curtailed', curtailed[id]);
-            turbine.classList.add('active-click');
-        }
-        
+        function togglePause() { if (!isPlaying) return; isPaused = !isPaused; document.getElementById('pause-screen').classList.toggle('hidden', !isPaused); if (!isPaused) lastTimestamp = performance.now(); }
+        function toggleCurtail(id) { if (!isPlaying || isPaused) return; curtailed[id] = !curtailed[id]; targetSpeed[id] = curtailed[id] ? 0.8 : (id === 1 ? 4 : 4.5); document.getElementById(`turbine-${id}`).classList.toggle('curtailed', curtailed[id]); document.getElementById(`turbine-${id}`).classList.add('active-click'); }
         function resetTurbineClick(id) { document.getElementById(`turbine-${id}`).classList.remove('active-click'); }
+        function showFeedback(text, x, y, isGood) { let el = document.createElement('div'); el.className = `feedback-text ${isGood ? 'feedback-good' : 'feedback-bad'}`; el.innerText = text; el.style.left = `${x}px`; el.style.top = `${y}px`; document.getElementById('game-container').appendChild(el); setTimeout(() => el.remove(), 1000); }
 
-        function showFeedback(text, x, y, isGood) {
-            let el = document.createElement('div');
-            el.className = `feedback-text ${isGood ? 'feedback-good' : 'feedback-bad'}`;
-            el.innerText = text; el.style.left = `${x}px`; el.style.top = `${y}px`;
-            document.getElementById('game-container').appendChild(el);
-            setTimeout(() => el.remove(), 1000);
-        }
-
-        // Action : Onde de Choc Globale
         function triggerUltrasound() {
             if (!isPlaying || isPaused || production < 30 || ultrasoundCharge < 100) return;
-            
             production -= 30; ultrasoundCharge = 0;
-            document.getElementById('us-progress').style.height = '0%';
-            document.getElementById('btn-ultrasound').disabled = true;
+            let fillEl = document.getElementById('battery-fill'); fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
 
-            let fillEl = document.getElementById('battery-fill');
-            fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
-
-            // Animation des ondes successives à l'écran
             let waveContainer = document.getElementById('wave-container');
             for(let i=0; i<3; i++) {
-                let wave = document.createElement('div');
-                wave.className = 'global-wave';
-                wave.style.animationDelay = (i * 0.15) + 's';
-                waveContainer.appendChild(wave);
-                setTimeout(() => wave.remove(), 1500);
+                let wave = document.createElement('div'); wave.className = 'global-wave'; wave.style.animationDelay = (i * 0.15) + 's';
+                waveContainer.appendChild(wave); setTimeout(() => wave.remove(), 1500);
             }
 
-            let cx = window.innerWidth / 2;
-            let cy = window.innerHeight / 2;
-
-            // Répulsion radiale de TOUS les animaux
+            let cx = window.innerWidth / 2; let cy = window.innerHeight / 2;
             document.querySelectorAll('.creature').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                creature.classList.add('fleeing'); savedFauna++; updateBiodiversity();
+                let rect = creature.getBoundingClientRect(); showFeedback("💚", rect.left, rect.top, true);
                 
-                creature.classList.add('fleeing');
-                savedFauna++;
-                updateBiodiversity();
-                
-                let rect = creature.getBoundingClientRect();
-                showFeedback("💚", rect.left, rect.top, true);
-                
-                // Calcul mathématique pour propulser l'animal vers l'extérieur
-                let dx = rect.left - cx;
-                let dy = rect.top - cy;
-                let angle = Math.atan2(dy, dx);
-                let dist = 800; // Poussée lointaine
-                
+                let dx = rect.left - cx; let dy = rect.top - cy; let angle = Math.atan2(dy, dx); let dist = 800; 
                 creature.style.transition = "all 0.8s cubic-bezier(0.2, 1, 0.3, 1)";
                 creature.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(0.5) rotate(${Math.random()*360}deg)`;
-                creature.style.opacity = '0';
-                
-                setTimeout(() => creature.remove(), 1000);
+                creature.style.opacity = '0'; setTimeout(() => creature.remove(), 1000);
             });
             updateUI();
         }
@@ -824,147 +413,105 @@
         function manageCreatureSpawns() {
             if (!isPlaying || isPaused) return;
             let freqModifier = Math.min(1.5, 1 + (currentLevel * 0.1));
-            
-            if (isNight) {
-                let waveSize = Math.floor(Math.random() * (2 + currentLevel/2)) + 1;
-                for (let i = 0; i < waveSize; i++) {
-                    setTimeout(() => { if (isNight && isPlaying && !isPaused) spawnCreature('bat'); }, i * 400 / freqModifier);
-                }
-            } else if (Math.random() < 0.7 * freqModifier) {
-                spawnCreature('bird');
-            }
+            if (isNight) { let waveSize = Math.floor(Math.random() * (2 + currentLevel/2)) + 1; for (let i = 0; i < waveSize; i++) { setTimeout(() => { if (isNight && isPlaying && !isPaused) spawnCreature('bat'); }, i * 400 / freqModifier); }
+            } else if (Math.random() < 0.7 * freqModifier) { spawnCreature('bird'); }
         }
 
         function spawnCreature(type) {
             const container = document.getElementById('game-container');
             let creature = document.createElement('div');
-            creature.className = `creature ${type}`;
+            
+            // Attribution aléatoire de l'espèce d'oiseau
+            let speciesClass = '';
+            if (type === 'bird') {
+                const species = ['sp-eagle', 'sp-pigeon', 'sp-crow', 'sp-parrot'];
+                speciesClass = species[Math.floor(Math.random() * species.length)];
+            }
+            
+            creature.className = `creature ${type} ${speciesClass}`;
             creature.innerHTML = `<div class="wing left"></div><div class="body"></div><div class="wing right"></div>`;
             
-            // Ciblage strict : Les animaux ne tombent plus n'importe où, mais au-dessus d'une éolienne
             let targetId = Math.random() < 0.5 ? 'turbine-1' : 'turbine-2';
             let tRect = document.getElementById(targetId).getBoundingClientRect();
-            // Zone de chute = centre de l'éolienne +/- 40px
             let startX = tRect.left + (tRect.width / 2) + (Math.random() * 80 - 40);
-            
             let posY = -60; let timeOffset = Math.random() * 100;
             
             creature.style.left = startX + 'px'; creature.style.top = posY + 'px';
             container.appendChild(creature);
 
-            let baseSpeed = (type === 'bat') ? 3.0 : 2.2;
-            let fallSpeed = baseSpeed + (currentLevel * 0.3);
+            let baseSpeed = (type === 'bat') ? 3.0 : 2.2; let fallSpeed = baseSpeed + (currentLevel * 0.3);
 
             let fallInterval = setInterval(() => {
                 if (!isPlaying) { creature.remove(); clearInterval(fallInterval); return; }
                 if (isPaused || creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
 
-                posY += fallSpeed;
-                // Mouvement sinusoïdal léger pour rester dans la zone de danger
-                let posX = startX + Math.sin(posY/40 + timeOffset) * 20; 
-                
-                creature.style.left = posX + 'px';
-                creature.style.top = posY + 'px';
+                posY += fallSpeed; let posX = startX + Math.sin(posY/40 + timeOffset) * 20; 
+                creature.style.left = posX + 'px'; creature.style.top = posY + 'px';
 
                 let hit1 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-1'), rot1);
                 let hit2 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-2'), rot2);
 
                 if (hit1 || hit2) {
                     let activeCurtail = (hit1 && tSpeed[1] < 1.2) || (hit2 && tSpeed[2] < 1.2);
-
                     if (activeCurtail) {
-                        savedFauna++; updateBiodiversity();
-                        showFeedback("💚", posX, posY, true);
+                        savedFauna++; updateBiodiversity(); showFeedback("💚", posX, posY, true);
                         creature.remove(); clearInterval(fallInterval);
                     } else {
-                        injuredFauna++; updateBiodiversity();
-                        showFeedback("💔", posX, posY, false);
-                        updateUI();
-                        creature.classList.add('crashing');
-                        setTimeout(() => creature.remove(), 800);
-                        clearInterval(fallInterval);
+                        injuredFauna++; updateBiodiversity(); showFeedback("💔", posX, posY, false);
+                        updateUI(); creature.classList.add('crashing'); setTimeout(() => creature.remove(), 800); clearInterval(fallInterval);
                     }
                 } else if (posY > window.innerHeight - 100) {
-                    savedFauna++; updateBiodiversity();
-                    creature.remove(); clearInterval(fallInterval);
+                    savedFauna++; updateBiodiversity(); creature.remove(); clearInterval(fallInterval);
                 }
             }, 30);
         }
 
-        // Collision mathématiquement parfaite basée sur l'axe absolu (0x0) du hub
         function checkTurbinePixelCollision(px, py, turbineEl, rotationDeg) {
             let towerEl = turbineEl.querySelector('.tower');
-            if (towerEl) {
-                let tRect = towerEl.getBoundingClientRect();
-                if (px >= tRect.left - 6 && px <= tRect.right + 6 && py >= tRect.top && py <= tRect.bottom) return true;
-            }
+            if (towerEl) { let tRect = towerEl.getBoundingClientRect(); if (px >= tRect.left - 6 && px <= tRect.right + 6 && py >= tRect.top && py <= tRect.bottom) return true; }
             let bladesEl = turbineEl.querySelector('.blades-container');
             if (bladesEl) {
-                let bRect = bladesEl.getBoundingClientRect();
-                let hubX = bRect.left; let hubY = bRect.top;
-                let bladeLength = turbineEl.id === 'turbine-1' ? 75 : 90;
-                
-                // L'angle de base en mathématiques pointe vers la droite. Notre pale(0deg) pointe vers le HAUT.
+                let bRect = bladesEl.getBoundingClientRect(); let hubX = bRect.left; let hubY = bRect.top; let bladeLength = turbineEl.id === 'turbine-1' ? 75 : 90;
                 let radBase = (rotationDeg - 90) * (Math.PI / 180);
                 for (let b = 0; b < 3; b++) {
                     let angle = radBase + (b * 120 * Math.PI / 180);
-                    let tipX = hubX + bladeLength * Math.cos(angle);
-                    let tipY = hubY + bladeLength * Math.sin(angle);
-                    // Marge de tolérance (18px) pour que la collision soit équitable
+                    let tipX = hubX + bladeLength * Math.cos(angle); let tipY = hubY + bladeLength * Math.sin(angle);
                     if (pointToSegmentDistance(px, py, hubX, hubY, tipX, tipY) < 18) return true;
                 }
-            }
-            return false;
+            } return false;
         }
 
         function pointToSegmentDistance(px, py, x1, y1, x2, y2) {
-            let A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1;
-            let dot = A * C + B * D, len_sq = C * C + D * D, param = -1;
-            if (len_sq != 0) param = dot / len_sq;
-            let xx = (param < 0) ? x1 : (param > 1) ? x2 : x1 + param * C;
-            let yy = (param < 0) ? y1 : (param > 1) ? y2 : y1 + param * D;
-            let dx = px - xx, dy = py - yy;
-            return Math.sqrt(dx * dx + dy * dy);
+            let A = px - x1, B = py - y1, C = x2 - x1, D = y2 - y1; let dot = A * C + B * D, len_sq = C * C + D * D, param = -1;
+            if (len_sq != 0) param = dot / len_sq; let xx = (param < 0) ? x1 : (param > 1) ? x2 : x1 + param * C; let yy = (param < 0) ? y1 : (param > 1) ? y2 : y1 + param * D;
+            let dx = px - xx, dy = py - yy; return Math.sqrt(dx * dx + dy * dy);
         }
 
         function updateUI() {
             document.getElementById('battery-fill').style.width = Math.round(production) + '%';
             document.getElementById('bio-fill').style.width = Math.round(biodiversityPercent) + '%';
             document.getElementById('level-num').innerText = currentLevel;
-            document.getElementById('saved-count').innerText = savedFauna;
+            
+            // Calcul du Score Animaux : Sauvés MOINS Blessés
+            let animalScore = savedFauna - injuredFauna;
+            document.getElementById('saved-count').innerText = animalScore;
+            
             document.getElementById('energy-count').innerText = Math.round(totalEnergyProduced);
 
             let batContainer = document.getElementById('battery-container');
             batContainer.classList.remove('danger-50', 'danger-25');
-            if (production <= 25) batContainer.classList.add('danger-25');
-            else if (production < 50) batContainer.classList.add('danger-50');
+            if (production <= 25) batContainer.classList.add('danger-25'); else if (production < 50) batContainer.classList.add('danger-50');
 
             let bioContainer = document.getElementById('bio-container');
             bioContainer.classList.remove('danger-50', 'danger-25');
-            if (biodiversityPercent <= 25) bioContainer.classList.add('danger-25');
-            else if (biodiversityPercent < 50) bioContainer.classList.add('danger-50');
+            if (biodiversityPercent <= 25) bioContainer.classList.add('danger-25'); else if (biodiversityPercent < 50) bioContainer.classList.add('danger-50');
         }
 
         function endGame(reason) {
-            isPlaying = false;
-            cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
-            saveScores();
-            localStorage.removeItem('batWattSaveGame');
-            document.querySelectorAll('.creature').forEach(b => b.remove());
-            document.getElementById('final-stats').innerHTML = 
-                `Jour atteint : <b>${currentLevel}</b><br>` +
-                `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` +
-                `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` +
-                `<span style="color:#ef4444">${reason}</span>`;
+            isPlaying = false; cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
+            saveScores(); localStorage.removeItem('batWattSaveGame'); document.querySelectorAll('.creature').forEach(b => b.remove());
+            document.getElementById('final-stats').innerHTML = `Jour atteint : <b>${currentLevel}</b><br>` + `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` + `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` + `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
-        }
-        
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then((reg) => {
-                    console.log('Service worker enregistré.', reg);
-                });
-            });
         }
     </script>
 </body>
