@@ -271,7 +271,7 @@
             osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + brakeDuration);
 
             // --- VOLUME DU FREIN ---
-            // 0.05 = Volume du frein (entre 0.0 et 1.0)
+            // 0.01 = Volume du frein (entre 0.0 et 1.0)
             let brakeVolume = 0.15; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
