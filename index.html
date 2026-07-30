@@ -21,17 +21,6 @@
         body { background: #0f172a; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; width: 100vw; height: 100dvh; overflow: hidden; color: #ffffff; touch-action: none; }
         #game-container { position: relative; width: 100%; height: 100%; background: linear-gradient(to bottom, #ff758c, #ff7eb3); overflow: hidden; }
 
-        /* --- CONTENEUR ONDES ULTRASONS --- */
-        #wave-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 45; overflow: hidden; }
-        .global-wave {
-            position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
-            border: 8px solid rgba(250, 204, 21, 0.6); border-radius: 50%;
-            transform: translate(-50%, -50%);
-            animation: expandGlobalWave 1.2s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
-            box-shadow: 0 0 40px rgba(250, 204, 21, 0.4), inset 0 0 40px rgba(250, 204, 21, 0.4);
-        }
-        @keyframes expandGlobalWave { 0% { width: 0; height: 0; opacity: 1; border-width: 40px; } 100% { width: 250vw; height: 250vw; opacity: 0; border-width: 2px; } }
-
         /* --- ÉTOILES & ASTRES & NUAGES --- */
         #stars-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 160px 120px, #ffffff, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; opacity: 0; transition: opacity 2s ease-in-out; z-index: 0; }
         .cloud { position: absolute; background: rgba(255, 255, 255, 0.8); border-radius: 50px; z-index: 2; animation: floatCloud linear infinite; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.1); }
@@ -93,7 +82,8 @@
         .turbine-hitbox { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 240px; z-index: 20; cursor: pointer; pointer-events: auto; }
 
         /* --- ANIMAUX CSS --- */
-        .creature { position: absolute; z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); will-change: transform; pointer-events: none; transform: scale(0.9); }
+        /* Animaux réduits avec scale(0.65) */
+        .creature { position: absolute; z-index: 30; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); will-change: transform; pointer-events: none; transform: scale(0.65); transform-origin: center center; }
         
         /* Base Oiseau */
         .bird .body { width: 14px; height: 26px; border-radius: 50% 50% 40% 40%; position: absolute; left: -7px; top: -13px; z-index: 2; }
@@ -119,14 +109,16 @@
         @keyframes flapBatL { 0% { transform: rotate(30deg) scaleX(1); } 100% { transform: rotate(-50deg) scaleX(0.5); } }
         @keyframes flapBatR { 0% { transform: rotate(-30deg) scaleX(1); } 100% { transform: rotate(50deg) scaleX(0.5); } }
 
+        /* Animation Crash adaptée à la nouvelle échelle */
         .crashing { animation: crashFall 0.8s ease-in forwards; }
-        @keyframes crashFall { 0% { transform: rotate(0deg) scale(0.9); } 50% { transform: rotate(180deg) scale(1.1); } 100% { transform: rotate(540deg) scale(0.5); opacity: 0; } }
+        @keyframes crashFall { 0% { transform: rotate(0deg) scale(0.65); } 50% { transform: rotate(180deg) scale(0.85); } 100% { transform: rotate(540deg) scale(0.4); opacity: 0; } }
+        
         .feedback-text { position: absolute; font-weight: bold; font-size: 16px; z-index: 60; animation: floatUp 1s ease-out forwards; pointer-events: none; }
         .feedback-good { color: #10b981; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .feedback-bad { color: #ef4444; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-40px); } }
 
-        /* --- MENUS & PANNEAU TESTS BOUTONS --- */
+        /* --- MODALES & MENUS --- */
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; pointer-events: auto; }
         .menu-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -135,59 +127,17 @@
         .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px;}
         .hidden { display: none !important; pointer-events: none; }
         .input-name { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3); background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-weight: bold; outline: none; }
-
-        /* PANNEAU PROPOSITIONS BOUTONS (TEMPORAIRE) */
-        #button-proposals {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px;
-            background: rgba(15, 23, 42, 0.95); border-top: 2px solid #334155;
-            display: flex; flex-wrap: wrap; justify-content: space-evenly; align-items: center;
-            z-index: 1000; pointer-events: auto;
-        }
-        .proposal-title { width: 100%; text-align: center; font-size: 14px; font-weight: bold; color: #cbd5e1; margin-bottom: 15px; }
-        
-        /* 1. SONAR RADAR */
-        .btn-d1 {
-            background: #083344; color: #22d3ee; border: 2px solid #06b6d4;
-            border-radius: 50%; width: 70px; height: 70px;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.5); display: flex; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: bold; cursor: pointer; position: relative; overflow: hidden; flex-direction: column;
-        }
-        .btn-d1::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; border: 1px solid #22d3ee; border-radius: 50%; animation: radar-ping 1.5s infinite; }
-        @keyframes radar-ping { 100% { width: 70px; height: 70px; opacity: 0; } }
-        
-        /* 2. NEUMORPHIC (Plastique doux) */
-        .btn-d2 {
-            background: #1e293b; color: #facc15; border: none;
-            padding: 15px 20px; border-radius: 12px;
-            box-shadow: 4px 4px 8px #0f172a, -4px -4px 8px #334155;
-            font-weight: bold; cursor: pointer; font-size: 12px; transition: all 0.1s;
-        }
-        .btn-d2:active { box-shadow: inset 4px 4px 8px #0f172a, inset -4px -4px 8px #334155; }
-
-        /* 3. HOLOGRAPHIC (Cyberpunk / Verre) */
-        .btn-d3 {
-            background: rgba(255, 255, 255, 0.05); color: #fff;
-            backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 15px 20px; border-radius: 30px;
-            box-shadow: 0 0 15px rgba(236, 72, 153, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.4);
-            text-shadow: 0 0 5px #fff; cursor: pointer; font-weight: bold; font-size: 12px;
-        }
-
-        /* 4. RETRO ARCADE (Physique) */
-        .btn-d4 {
-            background: #dc2626; color: white; border: none;
-            border-bottom: 6px solid #991b1b; border-radius: 10px;
-            padding: 15px 20px; font-weight: 900; font-size: 12px;
-            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: all 0.1s;
-        }
-        .btn-d4:active { transform: translateY(4px); border-bottom: 2px solid #991b1b; }
-
+        .leaderboard-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 14px; }
+        .leaderboard-table th { color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 8px; text-align: center; }
+        .leaderboard-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .settings-list { text-align: left; margin-bottom: 20px; font-size: 16px; color: #cbd5e1; }
+        .settings-list label { display: block; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .settings-list input { transform: scale(1.5); accent-color: #34d399; }
     </style>
 </head>
 <body>
 
     <div id="game-container" onpointerdown="handleContainerClick(event)">
-        <div id="wave-container"></div>
         <div id="stars-container"></div>
         <div class="cloud" style="top: 15%; width: 60px; height: 20px; animation-duration: 40s;"></div>
         <div class="cloud" style="top: 30%; width: 100px; height: 30px; animation-duration: 25s; opacity: 0.6;"></div>
@@ -226,15 +176,6 @@
             <div class="nacelle-group"><div class="nacelle"></div><div class="hub"><div class="blades-container" id="blades-2"><div class="blade"></div><div class="blade"></div><div class="blade"></div></div></div></div>
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
-
-        <!-- PANNEAU DES 4 PROPOSITIONS DE BOUTONS (Ils fonctionnent tous !) -->
-        <div id="button-proposals" onpointerdown="event.stopPropagation();">
-            <div class="proposal-title">CHOISIS LE DESIGN DU BOUTON (Ils déclenchent tous l'onde) :</div>
-            <button class="btn-d1" onclick="triggerUltrasound()"><span>🔊</span><span>SONAR</span></button>
-            <button class="btn-d2" onclick="triggerUltrasound()">🔊 NEUMORPHIC</button>
-            <button class="btn-d3" onclick="triggerUltrasound()">🔊 HOLOGRAPHIC</button>
-            <button class="btn-d4" onclick="triggerUltrasound()">🔊 ARCADE</button>
-        </div>
     </div>
 
     <!-- Modales -->
@@ -250,6 +191,28 @@
             </div>
             <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
+            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Local</button>
+            <button class="btn-secondary" onclick="showSettings()">⚙️ Paramètres</button>
+        </div>
+    </div>
+
+    <div id="leaderboard-screen" class="screen hidden">
+        <div class="menu-box">
+            <h1>🏆 Classement</h1>
+            <table class="leaderboard-table"><tbody id="leaderboard-list"></tbody></table>
+            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
+        </div>
+    </div>
+
+    <div id="settings-screen" class="screen hidden">
+        <div class="menu-box">
+            <h1>⚙️ Paramètres</h1>
+            <div class="settings-list">
+                <label><input type="checkbox" id="opt-music" onchange="toggleSetting('music')"> 🎵 Musique (Prochainement)</label>
+                <label><input type="checkbox" id="opt-sfx" onchange="toggleSetting('sfx')"> 🔊 Effets sonores (Prochainement)</label>
+                <label><input type="checkbox" id="opt-fx" onchange="toggleSetting('particles')"> ✨ Particules magiques</label>
+            </div>
+            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
         </div>
     </div>
 
@@ -276,15 +239,21 @@
         let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
         let curtailed = { 1: false, 2: false }; let tSpeed = { 1: 4, 2: 4.5 }; let targetSpeed = { 1: 4, 2: 4.5 }; 
-        let isNight = false, savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0, ultrasoundCharge = 100;
+        let isNight = false, savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
         let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
         document.getElementById('menu-high-level').innerText = highScores.maxLevel;
         document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
 
+        let batWattLeaderboard = JSON.parse(localStorage.getItem('batWattLeaderboard')) || [];
+        let gameSettings = JSON.parse(localStorage.getItem('batWattSettings')) || { sfx: true, music: true, particles: true };
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('player-name').value = localStorage.getItem('batWattLastPlayer') || "";
+            document.getElementById('opt-music').checked = gameSettings.music;
+            document.getElementById('opt-sfx').checked = gameSettings.sfx;
+            document.getElementById('opt-fx').checked = gameSettings.particles;
             checkSavedGame();
         });
 
@@ -294,23 +263,60 @@
             localStorage.setItem('batWattScores', JSON.stringify(highScores));
             document.getElementById('menu-high-level').innerText = highScores.maxLevel;
             document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
-            localStorage.setItem('batWattLastPlayer', document.getElementById('player-name').value.trim() || "Anonyme");
+
+            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
+            localStorage.setItem('batWattLastPlayer', pName);
+            
+            batWattLeaderboard.push({ name: pName, level: currentLevel, energy: Math.round(totalEnergyProduced) });
+            batWattLeaderboard.sort((a, b) => b.energy - a.energy);
+            batWattLeaderboard = batWattLeaderboard.slice(0, 5);
+            localStorage.setItem('batWattLeaderboard', JSON.stringify(batWattLeaderboard));
         }
 
         window.addEventListener('keydown', (e) => {
             if (!isPlaying || isPaused) return;
             if (e.key === '1') toggleCurtail(1); if (e.key === '2') toggleCurtail(2);
-            if (e.key === ' ') { e.preventDefault(); triggerUltrasound(); }
             if (e.key === 'Escape') togglePause();
         });
 
         function handleContainerClick(e) { if (isPlaying && e.clientY < (window.innerHeight / 2)) togglePause(); }
-        function showStartScreen() { document.getElementById('start-screen').classList.remove('hidden'); checkSavedGame(); }
+        
+        function showStartScreen() { 
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('settings-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden'); 
+            checkSavedGame(); 
+        }
+
+        function showLeaderboard() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.remove('hidden');
+            let tbody = document.getElementById('leaderboard-list');
+            tbody.innerHTML = `<tr><th>Joueur</th><th>Jour</th><th>Énergie</th></tr>`;
+            if (batWattLeaderboard.length === 0) {
+                tbody.innerHTML += `<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment</td></tr>`;
+            } else {
+                batWattLeaderboard.forEach(score => {
+                    tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.level}</td><td>${score.energy} kWh</td></tr>`;
+                });
+            }
+        }
+
+        function showSettings() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('settings-screen').classList.remove('hidden');
+        }
+
+        function toggleSetting(key) {
+            gameSettings[key] = !gameSettings[key];
+            localStorage.setItem('batWattSettings', JSON.stringify(gameSettings));
+        }
         
         function saveCurrentGame() {
-            let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced, ultrasoundCharge };
+            let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
             localStorage.setItem('batWattSaveGame', JSON.stringify(state)); alert("✅ Partie sauvegardée !"); quitToMenu();
         }
+        
         function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
         function checkSavedGame() { document.getElementById('btn-load').classList.toggle('hidden', !localStorage.getItem('batWattSaveGame')); }
         function quitToMenu() { isPlaying = false; isPaused = false; cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval); document.querySelectorAll('.creature').forEach(c => c.remove()); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('gameover-screen').classList.add('hidden'); showStartScreen(); }
@@ -320,9 +326,9 @@
             localStorage.setItem('batWattLastPlayer', document.getElementById('player-name').value.trim() || "Anonyme");
             
             if (loadedData && loadedData.currentLevel) {
-                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent; levelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime; savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna; totalEnergyProduced = loadedData.totalEnergyProduced; ultrasoundCharge = loadedData.ultrasoundCharge;
+                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent; levelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime; savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna; totalEnergyProduced = loadedData.totalEnergyProduced;
             } else {
-                production = 100; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0; savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; ultrasoundCharge = 100; 
+                production = 100; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0; savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; 
             }
             
             curtailed = { 1: false, 2: false }; tSpeed = { 1: 4, 2: 4.5 }; targetSpeed = { 1: 4, 2: 4.5 };
@@ -346,7 +352,6 @@
 
             if (addedPower > 0) {
                 production += addedPower; let addedKwh = addedPower * 1.5; totalEnergyProduced += addedKwh;
-                if (ultrasoundCharge < 100) ultrasoundCharge = Math.min(100, ultrasoundCharge + addedKwh);
             } else { production += addedPower; }
 
             production = Math.max(0, Math.min(100, production));
@@ -385,31 +390,6 @@
         function resetTurbineClick(id) { document.getElementById(`turbine-${id}`).classList.remove('active-click'); }
         function showFeedback(text, x, y, isGood) { let el = document.createElement('div'); el.className = `feedback-text ${isGood ? 'feedback-good' : 'feedback-bad'}`; el.innerText = text; el.style.left = `${x}px`; el.style.top = `${y}px`; document.getElementById('game-container').appendChild(el); setTimeout(() => el.remove(), 1000); }
 
-        function triggerUltrasound() {
-            if (!isPlaying || isPaused || production < 30 || ultrasoundCharge < 100) return;
-            production -= 30; ultrasoundCharge = 0;
-            let fillEl = document.getElementById('battery-fill'); fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
-
-            let waveContainer = document.getElementById('wave-container');
-            for(let i=0; i<3; i++) {
-                let wave = document.createElement('div'); wave.className = 'global-wave'; wave.style.animationDelay = (i * 0.15) + 's';
-                waveContainer.appendChild(wave); setTimeout(() => wave.remove(), 1500);
-            }
-
-            let cx = window.innerWidth / 2; let cy = window.innerHeight / 2;
-            document.querySelectorAll('.creature').forEach(creature => {
-                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
-                creature.classList.add('fleeing'); savedFauna++; updateBiodiversity();
-                let rect = creature.getBoundingClientRect(); showFeedback("💚", rect.left, rect.top, true);
-                
-                let dx = rect.left - cx; let dy = rect.top - cy; let angle = Math.atan2(dy, dx); let dist = 800; 
-                creature.style.transition = "all 0.8s cubic-bezier(0.2, 1, 0.3, 1)";
-                creature.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(0.5) rotate(${Math.random()*360}deg)`;
-                creature.style.opacity = '0'; setTimeout(() => creature.remove(), 1000);
-            });
-            updateUI();
-        }
-
         function manageCreatureSpawns() {
             if (!isPlaying || isPaused) return;
             let freqModifier = Math.min(1.5, 1 + (currentLevel * 0.1));
@@ -421,7 +401,6 @@
             const container = document.getElementById('game-container');
             let creature = document.createElement('div');
             
-            // Attribution aléatoire de l'espèce d'oiseau
             let speciesClass = '';
             if (type === 'bird') {
                 const species = ['sp-eagle', 'sp-pigeon', 'sp-crow', 'sp-parrot'];
@@ -443,7 +422,7 @@
 
             let fallInterval = setInterval(() => {
                 if (!isPlaying) { creature.remove(); clearInterval(fallInterval); return; }
-                if (isPaused || creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
+                if (isPaused || creature.classList.contains('crashing')) return;
 
                 posY += fallSpeed; let posX = startX + Math.sin(posY/40 + timeOffset) * 20; 
                 creature.style.left = posX + 'px'; creature.style.top = posY + 'px';
@@ -492,7 +471,6 @@
             document.getElementById('bio-fill').style.width = Math.round(biodiversityPercent) + '%';
             document.getElementById('level-num').innerText = currentLevel;
             
-            // Calcul du Score Animaux : Sauvés MOINS Blessés
             let animalScore = savedFauna - injuredFauna;
             document.getElementById('saved-count').innerText = animalScore;
             
