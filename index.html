@@ -221,7 +221,7 @@
 
             let filter = audioCtx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(200 + speed * 150, audioCtx.currentTime);
+            filter.frequency.setValueAtTime(500 + speed * 150, audioCtx.currentTime);
 
             let gain = audioCtx.createGain();
             gain.gain.setValueAtTime(0.05 * (speed / 4), audioCtx.currentTime);
@@ -244,7 +244,7 @@
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.4);
 
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
 
             osc.connect(gain);
