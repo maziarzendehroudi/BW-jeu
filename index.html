@@ -250,7 +250,7 @@
             
             // --- VOLUME DU VENT ---
             // 0.05 = Volume maximum du vent (entre 0.0 et 1.0). Augmente pour entendre le vent plus fort.
-            let maxWindVolume = 0.05;
+            let maxWindVolume = 0.1;
             gain.gain.setValueAtTime(maxWindVolume * (speed / 4), audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + durationSeconds);
 
@@ -283,7 +283,7 @@
 
             // --- VOLUME DU FREIN ---
             // 0.15 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.15; 
+            let brakeVolume = 0.05; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
@@ -313,7 +313,7 @@
                 let batDuration = 0.1; // 0.1 seconde (cri très court)
                 
                 // --- VOLUME CHAUVE-SOURIS ---
-                let batVolume = 0.1; // Volume entre 0.0 et 1.0
+                let batVolume = 0.5; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(batStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(batEndFreq, audioCtx.currentTime + batDuration);
@@ -337,7 +337,7 @@
                 let birdDuration = 0.15; // 0.15 seconde
                 
                 // --- VOLUME OISEAUX ---
-                let birdVolume = 0.12; // Volume entre 0.0 et 1.0
+                let birdVolume = 0.05; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(birdStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(birdStartFreq * 1.5, audioCtx.currentTime + birdDuration);
@@ -369,7 +369,7 @@
             let crashDuration = 0.3; // 0.3 seconde
             
             // --- VOLUME DU CHOC ---
-            let crashVolume = 0.3; // Volume entre 0.0 et 1.0
+            let crashVolume = 0.1; // Volume entre 0.0 et 1.0
 
             osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
