@@ -298,7 +298,7 @@
             let gain = audioCtx.createGain();
 
             osc.type = 'square';
-            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(30, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.3);
 
             gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
