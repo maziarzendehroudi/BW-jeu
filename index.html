@@ -188,7 +188,6 @@
         #turbine-2 .blade { height: 85px; width: 9px; top: 0px; left: -4.5px; }
         #turbine-2 .blade:nth-child(1) { transform: rotate(0deg); } #turbine-2 .blade:nth-child(2) { transform: rotate(120deg); } #turbine-2 .blade:nth-child(3) { transform: rotate(240deg); }
 
-        /* HITBOX MAGIQUE : Rend le clic sur l'éolienne ultra-fluide et immanquable */
         .turbine-hitbox {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 120px; height: 220px; z-index: 20;
@@ -196,53 +195,81 @@
             cursor: pointer; pointer-events: auto;
         }
 
-        /* --- BOUTON D'ACTION CENTRAL (URGENCE) --- */
+        /* --- BOUTON D'ACTION CENTRAL ÉLÉGANT --- */
         .control-deck {
             position: absolute; bottom: 30px; left: 0; right: 0;
             display: flex; justify-content: center; align-items: center;
             z-index: 50; pointer-events: none; 
         }
         
+        .ultrasound-wrapper {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+
         .btn-action-global { 
             pointer-events: auto;
-            width: 90px; height: 90px; border-radius: 16px; /* Format carré arrondi */
-            border: 4px solid #facc15;
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: #1e293b; backdrop-filter: blur(8px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.8);
+            padding: 14px 40px; /* Même format que le bloc 'Jour' */
+            border-radius: 20px;
+            border: 2px solid #facc15;
+            cursor: pointer; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(8px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
             position: relative; overflow: hidden; 
             display: flex; align-items: center; justify-content: center;
+            z-index: 2; /* Au-dessus des ondes */
         }
         
         .btn-action-global:disabled { 
             cursor: not-allowed; opacity: 0.6; filter: grayscale(90%); border-color: #475569; 
         }
-        .btn-action-global:active:not(:disabled) { transform: scale(0.92); }
+        .btn-action-global:active:not(:disabled) { transform: scale(0.95); }
         
-        .btn-icon { font-size: 38px; z-index: 2; position: relative; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); pointer-events: none; }
+        .btn-icon { 
+            font-size: 18px; font-weight: 800; color: #facc15; letter-spacing: 1px;
+            z-index: 2; position: relative; text-shadow: 0 2px 4px rgba(0,0,0,0.8); 
+            pointer-events: none; display: flex; align-items: center; gap: 8px;
+        }
 
-        /* Remplissage bandes jaunes et noires type urgence */
+        /* Remplissage jaune/noir élégant et transparent */
         #us-progress { 
             position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
             background: repeating-linear-gradient(
                 -45deg,
-                #facc15,
-                #facc15 15px,
-                #000000 15px,
-                #000000 30px
+                rgba(250, 204, 21, 0.25),
+                rgba(250, 204, 21, 0.25) 15px,
+                rgba(0, 0, 0, 0.4) 15px,
+                rgba(0, 0, 0, 0.4) 30px
             );
-            opacity: 0.9;
             transition: height 0.2s linear; 
+            z-index: 1;
         }
 
-        #btn-ultrasound:not(:disabled) {
-            box-shadow: 0 0 25px rgba(250, 204, 21, 0.5), inset 0 0 15px rgba(250, 204, 21, 0.4);
-            animation: pulse-emergency 1.5s infinite alternate ease-in-out;
+        /* Animation Ondes Sonores (quand le bouton est prêt) */
+        .sound-waves {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 20px;
+            border: 2px solid #facc15;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1;
         }
         
-        @keyframes pulse-emergency { 
-            0% { transform: translateY(0) scale(1); filter: brightness(1); } 
-            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 35px rgba(250, 204, 21, 0.7), inset 0 0 20px rgba(250, 204, 21, 0.6); } 
+        #btn-ultrasound:not(:disabled) + .sound-waves {
+            animation: emit-sound 2s infinite ease-out;
+        }
+        
+        @keyframes emit-sound {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.3, 1.6); opacity: 0; border-width: 0; }
+        }
+
+        /* Effet interne au bouton quand il est prêt */
+        #btn-ultrasound:not(:disabled) {
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6), inset 0 0 15px rgba(250, 204, 21, 0.25);
         }
 
         /* --- OPTIMISATION MOBILE --- */
@@ -257,8 +284,9 @@
             .unit { font-size: 11px; }
 
             .control-deck { bottom: 20px; }
-            .btn-action-global { width: 80px; height: 80px; border-radius: 12px; border-width: 3px; }
-            .btn-icon { font-size: 32px; }
+            .btn-action-global { padding: 12px 30px; border-radius: 16px; }
+            .btn-icon { font-size: 15px; }
+            .sound-waves { border-radius: 16px; }
             
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
@@ -376,12 +404,15 @@
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
-        <!-- Bouton d'Action Central Unique -->
+        <!-- Bouton d'Action Central Élégant avec Ondes Sonores -->
         <div class="control-deck" onpointerdown="event.stopPropagation();">
-            <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
-                <div id="us-progress" style="height: 0%;"></div>
-                <span class="btn-icon">🦇</span>
-            </button>
+            <div class="ultrasound-wrapper">
+                <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
+                    <div id="us-progress" style="height: 0%;"></div>
+                    <span class="btn-icon">🔊 ULTRASONS</span>
+                </button>
+                <div class="sound-waves"></div>
+            </div>
         </div>
     </div>
 
@@ -451,7 +482,7 @@
     </div>
 
     <script>
-        let production = 0, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
+        let production = 100, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
         let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
         
@@ -609,7 +640,8 @@
                 totalEnergyProduced = loadedData.totalEnergyProduced;
                 ultrasoundCharge = loadedData.ultrasoundCharge;
             } else {
-                production = 20; 
+                // Modification : Démarrage avec l'énergie (production) pleine !
+                production = 100; 
                 biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
                 savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
                 ultrasoundCharge = 100; 
@@ -695,7 +727,8 @@
                 let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1);
                 gameTime += dt;
                 
-                let accelRate = 2.46 * dt; 
+                // Modification : Accélération x3.5 pour un freinage/démarrage très réactif
+                let accelRate = 8.5 * dt; 
                 
                 for (let i of [1, 2]) {
                     if (tSpeed[i] < targetSpeed[i]) {
