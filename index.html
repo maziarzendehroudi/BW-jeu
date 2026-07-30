@@ -292,9 +292,31 @@
         .stats-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         .btn-main { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 6px 0 #047857; transition: all 0.1s; width: 100%; margin-bottom: 10px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0 0 #047857; }
-        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; transition: background 0.2s; margin-bottom: 10px;}
         .btn-secondary:hover { background: rgba(255,255,255,0.2); }
         .hidden { display: none !important; pointer-events: none; }
+
+        /* --- NOUVEAUX MENUS & UI --- */
+        .input-name {
+            width: 100%; padding: 12px; margin-bottom: 15px;
+            border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4); color: white;
+            font-size: 16px; text-align: center; font-weight: bold; outline: none;
+            transition: border-color 0.3s;
+        }
+        .input-name:focus { border-color: #34d399; }
+        .input-name::placeholder { color: rgba(255, 255, 255, 0.5); font-weight: normal; }
+        
+        .btn-resume { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 6px 0 #b45309; }
+        .btn-resume:active { box-shadow: 0 0 0 #b45309; }
+        
+        .leaderboard-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 14px; }
+        .leaderboard-table th { color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 8px; text-align: center; }
+        .leaderboard-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        
+        .settings-list { text-align: left; margin-bottom: 20px; font-size: 16px; color: #cbd5e1; }
+        .settings-list label { display: block; margin-bottom: 15px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .settings-list input { transform: scale(1.5); accent-color: #34d399; }
     </style>
 </head>
 <body>
@@ -381,12 +403,45 @@
         <div class="menu-box">
             <h1>🦇 Bat&Watt</h1>
             <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale (Oiseaux de jour, Chauves-souris la nuit).</p>
+            
+            <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15">
+            
             <div class="stats-box">
                 <b>🏆 Meilleurs Scores :</b><br>
                 Jour max : <span id="menu-high-level">1</span><br>
                 Énergie max : <span id="menu-high-energy">0</span> kWh
             </div>
-            <button class="btn-main" onclick="startGame()">LANCER LA CENTRALE</button>
+            
+            <button class="btn-main btn-resume hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
+            <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
+            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Général</button>
+            <button class="btn-secondary" onclick="showSettings()">⚙️ Paramètres</button>
+        </div>
+    </div>
+
+    <!-- NOUVEAU MENU : CLASSEMENT -->
+    <div id="leaderboard-screen" class="screen hidden">
+        <div class="menu-box">
+            <h1>🏆 Classement</h1>
+            <table class="leaderboard-table">
+                <tbody id="leaderboard-list">
+                    <!-- Généré en JS -->
+                </tbody>
+            </table>
+            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
+        </div>
+    </div>
+
+    <!-- NOUVEAU MENU : PARAMÈTRES -->
+    <div id="settings-screen" class="screen hidden">
+        <div class="menu-box">
+            <h1>⚙️ Paramètres</h1>
+            <div class="settings-list">
+                <label><input type="checkbox" id="opt-music" onchange="toggleSetting('music')"> 🎵 Musique (Prochainement)</label>
+                <label><input type="checkbox" id="opt-sfx" onchange="toggleSetting('sfx')"> 🔊 Effets sonores (Prochainement)</label>
+                <label><input type="checkbox" id="opt-fx" onchange="toggleSetting('particles')"> ✨ Particules magiques</label>
+            </div>
+            <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
         </div>
     </div>
 
@@ -394,7 +449,8 @@
         <div class="menu-box">
             <h1>PAUSE</h1>
             <button class="btn-main" onclick="togglePause()">Reprendre</button>
-            <button class="btn-secondary" onclick="quitToMenu()">Quitter vers le Menu</button>
+            <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">💾 Sauvegarder et Quitter</button>
+            <button class="btn-secondary" onclick="quitToMenu()">Quitter sans Sauvegarder</button>
         </div>
     </div>
 
@@ -428,12 +484,36 @@
         document.getElementById('menu-high-level').innerText = highScores.maxLevel;
         document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
 
+        // --- GESTION NOUVEAUX MENUS & DONNÉES ---
+        let batWattLeaderboard = JSON.parse(localStorage.getItem('batWattLeaderboard')) || [];
+        let gameSettings = JSON.parse(localStorage.getItem('batWattSettings')) || { sfx: true, music: true, particles: true };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let lastPlayerName = localStorage.getItem('batWattLastPlayer') || "";
+            document.getElementById('player-name').value = lastPlayerName;
+            
+            document.getElementById('opt-music').checked = gameSettings.music;
+            document.getElementById('opt-sfx').checked = gameSettings.sfx;
+            document.getElementById('opt-fx').checked = gameSettings.particles;
+            
+            checkSavedGame();
+        });
+
         function saveScores() {
             if (currentLevel > highScores.maxLevel) highScores.maxLevel = currentLevel;
             if (totalEnergyProduced > highScores.maxEnergy) highScores.maxEnergy = totalEnergyProduced;
             localStorage.setItem('batWattScores', JSON.stringify(highScores));
             document.getElementById('menu-high-level').innerText = highScores.maxLevel;
             document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
+
+            // Ajout au nouveau Leaderboard
+            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
+            localStorage.setItem('batWattLastPlayer', pName);
+            
+            batWattLeaderboard.push({ name: pName, level: currentLevel, energy: Math.round(totalEnergyProduced) });
+            batWattLeaderboard.sort((a, b) => b.energy - a.energy);
+            batWattLeaderboard = batWattLeaderboard.slice(0, 5); // Conserver le top 5
+            localStorage.setItem('batWattLeaderboard', JSON.stringify(batWattLeaderboard));
         }
 
         window.addEventListener('keydown', (e) => {
@@ -451,32 +531,113 @@
             }
         }
 
+        // --- FONCTIONS DE NAVIGATION DES MENUS ---
+        function showStartScreen() {
+            document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('settings-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            checkSavedGame();
+        }
+
+        function showLeaderboard() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('leaderboard-screen').classList.remove('hidden');
+            
+            let tbody = document.getElementById('leaderboard-list');
+            tbody.innerHTML = `<tr><th>Joueur</th><th>Jour</th><th>Énergie</th></tr>`;
+            if (batWattLeaderboard.length === 0) {
+                tbody.innerHTML += `<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment</td></tr>`;
+            } else {
+                batWattLeaderboard.forEach(score => {
+                    tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.level}</td><td>${score.energy} kWh</td></tr>`;
+                });
+            }
+        }
+
+        function showSettings() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('settings-screen').classList.remove('hidden');
+        }
+
+        function toggleSetting(key) {
+            gameSettings[key] = !gameSettings[key];
+            localStorage.setItem('batWattSettings', JSON.stringify(gameSettings));
+        }
+
+        // --- FONCTIONS DE SAUVEGARDE ET CHARGEMENT ---
+        function saveCurrentGame() {
+            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
+            let state = {
+                playerName: pName,
+                production, biodiversityPercent, levelTime, currentLevel, gameTime,
+                savedFauna, injuredFauna, totalEnergyProduced,
+                ultrasoundCharge, scareCharge
+            };
+            localStorage.setItem('batWattSaveGame', JSON.stringify(state));
+            alert("✅ Partie sauvegardée avec succès !");
+            quitToMenu();
+        }
+
+        function loadGame() {
+            let save = JSON.parse(localStorage.getItem('batWattSaveGame'));
+            if(save) {
+                document.getElementById('player-name').value = save.playerName || "Anonyme";
+                startGame(save);
+            }
+        }
+
+        function checkSavedGame() {
+            let save = localStorage.getItem('batWattSaveGame');
+            if(save) {
+                document.getElementById('btn-load').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-load').classList.add('hidden');
+            }
+        }
+
         function quitToMenu() {
             isPlaying = false; isPaused = false;
             cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
             document.querySelectorAll('.creature').forEach(c => c.remove());
             document.getElementById('pause-screen').classList.add('hidden');
             document.getElementById('gameover-screen').classList.add('hidden');
-            document.getElementById('start-screen').classList.remove('hidden');
+            showStartScreen();
         }
 
-        function startGame() {
+        function startGame(loadedData = null) {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('pause-screen').classList.add('hidden');
             document.getElementById('gameover-screen').classList.add('hidden');
             document.querySelectorAll('.creature').forEach(c => c.remove());
             
-            production = 20; 
-            biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
-            savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
+            // Conservation du nom
+            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
+            localStorage.setItem('batWattLastPlayer', pName);
             
-            // Réinitialisation des deux charges
-            ultrasoundCharge = 100; 
-            scareCharge = 100;
-            document.getElementById('us-progress').style.height = '100%';
-            document.getElementById('scare-progress').style.height = '100%';
-            document.getElementById('btn-ultrasound').disabled = false;
-            document.getElementById('btn-scare').disabled = false;
+            // Initialisation conditionnelle (Nouvelle partie ou Chargement)
+            if (loadedData && loadedData.currentLevel) {
+                production = loadedData.production;
+                biodiversityPercent = loadedData.biodiversityPercent;
+                levelTime = loadedData.levelTime;
+                currentLevel = loadedData.currentLevel;
+                gameTime = loadedData.gameTime;
+                savedFauna = loadedData.savedFauna;
+                injuredFauna = loadedData.injuredFauna;
+                totalEnergyProduced = loadedData.totalEnergyProduced;
+                ultrasoundCharge = loadedData.ultrasoundCharge;
+                scareCharge = loadedData.scareCharge;
+            } else {
+                production = 20; 
+                biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
+                savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
+                ultrasoundCharge = 100; 
+                scareCharge = 100;
+            }
+            
+            document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
+            document.getElementById('scare-progress').style.height = scareCharge + '%';
+            document.getElementById('btn-ultrasound').disabled = ultrasoundCharge < 100;
+            document.getElementById('btn-scare').disabled = scareCharge < 100;
 
             curtailed = { 1: false, 2: false };
             tSpeed = { 1: 4, 2: 4.5 };
@@ -853,6 +1014,9 @@
             isPlaying = false;
             cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
             saveScores();
+            
+            // Efface la sauvegarde de la partie en cours puisqu'elle est terminée
+            localStorage.removeItem('batWattSaveGame');
             
             document.querySelectorAll('.creature').forEach(b => b.remove());
             document.getElementById('final-stats').innerHTML = 
