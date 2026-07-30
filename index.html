@@ -35,9 +35,10 @@
 
         /* --- HUD --- */
         .top-hud { position: absolute; top: 0; left: 0; width: 100%; padding: 30px 20px 0; z-index: 40; pointer-events: none; display: flex; align-items: center; justify-content: space-between; gap: 0; }
-        .hud-side { flex-grow: 1; position: relative; height: 12px; display: flex; align-items: center; }
+        .hud-side { flex-grow: 1; position: relative; height: 12px; display: flex; align-items: center; transition: transform 0.5s ease; }
         #battery-container { margin-right: -15px; } #bio-container { margin-left: -15px; }
-        .modern-track { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); pointer-events: auto; transition: transform 0.2s, box-shadow 0.2s; }
+        
+        .modern-track { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.15); pointer-events: auto; transition: transform 0.2s, box-shadow 0.5s ease, background 0.5s ease; }
         #battery-container .modern-track { border-radius: 6px 0 0 6px; display: flex; justify-content: flex-end; }
         #bio-container .modern-track { border-radius: 0 6px 6px 0; }
         .modern-fill { height: 100%; border-radius: inherit; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
@@ -45,12 +46,22 @@
         .bio-fill { background: linear-gradient(to right, #ef4444, #10b981); box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 0 5px rgba(16, 185, 129, 0.5); }
         .hud-stats { position: absolute; top: 24px; display: flex; align-items: center; gap: 6px; font-size: 24px; font-weight: 900; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.9); transition: all 0.3s ease; }
         #battery-container .hud-stats { left: 0; } #bio-container .hud-stats { right: 0; }
+        
+        /* --- ANIMATIONS URGENCE JAUGE --- */
+        .danger-50 { animation: pulseAlert50 1.5s infinite ease-in-out; }
+        .danger-25 { animation: pulseAlert25 0.75s infinite ease-in-out; }
+        @keyframes pulseAlert50 { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+        @keyframes pulseAlert25 { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+        .danger-50 .modern-track { background: rgba(153, 27, 27, 0.7); box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 0 12px rgba(239, 68, 68, 0.5); }
+        .danger-25 .modern-track { background: rgba(220, 38, 38, 0.8); box-shadow: inset 0 2px 4px rgba(0,0,0,0.9), 0 0 20px rgba(239, 68, 68, 0.9); }
+
         .hud-icon { font-size: 18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); } .unit { font-size: 14px; font-weight: 700; color: #cbd5e1; }
         .hud-center { display: flex; flex-direction: column; align-items: center; justify-content: center; background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5), inset 0 2px 4px rgba(255,255,255,0.3); color: white; padding: 14px 40px; border-radius: 20px; pointer-events: auto; position: relative; z-index: 50; flex-shrink: 0; }
         .day-text { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: -4px; }
         .day-num { font-size: 54px; font-weight: 900; line-height: 1; }
+        
         .level-up-anim { animation: dayUpSpectacular 2s forwards; }
-        @keyframes dayUpSpectacular { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.6) translateY(8px); filter: brightness(2) drop-shadow(0 0 30px #f59e0b); color: #ffffff; } 100% { transform: scale(1); filter: brightness(1); } }
+        @keyframes dayUpSpectacular { 0% { transform: scale(1) rotate(0deg); filter: brightness(1); } 20% { transform: scale(1.3) translateY(2px) rotate(-5deg); filter: brightness(1.5); } 50% { transform: scale(1.8) translateY(12px) rotate(5deg); filter: brightness(2.5) drop-shadow(0 0 40px #f59e0b); color: #ffffff; text-shadow: 0 0 20px #fbbf24, 0 0 40px #ea580c; } 80% { transform: scale(1.3) translateY(2px) rotate(-3deg); filter: brightness(1.5); } 100% { transform: scale(1) rotate(0deg); filter: brightness(1); } }
 
         /* --- ÉOLIENNES --- */
         .wind-turbine { position: absolute; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: filter 0.2s; pointer-events: none; }
@@ -80,7 +91,7 @@
         .sp-eagle .body { background: #8b5a2b; } .sp-eagle .body::after { background: #facc15; } .sp-eagle .wing { background: #654321; }
         .sp-pigeon .body { background: #94a3b8; } .sp-pigeon .body::after { background: #cbd5e1; } .sp-pigeon .wing { background: #64748b; }
         .sp-crow .body { background: #1e293b; } .sp-crow .body::after { background: #0f172a; } .sp-crow .wing { background: #020617; }
-        .sp-parrot .body { background: #ef4444; } .sp-parrot .body::after { background: #eab308; } .sp-parrot .wing { background: #3b82f6; }
+        .sp-parrot .body { background: #855c41; } .sp-parrot .body::after { background: #ea580c; } .sp-parrot .wing { background: #5c3a21; }
 
         .bat .body { width: 12px; height: 22px; background: #1e293b; border-radius: 40% 40% 60% 60%; position: absolute; left: -6px; top: -11px; z-index: 2; }
         .bat .body::before { content:''; position:absolute; top:-4px; left:2px; width:8px; height:6px; background: #1e293b; clip-path: polygon(0 100%, 50% 0, 100% 100%); }
@@ -265,14 +276,14 @@
             
             // --- DURÉE DU FREINAGE ---
             // 0.4 = Durée en secondes du grincement de freinage
-            let brakeDuration = 0.2; 
+            let brakeDuration = 0.4; 
 
             osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + brakeDuration);
 
             // --- VOLUME DU FREIN ---
-            // 0.01 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.01; 
+            // 0.15 = Volume du frein (entre 0.0 et 1.0)
+            let brakeVolume = 0.15; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
@@ -358,7 +369,7 @@
             let crashDuration = 0.3; // 0.3 seconde
             
             // --- VOLUME DU CHOC ---
-            let crashVolume = 0.05; // Volume entre 0.0 et 1.0
+            let crashVolume = 0.3; // Volume entre 0.0 et 1.0
 
             osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
@@ -388,7 +399,7 @@
             let alarmDuration = 0.2; // 0.2 seconde
             
             // --- VOLUME DE L'ALARME ---
-            let alarmVolume = 0.2; // Volume modéré pour ne pas agacer le joueur (0.0 à 1.0)
+            let alarmVolume = 0.08; // Volume modéré pour ne pas agacer le joueur (0.0 à 1.0)
 
             osc.frequency.setValueAtTime(alarmHighFreq, audioCtx.currentTime);
             osc.frequency.setValueAtTime(alarmLowFreq, audioCtx.currentTime + 0.1);
