@@ -196,59 +196,53 @@
             cursor: pointer; pointer-events: auto;
         }
 
-        /* --- BOUTONS D'ACTION RONDS (FABs) --- */
+        /* --- BOUTON D'ACTION CENTRAL (URGENCE) --- */
         .control-deck {
             position: absolute; bottom: 30px; left: 0; right: 0;
-            display: flex; justify-content: center; align-items: center; gap: 30px;
+            display: flex; justify-content: center; align-items: center;
             z-index: 50; pointer-events: none; 
         }
         
         .btn-action-global { 
             pointer-events: auto;
-            width: 72px; height: 72px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.1);
+            width: 90px; height: 90px; border-radius: 16px; /* Format carré arrondi */
+            border: 4px solid #facc15;
             cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; 
+            background: #1e293b; backdrop-filter: blur(8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(0,0,0,0.8);
+            position: relative; overflow: hidden; 
             display: flex; align-items: center; justify-content: center;
         }
         
-        .btn-action-global:disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(80%); }
-        .btn-action-global:active:not(:disabled) { transform: scale(0.9); }
+        .btn-action-global:disabled { 
+            cursor: not-allowed; opacity: 0.6; filter: grayscale(90%); border-color: #475569; 
+        }
+        .btn-action-global:active:not(:disabled) { transform: scale(0.92); }
         
-        .btn-icon { font-size: 32px; z-index: 2; position: relative; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); pointer-events: none; }
+        .btn-icon { font-size: 38px; z-index: 2; position: relative; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); pointer-events: none; }
 
-        /* Style spécifique ULTRASONS (Jaune) */
-        #btn-ultrasound:not(:disabled) {
-            border-color: #facc15;
-            box-shadow: 0 0 20px rgba(250, 204, 21, 0.3), inset 0 0 15px rgba(250, 204, 21, 0.3);
-            animation: float-us 2s infinite alternate ease-in-out;
-        }
-        @keyframes float-us { 
-            0% { transform: translateY(0) scale(1); filter: brightness(1); } 
-            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 30px rgba(250, 204, 21, 0.6), inset 0 0 20px rgba(250, 204, 21, 0.6); } 
-        }
-        
+        /* Remplissage bandes jaunes et noires type urgence */
         #us-progress { 
             position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
-            background: linear-gradient(to top, #ca8a04, #facc15); opacity: 0.85;
+            background: repeating-linear-gradient(
+                -45deg,
+                #facc15,
+                #facc15 15px,
+                #000000 15px,
+                #000000 30px
+            );
+            opacity: 0.9;
             transition: height 0.2s linear; 
         }
 
-        /* Style spécifique EFFAROUCHAGE (Orange) */
-        #btn-scare:not(:disabled) {
-            border-color: #f97316;
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.3), inset 0 0 15px rgba(249, 115, 22, 0.3);
-            animation: float-scare 2s infinite alternate ease-in-out;
+        #btn-ultrasound:not(:disabled) {
+            box-shadow: 0 0 25px rgba(250, 204, 21, 0.5), inset 0 0 15px rgba(250, 204, 21, 0.4);
+            animation: pulse-emergency 1.5s infinite alternate ease-in-out;
         }
-        @keyframes float-scare { 
+        
+        @keyframes pulse-emergency { 
             0% { transform: translateY(0) scale(1); filter: brightness(1); } 
-            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.6), inset 0 0 20px rgba(249, 115, 22, 0.6); } 
-        }
-
-        #scare-progress { 
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; 
-            background: linear-gradient(to top, #c2410c, #f97316); opacity: 0.85;
-            transition: height 0.2s linear; 
+            100% { transform: translateY(-4px) scale(1.05); filter: brightness(1.2); box-shadow: 0 10px 35px rgba(250, 204, 21, 0.7), inset 0 0 20px rgba(250, 204, 21, 0.6); } 
         }
 
         /* --- OPTIMISATION MOBILE --- */
@@ -262,9 +256,9 @@
             .hud-icon { font-size: 14px; }
             .unit { font-size: 11px; }
 
-            .control-deck { bottom: 20px; gap: 20px; }
-            .btn-action-global { width: 64px; height: 64px; }
-            .btn-icon { font-size: 28px; }
+            .control-deck { bottom: 20px; }
+            .btn-action-global { width: 80px; height: 80px; border-radius: 12px; border-width: 3px; }
+            .btn-icon { font-size: 32px; }
             
             #turbine-1 { bottom: 115px; }
             #turbine-2 { bottom: 135px; }
@@ -330,7 +324,6 @@
         
         <div id="moon-body" class="celestial moon">
             <svg viewBox="0 0 52 52" width="100%" height="100%">
-                <!-- Le cache sombre (cercle de fond) a été supprimé -->
                 <path d="M26,0 A26,26 0 0,1 26,52 A14,26 0 0,0 26,0 Z" fill="#f1f5f9" />
             </svg>
         </div>
@@ -372,7 +365,6 @@
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-1">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
-            <!-- Hitbox magique pour clic parfait -->
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(1); event.stopPropagation();" onpointerup="resetTurbineClick(1);" onpointercancel="resetTurbineClick(1);" onpointerout="resetTurbineClick(1);"></div>
         </div>
 
@@ -381,19 +373,14 @@
             <div class="nacelle"><div class="hub"><div class="blades-container" id="blades-2">
                 <div class="blade"></div><div class="blade"></div><div class="blade"></div>
             </div></div></div>
-            <!-- Hitbox magique pour clic parfait -->
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
-        <!-- Boutons d'Action Ronds -->
+        <!-- Bouton d'Action Central Unique -->
         <div class="control-deck" onpointerdown="event.stopPropagation();">
             <button class="btn-action-global" id="btn-ultrasound" onclick="triggerUltrasound()">
                 <div id="us-progress" style="height: 0%;"></div>
                 <span class="btn-icon">🦇</span>
-            </button>
-            <button class="btn-action-global" id="btn-scare" onclick="triggerScare()">
-                <div id="scare-progress" style="height: 0%;"></div>
-                <span class="btn-icon">🦅</span>
             </button>
         </div>
     </div>
@@ -402,7 +389,7 @@
     <div id="start-screen" class="screen">
         <div class="menu-box">
             <h1>🦇 Bat&Watt</h1>
-            <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale (Oiseaux de jour, Chauves-souris la nuit).</p>
+            <p>Régulez la production électrique de vos éoliennes tout en préservant la faune locale.</p>
             
             <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15">
             
@@ -414,12 +401,12 @@
             
             <button class="btn-main btn-resume hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
-            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Général</button>
+            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Local</button>
             <button class="btn-secondary" onclick="showSettings()">⚙️ Paramètres</button>
         </div>
     </div>
 
-    <!-- NOUVEAU MENU : CLASSEMENT -->
+    <!-- MENU CLASSEMENT -->
     <div id="leaderboard-screen" class="screen hidden">
         <div class="menu-box">
             <h1>🏆 Classement</h1>
@@ -432,7 +419,7 @@
         </div>
     </div>
 
-    <!-- NOUVEAU MENU : PARAMÈTRES -->
+    <!-- MENU PARAMÈTRES -->
     <div id="settings-screen" class="screen hidden">
         <div class="menu-box">
             <h1>⚙️ Paramètres</h1>
@@ -475,8 +462,7 @@
         let isNight = false;
         let savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
         
-        let ultrasoundCharge = 100; // Charge Chauves-souris
-        let scareCharge = 100;      // Charge Oiseaux
+        let ultrasoundCharge = 100; // Charge unique pour le bouton central
         
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
@@ -506,7 +492,7 @@
             document.getElementById('menu-high-level').innerText = highScores.maxLevel;
             document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
 
-            // Ajout au nouveau Leaderboard
+            // Ajout au Classement Local
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             localStorage.setItem('batWattLastPlayer', pName);
             
@@ -524,7 +510,6 @@
             if (e.key === 'Escape') togglePause();
         });
 
-        // La pause ne s'active que si on clique dans la MOITIÉ HAUTE de l'écran
         function handleContainerClick(e) { 
             if (isPlaying && e.clientY < (window.innerHeight / 2)) {
                 togglePause(); 
@@ -571,7 +556,7 @@
                 playerName: pName,
                 production, biodiversityPercent, levelTime, currentLevel, gameTime,
                 savedFauna, injuredFauna, totalEnergyProduced,
-                ultrasoundCharge, scareCharge
+                ultrasoundCharge
             };
             localStorage.setItem('batWattSaveGame', JSON.stringify(state));
             alert("✅ Partie sauvegardée avec succès !");
@@ -610,11 +595,9 @@
             document.getElementById('gameover-screen').classList.add('hidden');
             document.querySelectorAll('.creature').forEach(c => c.remove());
             
-            // Conservation du nom
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             localStorage.setItem('batWattLastPlayer', pName);
             
-            // Initialisation conditionnelle (Nouvelle partie ou Chargement)
             if (loadedData && loadedData.currentLevel) {
                 production = loadedData.production;
                 biodiversityPercent = loadedData.biodiversityPercent;
@@ -625,19 +608,15 @@
                 injuredFauna = loadedData.injuredFauna;
                 totalEnergyProduced = loadedData.totalEnergyProduced;
                 ultrasoundCharge = loadedData.ultrasoundCharge;
-                scareCharge = loadedData.scareCharge;
             } else {
                 production = 20; 
                 biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0;
                 savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0;
                 ultrasoundCharge = 100; 
-                scareCharge = 100;
             }
             
             document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
-            document.getElementById('scare-progress').style.height = scareCharge + '%';
             document.getElementById('btn-ultrasound').disabled = ultrasoundCharge < 100;
-            document.getElementById('btn-scare').disabled = scareCharge < 100;
 
             curtailed = { 1: false, 2: false };
             tSpeed = { 1: 4, 2: 4.5 };
@@ -683,7 +662,7 @@
                 let addedKwh = addedPower * 1.5;
                 totalEnergyProduced += addedKwh;
                 
-                // Rechargement Ultrasons (Chauves-souris)
+                // Rechargement Ultrasons (Bouton Central)
                 if (ultrasoundCharge < 100) {
                     ultrasoundCharge += addedKwh;
                     if (ultrasoundCharge >= 100) {
@@ -691,16 +670,6 @@
                         document.getElementById('btn-ultrasound').disabled = false;
                     }
                     document.getElementById('us-progress').style.height = ultrasoundCharge + '%';
-                }
-                
-                // Rechargement Effarouchage (Oiseaux)
-                if (scareCharge < 100) {
-                    scareCharge += addedKwh;
-                    if (scareCharge >= 100) {
-                        scareCharge = 100;
-                        document.getElementById('btn-scare').disabled = false;
-                    }
-                    document.getElementById('scare-progress').style.height = scareCharge + '%';
                 }
             } else {
                 production += addedPower;
@@ -779,7 +748,6 @@
 
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
             
-            // Trajectoire abaissée pour passer bien en dessous des barres du haut
             let sunEl = document.getElementById('sun-body');
             sunEl.style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`;
             sunEl.style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
@@ -840,41 +808,8 @@
                 setTimeout(() => turbine.style.filter = "none", 400);
             });
 
-            // Ne cible que les chauves-souris
+            // Ne cible que les chauves-souris (les oiseaux restent esquivables uniquement via le curtailment)
             document.querySelectorAll('.creature.bat-icon').forEach(creature => {
-                if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
-                creature.classList.add('fleeing');
-                savedFauna++;
-                updateBiodiversity();
-                
-                let rect = creature.getBoundingClientRect();
-                showFeedback("💚", rect.left, rect.top, true);
-                setTimeout(() => creature.remove(), 600);
-            });
-            updateUI();
-        }
-
-        // Action : Repousser uniquement les Oiseaux
-        function triggerScare() {
-            if (!isPlaying || isPaused || production < 30 || scareCharge < 100) return;
-            
-            production -= 30;
-            scareCharge = 0;
-            
-            document.getElementById('scare-progress').style.height = '0%';
-            document.getElementById('btn-scare').disabled = true;
-
-            let fillEl = document.getElementById('battery-fill');
-            fillEl.classList.add('power-drain'); setTimeout(() => fillEl.classList.remove('power-drain'), 400);
-
-            [1, 2].forEach(id => {
-                let turbine = document.getElementById(`turbine-${id}`);
-                turbine.style.filter = "drop-shadow(0 0 20px #f97316)"; // Halo Orange
-                setTimeout(() => turbine.style.filter = "none", 400);
-            });
-
-            // Ne cible que les oiseaux
-            document.querySelectorAll('.creature.bird-icon').forEach(creature => {
                 if (creature.classList.contains('crashing') || creature.classList.contains('fleeing')) return;
                 creature.classList.add('fleeing');
                 savedFauna++;
@@ -1015,7 +950,6 @@
             cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval);
             saveScores();
             
-            // Efface la sauvegarde de la partie en cours puisqu'elle est terminée
             localStorage.removeItem('batWattSaveGame');
             
             document.querySelectorAll('.creature').forEach(b => b.remove());
