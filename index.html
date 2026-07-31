@@ -175,9 +175,12 @@
                 Jour max : <span id="menu-high-level">1</span><br>
                 Énergie max : <span id="menu-high-energy">0</span> kWh
             </div>
+            
+            <button id="btn-install" class="btn-main hidden" onclick="installPWA()" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top:15px; margin-bottom: 15px;">📲 Installer le Jeu</button>
             <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
             <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Local</button>
+            <button class="btn-secondary" onclick="showAudioSettings()">🎛️ Paramètres Audio</button>
         </div>
     </div>
 
@@ -194,6 +197,7 @@
             <h1>PAUSE</h1>
             <button class="btn-main" onclick="togglePause()">Reprendre</button>
             <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">💾 Sauvegarder et Quitter</button>
+            <button class="btn-secondary" onclick="showAudioSettings()" style="margin-bottom: 10px;">🎛️ Paramètres Audio</button>
             <button class="btn-secondary" onclick="quitToMenu()">Quitter sans Sauvegarder</button>
         </div>
     </div>
@@ -207,7 +211,77 @@
         </div>
     </div>
 
+    <!-- Paramètres Audio Avancés -->
+    <div id="audio-settings-screen" class="screen hidden">
+        <div class="menu-box" style="max-height: 95vh; overflow-y: auto;">
+            <h1>🎛️ Sons Avancés</h1>
+            <p style="font-size: 13px; margin-bottom: 15px; color: #cbd5e1;">Configurez les différents canaux sonores.</p>
+
+            <select id="audio-slot-select" class="input-name" onchange="loadAudioSlot(this.value)">
+                <option value="0">Canal 1 (Vent par défaut)</option>
+                <option value="1">Canal 2 (Frein par défaut)</option>
+                <option value="2">Canal 3 (Chauve-souris par défaut)</option>
+                <option value="3">Canal 4 (Oiseau par défaut)</option>
+                <option value="4">Canal 5 (Crash par défaut)</option>
+                <option value="5">Canal 6 (Alarme par défaut)</option>
+                <option value="6">Canal 7 (Jour Sup. par défaut)</option>
+            </select>
+
+            <div style="text-align: left; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                <label><b>Événement / Action :</b></label><br>
+                <select id="audio-action" class="input-name" style="padding: 8px; margin: 5px 0 15px;">
+                    <option value="wind">Vent Continu</option>
+                    <option value="brake">Freinage Mécanique</option>
+                    <option value="bat">Cri Chauve-souris</option>
+                    <option value="bird">Cri Oiseau</option>
+                    <option value="crash">Impact / Crash</option>
+                    <option value="alarm">Alarme Danger</option>
+                    <option value="dayup">Niveau Supérieur</option>
+                    <option value="none">-- Désactivé --</option>
+                </select>
+
+                <label><b>Type de son :</b></label><br>
+                <select id="audio-type" class="input-name" style="padding: 8px; margin: 5px 0 15px;">
+                    <option value="sine">Sine (Doux)</option>
+                    <option value="square">Square (Rétro 8-bit)</option>
+                    <option value="sawtooth">Sawtooth (Mordant)</option>
+                    <option value="triangle">Triangle (Flûté)</option>
+                    <option value="noise">Bruit Blanc (Souffle)</option>
+                </select>
+
+                <label><b>Durée :</b> <span id="val-duration">0.3</span> s</label><br>
+                <input type="range" id="audio-duration" min="0.05" max="2" step="0.05" style="width: 100%; margin: 5px 0 15px;" oninput="document.getElementById('val-duration').innerText = this.value">
+
+                <label><b>Fréquence (Base) :</b> <span id="val-freq">200</span> Hz</label><br>
+                <input type="range" id="audio-freq" min="20" max="3000" step="10" style="width: 100%; margin: 5px 0 15px;" oninput="document.getElementById('val-freq').innerText = this.value">
+
+                <label><b>Volume :</b> <span id="val-volume">0.1</span></label><br>
+                <input type="range" id="audio-volume" min="0" max="1" step="0.01" style="width: 100%; margin: 5px 0 10px;" oninput="document.getElementById('val-volume').innerText = this.value">
+            </div>
+
+            <button class="btn-main" onclick="testCurrentSlot()" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">▶️ TESTER CE CANAL</button>
+            <button class="btn-main" onclick="saveAudioSettings()">💾 ENREGISTRER</button>
+            <button class="btn-secondary" onclick="resetAudioSettings()">Réinitialiser par défaut</button>
+            <button class="btn-secondary" onclick="closeAudioSettings()">Annuler / Retour</button>
+        </div>
+    </div>
+
     <script>
+        // =========================================================================
+        // --- DATA STRUCTURE: PARAMÉTRAGE AUDIO AVANCÉ ---
+        // =========================================================================
+        let defaultSounds = [
+            { id: 1, action: 'wind', type: 'noise', duration: 0.3, freq: 200, volume: 0.1 },
+            { id: 2, action: 'brake', type: 'sawtooth', duration: 0.4, freq: 150, volume: 0.01 },
+            { id: 3, action: 'bat', type: 'sine', duration: 0.1, freq: 2200, volume: 1.0 },
+            { id: 4, action: 'bird', type: 'triangle', duration: 0.15, freq: 800, volume: 0.05 },
+            { id: 5, action: 'crash', type: 'square', duration: 0.3, freq: 100, volume: 0.5 },
+            { id: 6, action: 'alarm', type: 'sine', duration: 0.2, freq: 880, volume: 0.2 },
+            { id: 7, action: 'dayup', type: 'triangle', duration: 0.3, freq: 523.25, volume: 0.2 }
+        ];
+        let customSounds = JSON.parse(localStorage.getItem('bwCustomSounds')) || JSON.parse(JSON.stringify(defaultSounds));
+        let currentEditingSlot = 0;
+
         // =========================================================================
         // --- SYNTHÉTISEUR AUDIO WEB AUDIO API (DOCUMENTATION & CONFIGURATION) ---
         // =========================================================================
@@ -222,234 +296,362 @@
             }
         }
 
+        // --- GÉNÉRATEUR GÉNÉRIQUE DE BRUIT BLANC (POUR LES TYPES "NOISE" HORS-VENT) ---
+        function generateGenericNoise(config) {
+            let bufferSize = Math.max(1, audioCtx.sampleRate * config.duration);
+            let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            let data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            let noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            let filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(config.freq, audioCtx.currentTime);
+            let gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(config.volume, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + config.duration);
+            noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            noise.start();
+        }
+
         // 1. SOUND EFFECT : Bruit du vent continu dans les pales d'éolienne
         function playWindSound(speed) {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            
-            // --- DURÉE DU SOUFFLE ---
-            // 0.3 = durée en secondes de chaque impulsion sonore du vent
-            let durationSeconds = 0.3; 
-            let bufferSize = audioCtx.sampleRate * durationSeconds;
-            
-            let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            let data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; // Génération du bruit blanc
+            customSounds.filter(s => s.action === 'wind').forEach(config => {
+                if (config.type === 'noise') {
+                    // --- DURÉE DU SOUFFLE ---
+                    let durationSeconds = config.duration; 
+                    let bufferSize = audioCtx.sampleRate * durationSeconds;
+                    
+                    let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    let data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1; // Génération du bruit blanc
 
-            let noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
+                    let noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
 
-            let filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            
-            // --- FRÉQUENCE DU VENT ---
-            // 200 = fréquence de base (en Hz), 150 = facteur de vitesse.
-            // Augmente 200 (ex: 500) pour un vent aigu/sifflant, baisse (ex: 100) pour un vent sourd.
-            let baseWindFreq = 200;
-            filter.frequency.setValueAtTime(baseWindFreq + speed * 150, audioCtx.currentTime);
+                    let filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    
+                    // --- FRÉQUENCE DU VENT ---
+                    let baseWindFreq = config.freq;
+                    filter.frequency.setValueAtTime(baseWindFreq + speed * 150, audioCtx.currentTime);
 
-            let gain = audioCtx.createGain();
-            
-            // --- VOLUME DU VENT ---
-            // 0.05 = Volume maximum du vent (entre 0.0 et 1.0). Augmente pour entendre le vent plus fort.
-            let maxWindVolume = 0.1;
-            gain.gain.setValueAtTime(maxWindVolume * (speed / 4), audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + durationSeconds);
+                    let gain = audioCtx.createGain();
+                    
+                    // --- VOLUME DU VENT ---
+                    let maxWindVolume = config.volume;
+                    gain.gain.setValueAtTime(maxWindVolume * (speed / 4), audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + durationSeconds);
 
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
 
-            noise.start();
+                    noise.start();
+                } else {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = config.type;
+                    osc.frequency.setValueAtTime(config.freq + speed * 10, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(config.volume * (speed / 4), audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + config.duration);
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.start(); osc.stop(audioCtx.currentTime + config.duration);
+                }
+            });
         }
 
         // 2. SOUND EFFECT : Frein mécanique lors du clic sur l'éolienne
         function playBrakeSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
+            customSounds.filter(s => s.action === 'brake').forEach(config => {
+                if (config.type === 'noise') { generateGenericNoise(config); return; }
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
 
-            osc.type = 'sawtooth'; // Forme d'onde : 'sawtooth' (mordant), 'sine' (doux), 'square' (rétro)
-            
-            // --- FRÉQUENCE DU FREIN ---
-            // 150 = Fréquence de départ (Hz) | 40 = Fréquence de fin (Hz) [Effet de ralentissement]
-            let startFreq = 150;
-            let endFreq = 40;
-            
-            // --- DURÉE DU FREINAGE ---
-            // 0.4 = Durée en secondes du grincement de freinage
-            let brakeDuration = 0.4; 
+                osc.type = config.type; // Forme d'onde : 'sawtooth' (mordant), 'sine' (doux), 'square' (rétro)
+                
+                // --- FRÉQUENCE DU FREIN ---
+                let startFreq = config.freq;
+                let endFreq = config.freq * (40/150); // Maintien du ratio d'effet de ralentissement
+                
+                // --- DURÉE DU FREINAGE ---
+                let brakeDuration = config.duration; 
 
-            osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + brakeDuration);
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + brakeDuration);
 
-            // --- VOLUME DU FREIN ---
-            // 0.15 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.01; 
-            gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
+                // --- VOLUME DU FREIN ---
+                let brakeVolume = config.volume; 
+                gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
 
-            osc.start();
-            osc.stop(audioCtx.currentTime + brakeDuration);
+                osc.start();
+                osc.stop(audioCtx.currentTime + brakeDuration);
+            });
         }
 
         // 3. SOUND EFFECT : Cris des Animaux (Chauves-souris & Oiseaux)
         function playAnimalSound(type, speciesClass) {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
+            let actionTarget = type === 'bat' ? 'bat' : 'bird';
+            
+            customSounds.filter(s => s.action === actionTarget).forEach(config => {
+                if (config.type === 'noise') { generateGenericNoise(config); return; }
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
 
-            if (type === 'bat') {
-                // --- CRIS CHAUVE-SOURIS ---
-                osc.type = 'sine';
-                
-                // --- FRÉQUENCE CHAUVE-SOURIS ---
-                // 2200 Hz -> 1200 Hz (Ultrason aigu glissant)
-                let batStartFreq = 2200; 
-                let batEndFreq = 1200;
-                
-                // --- DURÉE CHAUVE-SOURIS ---
-                let batDuration = 0.1; // 0.1 seconde (cri très court)
-                
-                // --- VOLUME CHAUVE-SOURIS ---
-                let batVolume = 1.0; // Volume entre 0.0 et 1.0
+                if (type === 'bat') {
+                    // --- CRIS CHAUVE-SOURIS ---
+                    osc.type = config.type;
+                    
+                    // --- FRÉQUENCE CHAUVE-SOURIS ---
+                    let batStartFreq = config.freq; 
+                    let batEndFreq = config.freq * (1200/2200); // Maintien ratio aigu glissant
+                    
+                    // --- DURÉE CHAUVE-SOURIS ---
+                    let batDuration = config.duration; 
+                    
+                    // --- VOLUME CHAUVE-SOURIS ---
+                    let batVolume = config.volume; 
 
-                osc.frequency.setValueAtTime(batStartFreq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(batEndFreq, audioCtx.currentTime + batDuration);
-                gain.gain.setValueAtTime(batVolume, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + batDuration);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + batDuration);
-            } else {
-                // --- CRIS OISEAUX ---
-                osc.type = 'triangle';
-                
-                // --- FRÉQUENCES PAR ESPÈCE D'OISEAU (Hz) ---
-                let birdStartFreq = 800; // Valeur par défaut
-                if (speciesClass === 'sp-eagle') birdStartFreq = 1200;  // Aigle (Aigu)
-                else if (speciesClass === 'sp-pigeon') birdStartFreq = 450; // Pigeon (Grave / Sourd)
-                else if (speciesClass === 'sp-crow') birdStartFreq = 300;   // Corbeau (Très grave)
-                else if (speciesClass === 'sp-parrot') birdStartFreq = 1500; // Perroquet (Strident)
+                    osc.frequency.setValueAtTime(batStartFreq, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(batEndFreq, audioCtx.currentTime + batDuration);
+                    gain.gain.setValueAtTime(batVolume, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + batDuration);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + batDuration);
+                } else {
+                    // --- CRIS OISEAUX ---
+                    osc.type = config.type;
+                    
+                    // --- FRÉQUENCES PAR ESPÈCE D'OISEAU (Hz) ---
+                    let birdStartFreq = config.freq; 
+                    let mult = 1;
+                    if (speciesClass === 'sp-eagle') mult = 1.5;  
+                    else if (speciesClass === 'sp-pigeon') mult = 0.5625; 
+                    else if (speciesClass === 'sp-crow') mult = 0.375;   
+                    else if (speciesClass === 'sp-parrot') mult = 1.875; 
 
-                // --- DURÉE OISEAUX ---
-                let birdDuration = 0.15; // 0.15 seconde
-                
-                // --- VOLUME OISEAUX ---
-                let birdVolume = 0.05; // Volume entre 0.0 et 1.0
+                    birdStartFreq *= mult;
 
-                osc.frequency.setValueAtTime(birdStartFreq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(birdStartFreq * 1.5, audioCtx.currentTime + birdDuration);
+                    // --- DURÉE OISEAUX ---
+                    let birdDuration = config.duration; 
+                    
+                    // --- VOLUME OISEAUX ---
+                    let birdVolume = config.volume;
 
-                gain.gain.setValueAtTime(birdVolume, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + birdDuration);
+                    osc.frequency.setValueAtTime(birdStartFreq, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(birdStartFreq * 1.5, audioCtx.currentTime + birdDuration);
 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + birdDuration);
-            }
+                    gain.gain.setValueAtTime(birdVolume, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + birdDuration);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + birdDuration);
+                }
+            });
         }
 
         // 4. SOUND EFFECT : Impact / Collision d'un animal blessé
         function playCrashSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
+            customSounds.filter(s => s.action === 'crash').forEach(config => {
+                if (config.type === 'noise') { generateGenericNoise(config); return; }
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
 
-            osc.type = 'square';
-            
-            // --- FRÉQUENCE DU CHOC ---
-            // 100 Hz -> 20 Hz (Bruit sourd d'impact). Baisse 100 à 50 pour un choc encore plus lourd.
-            let crashStartFreq = 100; 
-            let crashEndFreq = 20;
-            
-            // --- DURÉE DU CHOC ---
-            let crashDuration = 0.3; // 0.3 seconde
-            
-            // --- VOLUME DU CHOC ---
-            let crashVolume = 0.5; // Volume entre 0.0 et 1.0
+                osc.type = config.type;
+                
+                // --- FRÉQUENCE DU CHOC ---
+                let crashStartFreq = config.freq; 
+                let crashEndFreq = config.freq * (20/100);
+                
+                // --- DURÉE DU CHOC ---
+                let crashDuration = config.duration; 
+                
+                // --- VOLUME DU CHOC ---
+                let crashVolume = config.volume; 
 
-            osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
+                osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
 
-            gain.gain.setValueAtTime(crashVolume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + crashDuration);
+                gain.gain.setValueAtTime(crashVolume, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + crashDuration);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + crashDuration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + crashDuration);
+            });
         }
 
         // 5. SOUND EFFECT : Alarme (Batterie ou Biodiversité sous les 25%)
         function playAlarmSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
+            customSounds.filter(s => s.action === 'alarm').forEach(config => {
+                if (config.type === 'noise') { generateGenericNoise(config); return; }
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
 
-            osc.type = 'sine';
-            
-            // --- FRÉQUENCES DE L'ALARME (Bip-Bip 2 tons) ---
-            let alarmHighFreq = 880; // Ton 1 (Hz)
-            let alarmLowFreq = 440;  // Ton 2 (Hz)
-            
-            // --- DURÉE DE L'ALARME ---
-            let alarmDuration = 0.2; // 0.2 seconde
-            
-            // --- VOLUME DE L'ALARME ---
-            let alarmVolume = 0.2; // Volume modéré pour ne pas agacer le joueur (0.0 à 1.0)
+                osc.type = config.type;
+                
+                // --- FRÉQUENCES DE L'ALARME (Bip-Bip 2 tons) ---
+                let alarmHighFreq = config.freq; 
+                let alarmLowFreq = config.freq / 2;  
+                
+                // --- DURÉE DE L'ALARME ---
+                let alarmDuration = config.duration; 
+                
+                // --- VOLUME DE L'ALARME ---
+                let alarmVolume = config.volume; 
 
-            osc.frequency.setValueAtTime(alarmHighFreq, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(alarmLowFreq, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(alarmHighFreq, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(alarmLowFreq, audioCtx.currentTime + (alarmDuration/2));
 
-            gain.gain.setValueAtTime(alarmVolume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + alarmDuration);
+                gain.gain.setValueAtTime(alarmVolume, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + alarmDuration);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + alarmDuration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + alarmDuration);
+            });
         }
 
         // 6. SOUND EFFECT : Fanfare joyeuse lors du changement de Jour
         function playDayUpSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            
-            // --- FRÉQUENCES DE LA MÉLODIE (Notes en Hz) ---
-            // Do4 (523.25Hz), Mi4 (659.25Hz), Sol4 (783.99Hz), Do5 (1046.50Hz)
-            let notes = [523.25, 659.25, 783.99, 1046.50]; 
-            
-            // --- DURÉE PAR NOTE ---
-            let noteDuration = 0.3; // Chaque note dure 0.3 seconde
-            
-            // --- VOLUME DE LA FANFARE ---
-            let fanfareVolume = 0.2; // Volume global (0.0 à 1.0)
-
-            notes.forEach((freq, i) => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-
-                osc.type = 'triangle';
+            customSounds.filter(s => s.action === 'dayup').forEach(config => {
+                // --- DURÉE PAR NOTE ---
+                let noteDuration = config.duration; 
+                // --- VOLUME DE LA FANFARE ---
+                let fanfareVolume = config.volume; 
                 
-                // Décalage de 0.1s entre chaque note pour jouer l'accord
-                let startTime = audioCtx.currentTime + (i * 0.1); 
+                // --- FRÉQUENCES DE LA MÉLODIE (Notes en Hz) ---
+                let notes = [config.freq, config.freq*1.26, config.freq*1.5, config.freq*2]; 
+                
+                notes.forEach((freq, i) => {
+                    if (config.type === 'noise') {
+                        let c2 = {...config, freq: freq, duration: noteDuration, volume: fanfareVolume};
+                        setTimeout(() => generateGenericNoise(c2), i * 100);
+                        return;
+                    }
 
-                osc.frequency.setValueAtTime(freq, startTime);
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
 
-                gain.gain.setValueAtTime(fanfareVolume, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + noteDuration);
+                    osc.type = config.type;
+                    
+                    // Décalage de 0.1s entre chaque note pour jouer l'accord
+                    let startTime = audioCtx.currentTime + (i * 0.1); 
 
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(freq, startTime);
 
-                osc.start(startTime);
-                osc.stop(startTime + noteDuration);
+                    gain.gain.setValueAtTime(fanfareVolume, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + noteDuration);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + noteDuration);
+                });
             });
         }
 
+
+        // =========================================================================
+        // --- GESTION DE L'UI DES PARAMÈTRES AUDIO ---
+        // =========================================================================
+        function showAudioSettings() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('pause-screen').classList.add('hidden');
+            document.getElementById('audio-settings-screen').classList.remove('hidden');
+            document.getElementById('audio-slot-select').value = "0";
+            loadAudioSlot(0);
+        }
+
+        function closeAudioSettings() {
+            document.getElementById('audio-settings-screen').classList.add('hidden');
+            if (isPlaying && isPaused) {
+                document.getElementById('pause-screen').classList.remove('hidden');
+            } else {
+                document.getElementById('start-screen').classList.remove('hidden');
+            }
+        }
+
+        function loadAudioSlot(index) {
+            currentEditingSlot = parseInt(index);
+            let s = customSounds[currentEditingSlot];
+            document.getElementById('audio-action').value = s.action;
+            document.getElementById('audio-type').value = s.type;
+            document.getElementById('audio-duration').value = s.duration;
+            document.getElementById('val-duration').innerText = s.duration;
+            document.getElementById('audio-freq').value = s.freq;
+            document.getElementById('val-freq').innerText = s.freq;
+            document.getElementById('audio-volume').value = s.volume;
+            document.getElementById('val-volume').innerText = s.volume;
+        }
+
+        function updateSlotFromUI() {
+            let s = customSounds[currentEditingSlot];
+            s.action = document.getElementById('audio-action').value;
+            s.type = document.getElementById('audio-type').value;
+            s.duration = parseFloat(document.getElementById('audio-duration').value);
+            s.freq = parseFloat(document.getElementById('audio-freq').value);
+            s.volume = parseFloat(document.getElementById('audio-volume').value);
+        }
+
+        ['audio-action', 'audio-type', 'audio-duration', 'audio-freq', 'audio-volume'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateSlotFromUI);
+            if(id.includes('duration') || id.includes('freq') || id.includes('volume')) {
+                 document.getElementById(id).addEventListener('input', updateSlotFromUI);
+            }
+        });
+
+        function saveAudioSettings() {
+            updateSlotFromUI();
+            localStorage.setItem('bwCustomSounds', JSON.stringify(customSounds));
+            closeAudioSettings();
+        }
+
+        function resetAudioSettings() {
+            customSounds = JSON.parse(JSON.stringify(defaultSounds));
+            loadAudioSlot(currentEditingSlot);
+            localStorage.setItem('bwCustomSounds', JSON.stringify(customSounds));
+        }
+
+        function testCurrentSlot() {
+            initAudio();
+            updateSlotFromUI();
+            let config = customSounds[currentEditingSlot];
+            // Test unitaire de la configuration
+            if (config.action === 'wind') {
+                 if(config.type === 'noise') generateGenericNoise(config);
+                 else {
+                     let osc=audioCtx.createOscillator(); let gain=audioCtx.createGain();
+                     osc.type=config.type; osc.frequency.setValueAtTime(config.freq, audioCtx.currentTime);
+                     gain.gain.setValueAtTime(config.volume, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + config.duration);
+                     osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + config.duration);
+                 }
+            } else if (config.action === 'brake') playBrakeSound();
+            else if (config.action === 'bat') playAnimalSound('bat', null);
+            else if (config.action === 'bird') playAnimalSound('bird', 'sp-eagle');
+            else if (config.action === 'crash') playCrashSound();
+            else if (config.action === 'alarm') playAlarmSound();
+            else if (config.action === 'dayup') playDayUpSound();
+            else if (config.action === 'none') { /* Muet */ }
+        }
 
         // =========================================================================
         // --- LOGIQUE ET MOTEUR DE JEU ---
@@ -499,6 +701,7 @@
         
         function showStartScreen() { 
             document.getElementById('leaderboard-screen').classList.add('hidden');
+            document.getElementById('audio-settings-screen').classList.add('hidden');
             document.getElementById('start-screen').classList.remove('hidden'); 
             checkSavedGame(); 
         }
@@ -524,7 +727,7 @@
         
         function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
         function checkSavedGame() { document.getElementById('btn-load').classList.toggle('hidden', !localStorage.getItem('batWattSaveGame')); }
-        function quitToMenu() { isPlaying = false; isPaused = false; cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval); document.querySelectorAll('.creature').forEach(c => c.remove()); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('gameover-screen').classList.add('hidden'); showStartScreen(); }
+        function quitToMenu() { isPlaying = false; isPaused = false; cancelAnimationFrame(animFrameId); clearInterval(gameInterval); clearInterval(creatureInterval); document.querySelectorAll('.creature').forEach(c => c.remove()); document.getElementById('pause-screen').classList.add('hidden'); document.getElementById('gameover-screen').classList.add('hidden'); document.getElementById('audio-settings-screen').classList.add('hidden'); showStartScreen(); }
 
         function startGame(loadedData = null) {
             initAudio(); // Activation de l'AudioContext sur le premier clic utilisateur
@@ -729,9 +932,34 @@
             document.getElementById('final-stats').innerHTML = `Jour atteint : <b>${currentLevel}</b><br>` + `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` + `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` + `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
         }
+
         // =========================================================================
-        // --- ENREGISTREMENT DU SERVICE WORKER (PWA) ---
+        // --- ENREGISTREMENT DU SERVICE WORKER & GESTION PWA ---
         // =========================================================================
+        let deferredPrompt;
+
+        // Interception du prompt d'installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Empêche l'affichage automatique du prompt par défaut
+            deferredPrompt = e;
+            // Affiche le bouton personnalisé d'installation
+            let installBtn = document.getElementById('btn-install');
+            if(installBtn) installBtn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('[PWA] Utilisateur a accepté l\'installation.');
+                        document.getElementById('btn-install').classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
