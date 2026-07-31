@@ -284,7 +284,7 @@
 
             // --- VOLUME DU FREIN ---
             // 0.15 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.05; 
+            let brakeVolume = 0.1; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
@@ -314,7 +314,7 @@
                 let batDuration = 0.1; // 0.1 seconde (cri très court)
                 
                 // --- VOLUME CHAUVE-SOURIS ---
-                let batVolume = 0.5; // Volume entre 0.0 et 1.0
+                let batVolume = 0.2; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(batStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(batEndFreq, audioCtx.currentTime + batDuration);
@@ -338,7 +338,7 @@
                 let birdDuration = 0.15; // 0.15 seconde
                 
                 // --- VOLUME OISEAUX ---
-                let birdVolume = 0.05; // Volume entre 0.0 et 1.0
+                let birdVolume = 0.2; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(birdStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(birdStartFreq * 1.5, audioCtx.currentTime + birdDuration);
@@ -370,7 +370,7 @@
             let crashDuration = 0.3; // 0.3 seconde
             
             // --- VOLUME DU CHOC ---
-            let crashVolume = 0.1; // Volume entre 0.0 et 1.0
+            let crashVolume = 0.5; // Volume entre 0.0 et 1.0
 
             osc.frequency.setValueAtTime(crashStartFreq, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(crashEndFreq, audioCtx.currentTime + crashDuration);
@@ -400,7 +400,7 @@
             let alarmDuration = 0.2; // 0.2 seconde
             
             // --- VOLUME DE L'ALARME ---
-            let alarmVolume = 0.08; // Volume modéré pour ne pas agacer le joueur (0.0 à 1.0)
+            let alarmVolume = 0.2; // Volume modéré pour ne pas agacer le joueur (0.0 à 1.0)
 
             osc.frequency.setValueAtTime(alarmHighFreq, audioCtx.currentTime);
             osc.frequency.setValueAtTime(alarmLowFreq, audioCtx.currentTime + 0.1);
@@ -426,7 +426,7 @@
             let noteDuration = 0.3; // Chaque note dure 0.3 seconde
             
             // --- VOLUME DE LA FANFARE ---
-            let fanfareVolume = 0.15; // Volume global (0.0 à 1.0)
+            let fanfareVolume = 0.2; // Volume global (0.0 à 1.0)
 
             notes.forEach((freq, i) => {
                 let osc = audioCtx.createOscillator();
