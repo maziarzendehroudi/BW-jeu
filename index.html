@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
 
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
@@ -727,6 +728,20 @@
             saveScores(); localStorage.removeItem('batWattSaveGame'); document.querySelectorAll('.creature').forEach(b => b.remove());
             document.getElementById('final-stats').innerHTML = `Jour atteint : <b>${currentLevel}</b><br>` + `Faune sauvée : <b>${savedFauna}</b> | Blessée : <b>${injuredFauna}</b><br>` + `Énergie totale envoyée : <b>${Math.round(totalEnergyProduced)} kWh</b><br><br>` + `<span style="color:#ef4444">${reason}</span>`;
             document.getElementById('gameover-screen').classList.remove('hidden');
+        }
+        // =========================================================================
+        // --- ENREGISTREMENT DU SERVICE WORKER (PWA) ---
+        // =========================================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('[PWA] Service Worker enregistré avec succès. Portée :', registration.scope);
+                    })
+                    .catch(error => {
+                        console.error('[PWA] Échec de l\'enregistrement du Service Worker :', error);
+                    });
+            });
         }
     </script>
 </body>
