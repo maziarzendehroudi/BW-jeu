@@ -284,7 +284,7 @@
 
             // --- VOLUME DU FREIN ---
             // 0.15 = Volume du frein (entre 0.0 et 1.0)
-            let brakeVolume = 0.1; 
+            let brakeVolume = 0.01; 
             gain.gain.setValueAtTime(brakeVolume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + brakeDuration);
 
@@ -314,7 +314,7 @@
                 let batDuration = 0.1; // 0.1 seconde (cri très court)
                 
                 // --- VOLUME CHAUVE-SOURIS ---
-                let batVolume = 0.2; // Volume entre 0.0 et 1.0
+                let batVolume = 1.0; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(batStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(batEndFreq, audioCtx.currentTime + batDuration);
@@ -338,7 +338,7 @@
                 let birdDuration = 0.15; // 0.15 seconde
                 
                 // --- VOLUME OISEAUX ---
-                let birdVolume = 0.2; // Volume entre 0.0 et 1.0
+                let birdVolume = 0.05; // Volume entre 0.0 et 1.0
 
                 osc.frequency.setValueAtTime(birdStartFreq, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(birdStartFreq * 1.5, audioCtx.currentTime + birdDuration);
