@@ -843,9 +843,6 @@
             
             creature.className = `creature ${type} ${speciesClass}`;
             creature.innerHTML = `<div class="wing left"></div><div class="body"></div><div class="wing right"></div>`;
-            
-            // Déclenchement du son de l'animal lors de son apparition
-            playAnimalSound(type, speciesClass);
 
             let targetId = Math.random() < 0.5 ? 'turbine-1' : 'turbine-2';
             let tRect = document.getElementById(targetId).getBoundingClientRect();
@@ -871,6 +868,10 @@
                     let activeCurtail = (hit1 && tSpeed[1] < 1.2) || (hit2 && tSpeed[2] < 1.2);
                     if (activeCurtail) {
                         savedFauna++; updateBiodiversity(); showFeedback("💚", posX, posY, true);
+                        
+                        // Déclenchement du son de l'animal lorsqu'il est sauvé
+                        playAnimalSound(type, speciesClass);
+                        
                         creature.remove(); clearInterval(fallInterval);
                     } else {
                         injuredFauna++; updateBiodiversity(); showFeedback("💔", posX, posY, false);
@@ -881,7 +882,12 @@
                         updateUI(); creature.classList.add('crashing'); setTimeout(() => creature.remove(), 800); clearInterval(fallInterval);
                     }
                 } else if (posY > window.innerHeight - 100) {
-                    savedFauna++; updateBiodiversity(); creature.remove(); clearInterval(fallInterval);
+                    savedFauna++; updateBiodiversity(); 
+                    
+                    // Déclenchement du son de l'animal lorsqu'il est sauvé (arrivée en bas)
+                    playAnimalSound(type, speciesClass);
+                    
+                    creature.remove(); clearInterval(fallInterval);
                 }
             }, 30);
         }
