@@ -234,7 +234,7 @@
 
 
         async function saveScoresToSupabase(playerName, animalsScore) {
-            if(SUPABASE_KEY === 'VOTRE_CLE_PUBLISHABLE_ICI') return; // Sécurité si clé non configurée
+            if(SUPABASE_KEY === 'sb_publishable_aMW58kK_MHzQdtAiNFJSMg_M35FphG7') return; // Sécurité si clé non configurée
             try {
                 await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
                     method: 'POST',
