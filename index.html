@@ -396,8 +396,17 @@
         }
 
         function saveCurrentGame() {
-            let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
+            let pName = document.getElementById('player-name').value.trim() || "Anonyme";
+            let state = { playerName: pName, production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
+            
+            // 1. Sauvegarde locale de la progression
             localStorage.setItem('batWattSaveGame', JSON.stringify(state)); 
+            
+            // 2. NOUVEAU : Envoi du score actuel au Cloud Supabase
+            let currentAnimalScore = savedFauna - injuredFauna;
+            saveScoresToSupabase(pName, currentAnimalScore);
+            
+            // 3. Retour au menu
             quitToMenu(); 
         }
         
