@@ -190,7 +190,7 @@
             <h1>🦇 Bat&Watt</h1>
             <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15" onfocus="if(this.value==='Anonyme')this.value='';">
             
-            <button id="btn-install" class="btn-main hidden" onclick="installPWA()" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top:15px; margin-bottom: 15px;">📲 Installer le Jeu</button>
+            <button id="btn-install" class="btn-main hidden" onclick="installPWA()" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top:15px; margin-bottom: 15px;">Installer l'application</button>
             <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
             <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement</button>
@@ -418,7 +418,7 @@
         function saveCurrentGame() {
             let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
             localStorage.setItem('batWattSaveGame', JSON.stringify(state)); 
-            quitToMenu(); // Revient directement au menu principal après sauvegarde
+            quitToMenu(); 
         }
         
         function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
