@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bat&Watt-v0.1 - Moteur Sonore WebAudio Documenté</title>
+    <title>Bat&Watt-v0.1 - Centrale & Biodiversité</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -122,7 +122,7 @@
         .leaderboard-table th { color: #60a5fa; border-bottom: 1px solid rgba(255,255,255,0.2); padding: 8px; text-align: center; }
         .leaderboard-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
 
-        /* Bouton Pause Minimaliste tout en bas au milieu */
+        /* Bouton Pause Minimaliste */
         #btn-pause { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); width: 44px; height: 44px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 50; pointer-events: auto; backdrop-filter: blur(4px); transition: background 0.2s; }
         #btn-pause:active { background: rgba(0, 0, 0, 0.7); }
         .pause-bars { width: 14px; height: 14px; display: flex; justify-content: space-between; }
@@ -180,7 +180,6 @@
             <div class="turbine-hitbox" onpointerdown="toggleCurtail(2); event.stopPropagation();" onpointerup="resetTurbineClick(2);" onpointercancel="resetTurbineClick(2);" onpointerout="resetTurbineClick(2);"></div>
         </div>
 
-        <!-- Bouton Pause minimaliste tout en bas au milieu -->
         <div id="btn-pause" onclick="togglePause()"><div class="pause-bars"><div class="pause-bar"></div><div class="pause-bar"></div></div></div>
     </div>
 
@@ -199,7 +198,7 @@
 
     <div id="leaderboard-screen" class="screen hidden">
         <div class="menu-box">
-            <h1>🏆 Classement</h1>
+            <h1>🏆 Classement Mondial</h1>
             <table class="leaderboard-table"><tbody id="leaderboard-list"></tbody></table>
             <button class="btn-secondary" onclick="showStartScreen()">Retour au Menu</button>
         </div>
@@ -224,7 +223,52 @@
 
     <script>
         // =========================================================================
-        // --- DESIGN SONORE FIGÉ (PARAMÈTRES FIXES) ---
+        // --- BASE DE DONNÉES MONDIALE (SUPABASE) ---
+        // =========================================================================
+        
+        // URL du projet extraite de ta capture d'écran
+        const SUPABASE_URL = 'https://rihrpondojutwxrhvisd.supabase.co'; 
+        
+        // ATTENTION: REMPLACE CE TEXTE par la longue clé qui commence par "sb_publishable_..."
+        const SUPABASE_KEY = 'VOTRE_CLE_PUBLISHABLE_ICI'; 
+
+
+        async function saveScoresToSupabase(playerName, animalsScore) {
+            if(SUPABASE_KEY === 'VOTRE_CLE_PUBLISHABLE_ICI') return; // Sécurité si clé non configurée
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/leaderboard`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({ name: playerName, animals: animalsScore })
+                });
+            } catch (error) {
+                console.error("Erreur de sauvegarde Cloud :", error);
+            }
+        }
+
+        async function fetchLeaderboardFromSupabase() {
+            if(SUPABASE_KEY === 'VOTRE_CLE_PUBLISHABLE_ICI') return [];
+            try {
+                let response = await fetch(`${SUPABASE_URL}/rest/v1/leaderboard?select=name,animals&order=animals.desc&limit=5`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                console.error("Erreur de récupération Cloud :", error);
+                return [];
+            }
+        }
+
+        // =========================================================================
+        // --- DESIGN SONORE FIGÉ ---
         // =========================================================================
         const soundConfig = {
             brake: { type: 'sawtooth', duration: 0.1, freq: 280, volume: 0.02 },
@@ -235,128 +279,63 @@
             dayup: { type: 'triangle', duration: 0.3,  freq: 520, volume: 0.2 }
         };
 
-        // =========================================================================
-        // --- SYNTHÉTISEUR AUDIO WEB AUDIO API ---
-        // =========================================================================
         let audioCtx = null;
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
 
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playBrakeSound() {
-            if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let cfg = soundConfig.brake;
+        function playSound(cfgKey, modifierMult = 1) {
+            if (!audioCtx) return;
+            let cfg = soundConfig[cfgKey];
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
-
             osc.type = cfg.type;
-            osc.frequency.setValueAtTime(cfg.freq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(cfg.freq * 0.3, audioCtx.currentTime + cfg.duration);
+            let startFreq = cfg.freq * modifierMult;
+
+            if(cfgKey === 'alarm') {
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(startFreq / 2, audioCtx.currentTime + (cfg.duration / 2));
+            } else if (cfgKey === 'crash') {
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(startFreq * 0.5, audioCtx.currentTime + cfg.duration);
+            } else if (cfgKey === 'brake') {
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(startFreq * 0.3, audioCtx.currentTime + cfg.duration);
+            } else {
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, audioCtx.currentTime + cfg.duration);
+            }
 
             gain.gain.setValueAtTime(cfg.volume, audioCtx.currentTime);
             gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + cfg.duration);
 
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + cfg.duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + cfg.duration);
         }
 
+        function playBrakeSound() { playSound('brake'); }
+        function playCrashSound() { playSound('crash'); }
+        function playAlarmSound() { playSound('alarm'); }
         function playAnimalSound(type, speciesClass) {
-            if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let cfg = (type === 'bat') ? soundConfig.bat : soundConfig.bird;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-
-            osc.type = cfg.type;
-            let startFreq = cfg.freq;
-
-            if (type === 'bird' && speciesClass) {
-                let mult = 1;
+            let mult = 1;
+            if (type === 'bird') {
                 if (speciesClass === 'sp-eagle') mult = 1.5;  
                 else if (speciesClass === 'sp-pigeon') mult = 0.5625; 
                 else if (speciesClass === 'sp-crow') mult = 0.375;    
                 else if (speciesClass === 'sp-parrot') mult = 1.875; 
-                startFreq *= mult;
             }
-
-            osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, audioCtx.currentTime + cfg.duration);
-
-            gain.gain.setValueAtTime(cfg.volume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + cfg.duration);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + cfg.duration);
-        }
-
-        function playCrashSound() {
-            if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let cfg = soundConfig.crash;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-
-            osc.type = cfg.type;
-            osc.frequency.setValueAtTime(cfg.freq, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(cfg.freq * 0.5, audioCtx.currentTime + cfg.duration);
-
-            gain.gain.setValueAtTime(cfg.volume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + cfg.duration);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + cfg.duration);
-        }
-
-        function playAlarmSound() {
-            if (!audioCtx || gameSettings && !gameSettings.sfx) return;
-            let cfg = soundConfig.alarm;
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-
-            osc.type = cfg.type;
-            osc.frequency.setValueAtTime(cfg.freq, audioCtx.currentTime);
-            osc.frequency.setValueAtTime(cfg.freq / 2, audioCtx.currentTime + (cfg.duration / 2));
-
-            gain.gain.setValueAtTime(cfg.volume, audioCtx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + cfg.duration);
-
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + cfg.duration);
+            playSound(type, mult);
         }
 
         function playDayUpSound() {
-            if (!audioCtx || gameSettings && !gameSettings.sfx) return;
+            if (!audioCtx) return;
             let cfg = soundConfig.dayup;
             let notes = [cfg.freq, cfg.freq * 1.26, cfg.freq * 1.5, cfg.freq * 2];
-
             notes.forEach((freq, i) => {
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-
-                osc.type = cfg.type;
-                let startTime = audioCtx.currentTime + (i * 0.1);
-
+                let osc = audioCtx.createOscillator(); let gain = audioCtx.createGain();
+                osc.type = cfg.type; let startTime = audioCtx.currentTime + (i * 0.1);
                 osc.frequency.setValueAtTime(freq, startTime);
-
-                gain.gain.setValueAtTime(cfg.volume, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + cfg.duration);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start(startTime);
-                osc.stop(startTime + cfg.duration);
+                gain.gain.setValueAtTime(cfg.volume, startTime); gain.gain.exponentialRampToValueAtTime(0.001, startTime + cfg.duration);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(startTime); osc.stop(startTime + cfg.duration);
             });
         }
 
@@ -370,9 +349,6 @@
         let isNight = false, savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
-        let batWattLeaderboard = JSON.parse(localStorage.getItem('batWattLeaderboard')) || [];
-        let gameSettings = { sfx: true, music: true, particles: true };
-
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('player-name').value = localStorage.getItem('batWattLastPlayer') || "";
             checkSavedGame();
@@ -381,12 +357,9 @@
         function saveScores() {
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             localStorage.setItem('batWattLastPlayer', pName);
-            
             let currentAnimalScore = savedFauna - injuredFauna;
-            batWattLeaderboard.push({ name: pName, animals: currentAnimalScore });
-            batWattLeaderboard.sort((a, b) => b.animals - a.animals);
-            batWattLeaderboard = batWattLeaderboard.slice(0, 5);
-            localStorage.setItem('batWattLeaderboard', JSON.stringify(batWattLeaderboard));
+            // Envoi au Cloud Supabase
+            saveScoresToSupabase(pName, currentAnimalScore);
         }
 
         window.addEventListener('keydown', (e) => {
@@ -401,15 +374,22 @@
             checkSavedGame(); 
         }
 
-        function showLeaderboard() {
+        async function showLeaderboard() {
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
             let tbody = document.getElementById('leaderboard-list');
+            
+            // Affichage de l'état de chargement
+            tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Chargement depuis le Cloud...</td></tr>`;
+            
+            // Récupération des données Cloud
+            let scores = await fetchLeaderboardFromSupabase();
+            
             tbody.innerHTML = `<tr><th>Joueur</th><th>Animaux sauvés</th></tr>`;
-            if (batWattLeaderboard.length === 0) {
-                tbody.innerHTML += `<tr><td colspan="2" style="text-align:center;">Aucun score pour le moment</td></tr>`;
+            if (!scores || scores.length === 0) {
+                tbody.innerHTML += `<tr><td colspan="2" style="text-align:center;">Aucun score ou base de données non connectée</td></tr>`;
             } else {
-                batWattLeaderboard.forEach(score => {
+                scores.forEach(score => {
                     tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.animals}</td></tr>`;
                 });
             }
