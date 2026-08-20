@@ -933,13 +933,15 @@
             let bioIconEl = document.getElementById('bio-icon');
             savedCountEl.innerText = animalScore;
             
-            // Le chiffre et le cœur deviennent rouges lorsqu'ils sont négatifs
+            // Le chiffre et l'icône du cœur deviennent rouges et s'illuminent lorsqu'ils sont négatifs
             if (animalScore < 0) {
                 savedCountEl.classList.add('text-danger');
-                bioIconEl.classList.add('text-danger');
+                bioIconEl.style.color = '#ef4444';
+                bioIconEl.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.8)';
             } else {
                 savedCountEl.classList.remove('text-danger');
-                bioIconEl.classList.remove('text-danger');
+                bioIconEl.style.color = '#ffffff';
+                bioIconEl.style.textShadow = '0 2px 4px rgba(0,0,0,0.5)';
             }
             
             // Conversion de la production (0-100%) en format x/10
