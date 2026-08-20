@@ -159,7 +159,6 @@
             <div class="hud-side" id="bio-container">
                 <div class="modern-track"><div class="modern-fill bio-fill" id="bio-fill" style="width: 100%;"></div></div>
                 <div class="hud-stats">
-                    <!-- Remplacement de l'émoji par un SVG dynamique pour que le CSS puisse changer la couleur -->
                     <span class="hud-icon" id="bio-icon">
                         <svg id="bio-heart-svg" width="20" height="20" viewBox="0 0 24 24" fill="#10b981" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); transition: fill 0.3s;">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -191,16 +190,11 @@
             <h1>🦇 Bat&Watt</h1>
             <p>Régulez la production, préservez la faune.</p>
             <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15">
-            <div class="stats-box">
-                <b>🏆 Meilleurs Scores :</b><br>
-                Jour max : <span id="menu-high-level">1</span><br>
-                Énergie max : <span id="menu-high-energy">0</span> kWh
-            </div>
             
             <button id="btn-install" class="btn-main hidden" onclick="installPWA()" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top:15px; margin-bottom: 15px;">📲 Installer le Jeu</button>
             <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
             <button class="btn-main" onclick="startGame()">NOUVELLE PARTIE</button>
-            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement Local</button>
+            <button class="btn-secondary" onclick="showLeaderboard()">🏆 Classement</button>
         </div>
     </div>
 
@@ -216,8 +210,7 @@
         <div class="menu-box">
             <h1>PAUSE</h1>
             <button class="btn-main" onclick="togglePause()">Reprendre</button>
-            <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">💾 Sauvegarder et Quitter</button>
-            <button class="btn-secondary" onclick="quitToMenu()">Quitter sans Sauvegarder</button>
+            <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">💾 Sauvegarder</button>
         </div>
     </div>
 
@@ -257,7 +250,6 @@
             }
         }
 
-        // 1. FREINAGE MÉCANIQUE
         function playBrakeSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
             let cfg = soundConfig.brake;
@@ -277,7 +269,6 @@
             osc.stop(audioCtx.currentTime + cfg.duration);
         }
 
-        // 2. CRIS DES ANIMAUX (Chauves-souris & Oiseaux)
         function playAnimalSound(type, speciesClass) {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
             let cfg = (type === 'bat') ? soundConfig.bat : soundConfig.bird;
@@ -308,7 +299,6 @@
             osc.stop(audioCtx.currentTime + cfg.duration);
         }
 
-        // 3. IMPACT / CRASH
         function playCrashSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
             let cfg = soundConfig.crash;
@@ -328,7 +318,6 @@
             osc.stop(audioCtx.currentTime + cfg.duration);
         }
 
-        // 4. ALARME DE DANGER
         function playAlarmSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
             let cfg = soundConfig.alarm;
@@ -348,7 +337,6 @@
             osc.stop(audioCtx.currentTime + cfg.duration);
         }
 
-        // 5. FANFAIRE DE NIVEAU SUPÉRIEUR
         function playDayUpSound() {
             if (!audioCtx || gameSettings && !gameSettings.sfx) return;
             let cfg = soundConfig.dayup;
@@ -383,10 +371,6 @@
         let isNight = false, savedFauna = 0, injuredFauna = 0, totalEnergyProduced = 0;
         let rot1 = 0, rot2 = 0, lastTimestamp = 0;
 
-        let highScores = JSON.parse(localStorage.getItem('batWattScores')) || { maxLevel: 1, maxEnergy: 0 };
-        document.getElementById('menu-high-level').innerText = highScores.maxLevel;
-        document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
-
         let batWattLeaderboard = JSON.parse(localStorage.getItem('batWattLeaderboard')) || [];
         let gameSettings = { sfx: true, music: true, particles: true };
 
@@ -396,17 +380,12 @@
         });
 
         function saveScores() {
-            if (currentLevel > highScores.maxLevel) highScores.maxLevel = currentLevel;
-            if (totalEnergyProduced > highScores.maxEnergy) highScores.maxEnergy = totalEnergyProduced;
-            localStorage.setItem('batWattScores', JSON.stringify(highScores));
-            document.getElementById('menu-high-level').innerText = highScores.maxLevel;
-            document.getElementById('menu-high-energy').innerText = Math.round(highScores.maxEnergy);
-
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             localStorage.setItem('batWattLastPlayer', pName);
             
-            batWattLeaderboard.push({ name: pName, level: currentLevel, energy: Math.round(totalEnergyProduced) });
-            batWattLeaderboard.sort((a, b) => b.energy - a.energy);
+            let currentAnimalScore = savedFauna - injuredFauna;
+            batWattLeaderboard.push({ name: pName, animals: currentAnimalScore });
+            batWattLeaderboard.sort((a, b) => b.animals - a.animals);
             batWattLeaderboard = batWattLeaderboard.slice(0, 5);
             localStorage.setItem('batWattLeaderboard', JSON.stringify(batWattLeaderboard));
         }
@@ -427,19 +406,20 @@
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('leaderboard-screen').classList.remove('hidden');
             let tbody = document.getElementById('leaderboard-list');
-            tbody.innerHTML = `<tr><th>Joueur</th><th>Jour</th><th>Énergie</th></tr>`;
+            tbody.innerHTML = `<tr><th>Joueur</th><th>Animaux sauvés</th></tr>`;
             if (batWattLeaderboard.length === 0) {
-                tbody.innerHTML += `<tr><td colspan="3" style="text-align:center;">Aucun score pour le moment</td></tr>`;
+                tbody.innerHTML += `<tr><td colspan="2" style="text-align:center;">Aucun score pour le moment</td></tr>`;
             } else {
                 batWattLeaderboard.forEach(score => {
-                    tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.level}</td><td>${score.energy} kWh</td></tr>`;
+                    tbody.innerHTML += `<tr><td>${score.name}</td><td>${score.animals}</td></tr>`;
                 });
             }
         }
 
         function saveCurrentGame() {
             let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
-            localStorage.setItem('batWattSaveGame', JSON.stringify(state)); alert("✅ Partie sauvegardée !"); quitToMenu();
+            localStorage.setItem('batWattSaveGame', JSON.stringify(state)); 
+            togglePause(); // Reprend le jeu ou ferme simplement la pause après sauvegarde discrète
         }
         
         function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
@@ -626,7 +606,6 @@
             let bioHeartSvg = document.getElementById('bio-heart-svg');
             savedCountEl.innerText = animalScore;
             
-            // Le chiffre et le cœur SVG deviennent rouges et s'illuminent lorsqu'ils sont négatifs
             if (animalScore < 0) {
                 savedCountEl.classList.add('text-danger');
                 bioHeartSvg.style.fill = '#ef4444';
