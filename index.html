@@ -152,12 +152,12 @@
         <div class="top-hud">
             <div class="hud-side" id="battery-container">
                 <div class="modern-track"><div class="modern-fill power-fill" id="battery-fill" style="width: 100%;"></div></div>
-                <div class="hud-stats"><span class="hud-icon">⚡</span><span class="hud-value"><span id="energy-count">10</span><span class="unit" id="energy-max">/10 kWh</span></span></div>
+                <div class="hud-stats"><span class="hud-icon">⚡</span><span class="hud-value"><span id="energy-count">10</span><span class="unit" id="energy-max">/10</span></span></div>
             </div>
             <div class="hud-center" id="level-badge"><div class="day-text">Jour</div><div class="day-num" id="level-num">1</div></div>
             <div class="hud-side" id="bio-container">
                 <div class="modern-track"><div class="modern-fill bio-fill" id="bio-fill" style="width: 100%;"></div></div>
-                <div class="hud-stats"><span class="hud-icon">💚</span><span class="hud-value" id="saved-count">0</span></div>
+                <div class="hud-stats"><span class="hud-icon" id="bio-icon">💚</span><span class="hud-value" id="saved-count">0</span></div>
             </div>
         </div>
 
@@ -930,16 +930,19 @@
             
             let animalScore = savedFauna - injuredFauna;
             let savedCountEl = document.getElementById('saved-count');
+            let bioIconEl = document.getElementById('bio-icon');
             savedCountEl.innerText = animalScore;
             
-            // Le chiffre devient rouge lorsqu'il est négatif
+            // Le chiffre et le cœur deviennent rouges lorsqu'ils sont négatifs
             if (animalScore < 0) {
                 savedCountEl.classList.add('text-danger');
+                bioIconEl.classList.add('text-danger');
             } else {
                 savedCountEl.classList.remove('text-danger');
+                bioIconEl.classList.remove('text-danger');
             }
             
-            // Conversion de la production (0-100%) en format x/10 kWh
+            // Conversion de la production (0-100%) en format x/10
             let currentKwh = Math.max(0, Math.min(10, Math.round((production / 100) * 10)));
             let energyCountEl = document.getElementById('energy-count');
             energyCountEl.innerText = currentKwh;
