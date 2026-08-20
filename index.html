@@ -113,7 +113,7 @@
         /* --- MODALES & MENUS & BOUTON PAUSE --- */
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; padding: 20px; pointer-events: auto; }
         .menu-box { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
-        .menu-box h1 { font-size: 28px; margin-bottom: 10px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .menu-box h1 { font-size: 28px; margin-bottom: 15px; background: linear-gradient(to right, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .btn-main { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 6px 0 #047857; transition: all 0.1s; width: 100%; margin-bottom: 10px; }
         .btn-secondary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 10px;}
         .hidden { display: none !important; pointer-events: none; }
@@ -188,8 +188,7 @@
     <div id="start-screen" class="screen">
         <div class="menu-box">
             <h1>🦇 Bat&Watt</h1>
-            <p>Régulez la production, préservez la faune.</p>
-            <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15">
+            <input type="text" id="player-name" class="input-name" placeholder="Ton pseudo (ex: ÉcoloPro)" maxlength="15" onfocus="if(this.value==='Anonyme')this.value='';">
             
             <button id="btn-install" class="btn-main hidden" onclick="installPWA()" style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top:15px; margin-bottom: 15px;">📲 Installer le Jeu</button>
             <button class="btn-main hidden" id="btn-load" onclick="loadGame()">CONTINUER LA PARTIE</button>
@@ -210,7 +209,7 @@
         <div class="menu-box">
             <h1>PAUSE</h1>
             <button class="btn-main" onclick="togglePause()">Reprendre</button>
-            <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">💾 Sauvegarder</button>
+            <button class="btn-secondary" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399;" onclick="saveCurrentGame()">Sauvegarder</button>
         </div>
     </div>
 
@@ -419,7 +418,7 @@
         function saveCurrentGame() {
             let state = { playerName: document.getElementById('player-name').value.trim(), production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
             localStorage.setItem('batWattSaveGame', JSON.stringify(state)); 
-            togglePause(); // Reprend le jeu ou ferme simplement la pause après sauvegarde discrète
+            quitToMenu(); // Revient directement au menu principal après sauvegarde
         }
         
         function loadGame() { let save = JSON.parse(localStorage.getItem('batWattSaveGame')); if(save) { document.getElementById('player-name').value = save.playerName || "Anonyme"; startGame(save); } }
