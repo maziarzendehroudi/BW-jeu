@@ -344,7 +344,7 @@
         // =========================================================================
         // --- LOGIQUE ET MOTEUR DE JEU ---
         // =========================================================================
-        let production = 100, biodiversityPercent = 100, levelTime = 60, currentLevel = 1, gameTime = 0;
+        let production = 100, biodiversityPercent = 100, levelTime = 60, visualLevelTime = 60, currentLevel = 1, gameTime = 0;
         let isPlaying = false, isPaused = false;
         let gameInterval, creatureInterval, animFrameId;
         let curtailed = { 1: false, 2: false }; let tSpeed = { 1: 4, 2: 4.5 }; let targetSpeed = { 1: 4, 2: 4.5 }; 
@@ -360,7 +360,6 @@
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             localStorage.setItem('batWattLastPlayer', pName);
             let currentAnimalScore = savedFauna - injuredFauna;
-            // Envoi au Cloud Supabase
             saveScoresToSupabase(pName, currentAnimalScore);
         }
 
@@ -381,10 +380,8 @@
             document.getElementById('leaderboard-screen').classList.remove('hidden');
             let tbody = document.getElementById('leaderboard-list');
             
-            // Affichage de l'état de chargement
             tbody.innerHTML = `<tr><td colspan="2" style="text-align:center;">Chargement depuis le Cloud...</td></tr>`;
             
-            // Récupération des données Cloud
             let scores = await fetchLeaderboardFromSupabase();
             
             tbody.innerHTML = `<tr><th>Joueur</th><th>Animaux sauvés</th></tr>`;
@@ -401,14 +398,11 @@
             let pName = document.getElementById('player-name').value.trim() || "Anonyme";
             let state = { playerName: pName, production, biodiversityPercent, levelTime, currentLevel, gameTime, savedFauna, injuredFauna, totalEnergyProduced };
             
-            // 1. Sauvegarde locale de la progression
             localStorage.setItem('batWattSaveGame', JSON.stringify(state)); 
             
-            // 2. NOUVEAU : Envoi du score actuel au Cloud Supabase
             let currentAnimalScore = savedFauna - injuredFauna;
             saveScoresToSupabase(pName, currentAnimalScore);
             
-            // 3. Retour au menu
             quitToMenu(); 
         }
         
@@ -422,9 +416,9 @@
             localStorage.setItem('batWattLastPlayer', document.getElementById('player-name').value.trim() || "Anonyme");
             
             if (loadedData && loadedData.currentLevel) {
-                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent; levelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime; savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna; totalEnergyProduced = loadedData.totalEnergyProduced;
+                production = loadedData.production; biodiversityPercent = loadedData.biodiversityPercent; levelTime = loadedData.levelTime; visualLevelTime = loadedData.levelTime; currentLevel = loadedData.currentLevel; gameTime = loadedData.gameTime; savedFauna = loadedData.savedFauna; injuredFauna = loadedData.injuredFauna; totalEnergyProduced = loadedData.totalEnergyProduced;
             } else {
-                production = 100; biodiversityPercent = 100; levelTime = 60; currentLevel = 1; gameTime = 0; savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; 
+                production = 100; biodiversityPercent = 100; levelTime = 60; visualLevelTime = 60; currentLevel = 1; gameTime = 0; savedFauna = 0; injuredFauna = 0; totalEnergyProduced = 0; 
             }
             
             curtailed = { 1: false, 2: false }; tSpeed = { 1: 4, 2: 4.5 }; targetSpeed = { 1: 4, 2: 4.5 };
@@ -458,7 +452,7 @@
 
             levelTime -= 0.4;
             if (levelTime <= 0) { 
-                currentLevel++; levelTime = 60; 
+                currentLevel++; levelTime = 60; visualLevelTime = 60;
                 let badge = document.getElementById('level-badge'); badge.classList.remove('level-up-anim'); void badge.offsetWidth; badge.classList.add('level-up-anim'); 
                 playDayUpSound(); 
             }
@@ -469,7 +463,11 @@
         function runVisualLoop(timestamp) {
             if (!isPlaying) return;
             if (!isPaused) {
-                let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1); gameTime += dt; let accelRate = 8.5 * dt; 
+                let dt = Math.min((timestamp - lastTimestamp) / 1000, 0.1); 
+                gameTime += dt; 
+                visualLevelTime -= dt; // Mise à jour fluide à 60 fps
+                
+                let accelRate = 8.5 * dt; 
                 for (let i of [1, 2]) { if (tSpeed[i] < targetSpeed[i]) tSpeed[i] = Math.min(targetSpeed[i], tSpeed[i] + accelRate); else if (tSpeed[i] > targetSpeed[i]) tSpeed[i] = Math.max(targetSpeed[i], tSpeed[i] - accelRate); }
                 rot1 += tSpeed[1] * (dt * 60); rot2 += tSpeed[2] * (dt * 60);
                 document.getElementById('blades-1').style.transform = `rotate(${rot1}deg)`; document.getElementById('blades-2').style.transform = `rotate(${rot2}deg)`;
@@ -480,7 +478,9 @@
         }
 
         function updateEphemerisPoetic() {
-            let progress = (60 - levelTime) / 60; 
+            // Utilisation de notre "fantôme" fluide visualLevelTime
+            let safeVisualTime = Math.max(0, visualLevelTime);
+            let progress = (60 - safeVisualTime) / 60; 
             let angle = progress * Math.PI * 2; 
             
             let sunFactor = Math.sin(angle); 
