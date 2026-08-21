@@ -6,6 +6,7 @@
     <title>Bat&Watt-v0.1 - Centrale & Biodiversité</title>
 
     <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -479,18 +480,53 @@
         }
 
         function updateEphemerisPoetic() {
-            let angle = ((gameTime % 60) / 60) * Math.PI * 2; let sunFactor = Math.sin(angle); let moonFactor = Math.sin(angle + Math.PI);
-            isNight = sunFactor < 0; document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
-            let topColor, botColor; let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); let t = (sf + 0.4) / 0.8; t = t * t * (3 - 2 * t); 
+            let progress = (60 - levelTime) / 60; 
+            let angle = progress * Math.PI * 2; 
+            
+            let sunFactor = Math.sin(angle); 
+            let moonFactor = Math.sin(angle + Math.PI);
+            isNight = sunFactor < 0; 
+            
+            document.getElementById('stars-container').style.opacity = isNight ? 1 : 0;
+            let topColor, botColor; 
+            let sf = Math.max(-0.4, Math.min(0.4, sunFactor)); 
+            let t = (sf + 0.4) / 0.8; 
+            t = t * t * (3 - 2 * t); 
+            
             const interp = (c1, c2, f) => [Math.round(c1[0] + f * (c2[0] - c1[0])), Math.round(c1[1] + f * (c2[1] - c1[1])), Math.round(c1[2] + f * (c2[2] - c1[2]))];
-            if (t > 0.5) { let tr = (t - 0.5) * 2; topColor = interp([255,130,110], [56,189,248], tr); botColor = interp([255,180,140], [186,230,253], tr); }
-            else { let tr = t * 2; topColor = interp([2,6,23], [255,130,110], tr); botColor = interp([15,23,42], [255,180,140], tr); }
+            
+            if (t > 0.5) { 
+                let tr = (t - 0.5) * 2; 
+                topColor = interp([255,130,110], [56,189,248], tr); 
+                botColor = interp([255,180,140], [186,230,253], tr); 
+            } else { 
+                let tr = t * 2; 
+                topColor = interp([2,6,23], [255,130,110], tr); 
+                botColor = interp([15,23,42], [255,180,140], tr); 
+            }
+            
             document.getElementById('game-container').style.background = `linear-gradient(to bottom, rgb(${topColor}), rgb(${botColor}))`;
-            document.getElementById('sun-body').style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`; document.getElementById('sun-body').style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
-            document.getElementById('moon-body').style.transform = `translate(${50 + Math.cos(angle + Math.PI)*45}vw, ${65 - Math.sin(angle + Math.PI)*45}vh) rotate(${-(angle * 180 / Math.PI)}deg)`; document.getElementById('moon-body').style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
+            document.getElementById('sun-body').style.transform = `translate(${50 + Math.cos(angle)*45}vw, ${65 - Math.sin(angle)*45}vh)`; 
+            document.getElementById('sun-body').style.opacity = Math.max(0, Math.min(1, (sunFactor + 0.3) * 2));
+            document.getElementById('moon-body').style.transform = `translate(${50 + Math.cos(angle + Math.PI)*45}vw, ${65 - Math.sin(angle + Math.PI)*45}vh) rotate(${-(angle * 180 / Math.PI)}deg)`; 
+            document.getElementById('moon-body').style.opacity = Math.max(0, Math.min(1, (moonFactor + 0.3) * 2));
         }
 
-        function togglePause() { if (!isPlaying) return; isPaused = !isPaused; document.getElementById('pause-screen').classList.toggle('hidden', !isPaused); if (!isPaused) lastTimestamp = performance.now(); }
+        function togglePause() { 
+            if (!isPlaying) return; 
+            isPaused = !isPaused; 
+            document.getElementById('pause-screen').classList.toggle('hidden', !isPaused); 
+            
+            let playState = isPaused ? 'paused' : 'running';
+            document.querySelectorAll('.creature, .mist-layer').forEach(el => el.style.animationPlayState = playState);
+
+            if (isPaused) { 
+                if (audioCtx && audioCtx.state === 'running') audioCtx.suspend();
+            } else {
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+                lastTimestamp = performance.now(); 
+            }
+        }
         
         function toggleCurtail(id) { 
             if (!isPlaying || isPaused) return; 
@@ -526,21 +562,28 @@
             creature.innerHTML = `<div class="wing left"></div><div class="body"></div><div class="wing right"></div>`;
 
             let targetId = Math.random() < 0.5 ? 'turbine-1' : 'turbine-2';
-            let tRect = document.getElementById(targetId).getBoundingClientRect();
-            let startX = tRect.left + (tRect.width / 2) + (Math.random() * 80 - 40);
-            let posY = -60; let timeOffset = Math.random() * 100;
             
-            creature.style.left = startX + 'px'; creature.style.top = posY + 'px';
+            let randomOffset = (Math.random() * 80 - 40); 
+            let posY = -60; 
+            let timeOffset = Math.random() * 100;
+            
             container.appendChild(creature);
 
-            let baseSpeed = (type === 'bat') ? 3.0 : 2.2; let fallSpeed = baseSpeed + (currentLevel * 0.3);
+            let baseSpeed = (type === 'bat') ? 3.0 : 2.2; 
+            let fallSpeed = baseSpeed + (currentLevel * 0.3);
 
             let fallInterval = setInterval(() => {
                 if (!isPlaying) { creature.remove(); clearInterval(fallInterval); return; }
                 if (isPaused || creature.classList.contains('crashing')) return;
 
-                posY += fallSpeed; let posX = startX + Math.sin(posY/40 + timeOffset) * 20; 
-                creature.style.left = posX + 'px'; creature.style.top = posY + 'px';
+                posY += fallSpeed; 
+                
+                let currentTurbineRect = document.getElementById(targetId).getBoundingClientRect();
+                let dynamicCenterX = currentTurbineRect.left + (currentTurbineRect.width / 2);
+                let posX = dynamicCenterX + randomOffset + Math.sin(posY/40 + timeOffset) * 20; 
+                
+                creature.style.left = posX + 'px'; 
+                creature.style.top = posY + 'px';
 
                 let hit1 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-1'), rot1);
                 let hit2 = checkTurbinePixelCollision(posX, posY, document.getElementById('turbine-2'), rot2);
